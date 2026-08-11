@@ -1,0 +1,46 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.1.2/ibek.support.schema.json
+
+# Imported from DLS production support module: BL15I-BUILDER 26-3
+# Source: /dls_sw/prod/R3.14.12.7/support/BL15I-BUILDER/26-3
+# Pristine copy of the EPICS template from that release.
+#
+# BL15I-BUILDER is the I15 beamline's builder repo.  It carries no src, dbd or
+# libraries - BL15I-BUILDERApp holds only Db, opi and protocol - so nothing here
+# needs compiling and the templates are pure msi (soft records only, no DTYP, no
+# VDCT expand()).  That is why this is vendored as a runtime pattern rather than
+# built into the IOC image: a beamline-specific repo has no business in a
+# generic IOC build, and its top-level Makefile would otherwise try to build
+# every BL15I IOC.
+#
+# Only the templates an IOC actually needs are vendored.  The release has ~45
+# more; add them here as they are wanted.
+# To check for updates: diff this pattern's files against that path, or against
+# the newest /dls_sw/prod/*/support/BL15I-BUILDER/ release.
+
+module: BL15I-BUILDER
+
+entity_models:
+  - name: auto_BL15I_SumTheDiode
+    description: |-
+      Accumulates a diode reading while the fast shutter is open.
+      :DIODESUM2 sums while the shutter is open and is zeroed when it closes;
+      :DIODESUM freezes the total at the moment the shutter closes.
+    parameters:
+      P:
+        type: str
+        description: EPICS PV prefix for the sum records
+      SHUTTER:
+        type: str
+        description: PV name of the fast shutter state (0 for closed)
+      DIODE:
+        type: str
+        description: PV name of the diode reading to accumulate
+    # gda_name / gda_desc are stripped globally by builder2ibek and appear only
+    # in the template's `%gdatag` comments, so they are deliberately not
+    # declared here.
+    databases:
+      - file: BL15I-SumTheDiode.template
+        args:
+          P:
+          SHUTTER:
+          DIODE:

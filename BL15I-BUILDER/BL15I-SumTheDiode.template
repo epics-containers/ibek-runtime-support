@@ -1,0 +1,47 @@
+# BL15I-SumTheDiode.template
+
+# Jonathan Thompson  March 2012
+# A template that accumulates diode readings while the fast shutter is open
+
+# P       - EPICS prefix
+# SHUTTER - The PV name of the fast shutter status
+# DIODE   - The PV name of the diode reading
+
+
+# The current sum frozen when shutter closed
+# %gdatag,template,simplePv,$(gda_name),$(gda_desc)
+# %gdatag,pv,ro,$(gda_name),RECORD,$(gda_desc)
+record(ao, "$(P):DIODESUM") {
+  field(VAL, "0")
+}
+
+# The current sum zeroed when shutter closed
+record(ao, "$(P):DIODESUM2") {
+  field(VAL, "0")
+  field(FLNK, "$(P):DIODECALC2")
+}
+
+# Perform the accumulation
+record(calcout, "$(P):DIODECALC") {
+  field(SCAN, ".1 second")
+  field(INPA, "$(SHUTTER)")     # Fast shutter state, 0 for closed
+  field(INPB, "$(DIODE)")         # Diode reading
+  field(INPC, "$(P):DIODESUM2") # The current sum
+  field(CALC, "A?(B+C):0")
+  field(DOPT, "Use CALC")
+  field(OOPT, "Every Time")
+  field(OUT,  "$(P):DIODESUM2 PP")
+}
+
+# Freeze the result when the shutter closed
+record(calcout, "$(P):DIODECALC2") {
+  field(SCAN, "Passive")
+  field(INPA, "$(SHUTTER)")     # Fast shutter state, 0 for closed
+  field(INPB, "$(P):DIODESUM2") # The current sum
+  field(CALC, "A")
+  field(OCAL, "B")
+  field(DOPT, "Use OCAL")
+  field(OOPT, "When Non-zero")
+  field(OUT,  "$(P):DIODESUM PP")
+}
+
