@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '*'
+  pull_request:
+
+jobs:
+
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v10.2.0
+        with:
+          version: "0.9.9"
+          # ibek 4.8 requires Python >= 3.13
+          python-version: "3.13"
+
+      - name: Load every pattern's ibek.support.yaml and check its database files
+        run: |
+          uv run --no-project --with 'ibek>=4.8.0' python - <<'PY'
+          from pathlib import Path
+          from ruamel.yaml import YAML
+          from ibek.entity_factory import EntityFactory
+          from ibek.support import Support
+          paths = sorted(Path(".").glob("*/*.ibek.support.yaml"))
+          assert paths, "no *.ibek.support.yaml found"
+          EntityFactory().make_entity_models(paths)
+          # database files are named relative to their pattern's folder
+          missing = [
+              f"{p}: {db.file}"
+              for p in paths
+              for model in Support(**YAML(typ="safe").load(p)).entity_models
+              for db in model.databases
+              if not (p.parent / db.file).is_file()
+          ]
+          assert not missing, "missing database files:\n" + "\n".join(missing)
+          print("\n".join(f"ok: {p}" for p in paths))
+          PY
+
+  release:
+    needs: check
+    if: github.ref_type == 'tag'
+    uses: ./.github/workflows/_release.yml
+    permissions:
+      contents: write
