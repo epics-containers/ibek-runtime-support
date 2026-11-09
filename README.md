@@ -39,11 +39,14 @@ There is **no hard-coded file shape**. The vendoring lock simply hashes a **file
 so it already generalises to any combination of the above (or files not yet invented).
 Add the files your support yaml needs and they are vendored together as a unit.
 
-This repo currently provides one pattern:
+Each pattern is a top-level folder, for example:
 
 ```
 detectorPlugins/
   detectorPlugins.ibek.support.yaml   # entity_models "gdaPlugins" and "detectorPlugins"
+BL15I-BUILDER/
+  BL15I-BUILDER.ibek.support.yaml
+  BL15I-SumTheDiode.template
 ```
 
 `detectorPlugins` is the **standard AreaDetector plugin set** used DLS-wide. Its
@@ -82,9 +85,12 @@ to the IOC instance, not to this library.
 
 ## Versioning
 
-Releases are cut as **repo-wide semantic-version git tags** (`v0.1.0`, `v0.2.0`, …). A
-tag is an **immutable point** covering every pattern in the repo at that revision, so
-`name@<tag>` always resolves to the same bytes.
+Releases are cut as **repo-wide semantic-version git tags**, written as bare `X.Y.Z`
+(`0.3.0`, `0.4.0`, …) as in ibek and ibek-runtime-streamdevice. The repo's first two
+tags are `v0.1.0` and `v0.2.0`. From `0.3.0` on, pushing a tag creates a GitHub
+Release automatically, with generated release notes. A tag is an **immutable point**
+covering every pattern in the repo at that revision, so `name@<tag>` always resolves to
+the same bytes.
 
 There is intentionally **no per-pattern version**: a single tag versions the whole
 library. Bump the tag when any pattern changes; consumers opt in to the new content by
@@ -200,7 +206,7 @@ into that instance's `ioc.schema.json` alongside the vendored patterns.
 4. Validate locally by vendoring into a scratch IOC instance:
    `ibek pattern add ibek-runtime-support:mydetector@HEAD <instance>` (or test against a
    branch) and run `ibek pattern check`.
-5. Open a PR. Once merged, **cut a new semver tag** (`vX.Y.Z`) so consumers can pin the
+5. Open a PR. Once merged, **cut a new semver tag** (bare `X.Y.Z`) so consumers can pin the
    new pattern; Renovate will then offer the bump downstream.
 
 ## License

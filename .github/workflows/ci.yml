@@ -21,14 +21,25 @@ jobs:
           # ibek 4.8 requires Python >= 3.13
           python-version: "3.13"
 
-      - name: Load every pattern's ibek.support.yaml with ibek
+      - name: Load every pattern's ibek.support.yaml and check its database files
         run: |
-          uv run --no-project --with 'ibek>=4.8.0b1' python - <<'PY'
+          uv run --no-project --with 'ibek>=4.8.0' python - <<'PY'
           from pathlib import Path
+          from ruamel.yaml import YAML
           from ibek.entity_factory import EntityFactory
+          from ibek.support import Support
           paths = sorted(Path(".").glob("*/*.ibek.support.yaml"))
           assert paths, "no *.ibek.support.yaml found"
           EntityFactory().make_entity_models(paths)
+          # database files are named relative to their pattern's folder
+          missing = [
+              f"{p}: {db.file}"
+              for p in paths
+              for model in Support(**YAML(typ="safe").load(p)).entity_models
+              for db in model.databases
+              if not (p.parent / db.file).is_file()
+          ]
+          assert not missing, "missing database files:\n" + "\n".join(missing)
           print("\n".join(f"ok: {p}" for p in paths))
           PY
 
