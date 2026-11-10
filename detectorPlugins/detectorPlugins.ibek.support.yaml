@@ -221,9 +221,12 @@ entity_models:
       - type: ADCore.NDFileHDF5
         NDARRAY_PORT: "{{ CAM }}"
         P: "{{ P }}"
-        PORT: "{{ PORTPREFIX }}.hdf5"
+        PORT: "{{ PORTPREFIX }}.hdf"
         QUEUE: "{{ PLUGINQUEUE }}"
         R: ":HDF5:"
+
+      - type: epics.PostStartupCommand
+        command: 'dbpf "{{ P }}:HDF5:FileTemplate", "%s/%s_%d.h5"'
 
       - type: ADCore.NDPvxsPlugin
         NDARRAY_PORT: "{{ CAM }}"
