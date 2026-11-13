@@ -1,0 +1,27 @@
+record(asyn, "BL19I-MO-FSTG-01:X:HMZ") {
+  field(DESC, "Send HMZ to X axis")
+  field(SCAN, "Passive")
+  field(PORT, "PMAC_S2")
+  field(AOUT, "#13hmz")
+}
+
+record(asyn, "BL19I-MO-FSTG-01:Y:HMZ") {
+  field(DESC, "Send HMZ to Y axis")
+  field(SCAN, "Passive")
+  field(PORT, "PMAC_S2")
+  field(AOUT, "#14hmz")
+}
+
+record(asyn, "BL19I-MO-FSTG-02:X:HMZ") {
+  field(DESC, "Send HMZ to X axis")
+  field(SCAN, "Passive")
+  field(PORT, "PMAC_S2")
+  field(AOUT, "#15hmz")
+}
+
+record(asyn, "BL19I-MO-FSTG-02:Y:HMZ") {
+  field(DESC, "Send HMZ to Y axis")
+  field(SCAN, "Passive")
+  field(PORT, "PMAC_S2")
+  field(AOUT, "#16hmz")
+}

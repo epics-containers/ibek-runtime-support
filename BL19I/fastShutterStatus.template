@@ -1,0 +1,29 @@
+record(bi, "$(P):SHUTTER_STATE") 
+{
+  field(DESC, "Fast shutter state")
+  field(ZNAM, "$(ZNAM)")
+  field(ONAM, "$(ONAM)")
+  field(SCAN, ".5 second")
+  field(INP, "$(Z):OUT1_TTL:STA")
+}
+
+record(calcout, "$(P):SHUTTER_OUT:CALC")
+{
+  field(DESC, "Calc if shutter in/out of beam")
+  field(SCAN, "1 second")
+  field(PINI, "YES")
+  field(CALC, "A <= -30.0 ? 1 : 0")
+  field(INPA, "BL19I-OP-BC-01:X.RBV")
+  field(FLNK, "$(P):SHUTTER_OUT")
+}
+
+record(bi, "$(P):SHUTTER_OUT")
+{
+  field(DESC, "Shutter moved out of beam")
+  field(ZNAM, "IN BEAM")
+  field(ONAM, "OUT OF BEAM")
+  #field(ZRVL, 0.0)
+  #field(ONVL, 1.0)
+  field(SCAN, "Passive")
+  field(INP, "$(P):SHUTTER_OUT:CALC.VAL")
+}

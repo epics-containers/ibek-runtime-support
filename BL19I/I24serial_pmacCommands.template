@@ -1,0 +1,24 @@
+# % macro, P,        Base name of PV
+# % macro, BRICKNUM, Step number of Geobrick
+
+record(stringout, "$(P):PMAC_STRING")
+{
+  field(DESC, "PMAC Command String")
+  field(OUT,  "$(P):FORMAT_STRING.AA PP")
+}
+
+record(scalcout, "$(P):FORMAT_STRING")
+{
+  field(DESC, "Format PMAC Command String")
+  field(CALC, "PRINTF('%s',AA)")
+  field(OUT,  "$(P):SEND_STRING.AOUT PP")
+  field(OOPT, "Every Time")
+}
+
+record(asyn, "$(P):SEND_STRING")
+{
+  field(DESC, "Output PMAC String")
+  field(PORT, "BRICK$(BRICKNUM)_S")
+  field(OEOS, "\r")
+  field(IEOS, "\006")
+}

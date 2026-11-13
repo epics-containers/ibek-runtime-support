@@ -1,0 +1,25 @@
+# % macro, P, Base name of PV
+
+record(stringout, "$(P):detDistance") {
+  field(DESC, "Detector distance")
+}
+
+record(stringout, "$(P):expTime") {
+  field(DESC, "Exposure time")
+}
+
+record(stringout, "$(P):blockCapacity") {
+  field(DESC, "Block capacity")
+}
+
+record(stringout, "$(P):chipCapacity") {
+  field(DESC, "Chip capacity")
+}
+
+record(stringout, "$(P):chipName") {
+  field(DESC, "Chip name")
+}
+
+record(stringout, "$(P):filePath") {
+  field(DESC, "File path")
+}

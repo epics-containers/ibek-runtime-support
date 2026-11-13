@@ -1,0 +1,6 @@
+record(stringin, "$(P)$(R)") {
+    field(DESC, "string record for up to 40 chars")
+    field(DTYP, "Soft Channel")
+    field(SCAN, "Passive")
+    field(VAL,  "GAS 1")
+}

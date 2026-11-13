@@ -1,0 +1,32 @@
+# % macro, P,    Base name of PV
+# % macro, MVAR, PMAC M-variable
+# % macro, PORT, Asyn port for PMAC
+
+record(asyn, "$(P):pmac:read:$(MVAR)") {
+  field(DESC, "Read $(MVAR)")
+  field(SCAN, ".2 second")
+  field(PINI, "YES")
+  field(AOUT, "$(MVAR)")
+  field(PORT, "$(PORT)")
+  field(FLNK,"$(P):pmac:decode:$(MVAR)")
+}
+
+record(scalcout, "$(P):pmac:decode:$(MVAR)") {
+  field(DESC, "Decode readback of $(MVAR)")
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(INAA, "$(P):pmac:read:$(MVAR).AINP")
+  field(CALC, "SSCANF(AA, '%f')")
+  field(FLNK,"$(P):signal:$(MVAR)")
+}
+
+record(calc, "$(P):signal:$(MVAR)") {
+  field(CALC, "A")
+  field(INPA, "$(P):pmac:decode:$(MVAR).AA")
+  field(FLNK,"$(P):reverseSignal:$(MVAR)")
+}
+
+record(calc, "$(P):reverseSignal:$(MVAR)") {
+  field(CALC, "(A=1)?0:1")
+  field(INPA, "$(P):pmac:decode:$(MVAR).AA")
+}

@@ -1,0 +1,18 @@
+record(bo, "$(P):pmac:setGPIO:$(MVAR)") {
+  field(SCAN, "Passive")
+  field(ZNAM, "$(ZNAM)")
+  field(ONAM, "$(ONAM)")
+  field(FLNK, "$(P):pmac:createGPIO:$(MVAR)")
+}
+
+record(scalcout, "$(P):pmac:createGPIO:$(MVAR)") {
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(INPA, "$(P):pmac:setGPIO:$(MVAR)")
+  field(CALC, "PRINTF('$(MVAR)=%d', A)")
+  field(OUT,  "$(P):pmac:writeGPIO:$(MVAR).AOUT PP")
+}
+
+record(asyn, "$(P):pmac:writeGPIO:$(MVAR)") {
+  field(PORT, "$(PORT)")
+}
