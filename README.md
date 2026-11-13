@@ -199,7 +199,10 @@ ibek pattern add ibek-runtime-support:BL15I-BUILDER@<tag> services/<instance>
 ```
 
 The pattern keeps the module's name, entity model names and parameter names, so an
-existing `ioc.yaml` validates unchanged once the pattern is vendored.
+existing `ioc.yaml` validates unchanged once the pattern is vendored, provided it uses
+only entity models the pattern carries. A pattern may carry only some of its module's
+templates (`BL15I-BUILDER` carries one); add the others to the pattern as they are
+wanted.
 
 Beamline code that must be compiled — SNL programs, aSub routines, device support —
 cannot be a runtime pattern. It stays in `ibek-support-dls`.
@@ -207,7 +210,8 @@ cannot be a runtime pattern. It stays in `ibek-support-dls`.
 Support that belongs to one instance alone can instead go straight into that
 instance's `config/` as a `*.ibek.support.yaml`. It is not recorded in
 `runtime-lock.yaml` (it is editable, not vendored) but is merged into that instance's
-`ioc.schema.json` alongside the vendored patterns.
+`ioc.schema.json` alongside the vendored patterns when you run
+`ibek pattern schema services/<instance>` after adding or changing it.
 
 ## Adding a new pattern
 
