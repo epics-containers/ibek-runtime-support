@@ -6,16 +6,16 @@
 # Macros:
 #% macro, P, EPICS name prefix
 #% macro, R, EPICS name suffix
-#% macro, limit_prefix, The prefix used for the smarpod limits
-#% macro, LIMA, Limit A suffix
-#% macro, LIMB, Limit B suffix
-#% macro, LIMC, Limit C suffix
-#% macro, LIMD, Limit D suffix
-#% macro, LIME, Limit E suffix
-#% macro, LIMF, Limit F suffix
-#% macro, LIMG, Limit G suffix
-#% macro, stop_link_one, The record used to stop smarpod one
-#% macro, stop_link_two, The record used to stop smarpod two
+#% macro, LIMIT_PREFIX, The prefix used for the smarpod limits
+#% macro, LIMIT1, Limit A suffix
+#% macro, LIMIT2, Limit B suffix
+#% macro, LIMIT3, Limit C suffix
+#% macro, LIMIT4, Limit D suffix
+#% macro, LIMIT5, Limit E suffix
+#% macro, LIMIT6, Limit F suffix
+#% macro, LIMIT7, Limit G suffix
+#% macro, STOPLINK1, The record used to stop smarpod one
+#% macro, STOPLINK2, The record used to stop smarpod two
 #
 # Martin Gaughran   16 Feb 2017
 #
@@ -36,13 +36,13 @@ record(calc, "$(P)$(R):CALC1") {
   field(SCAN, "Passive")
   field(PINI, "YES")
   field(FLNK, "$(P)$(R):CALC2")
-  field(INPA, "$(limit_prefix)$(LIMA) CP")
-  field(INPB, "$(limit_prefix)$(LIMB) CP")
-  field(INPC, "$(limit_prefix)$(LIMC) CP")
-  field(INPD, "$(limit_prefix)$(LIMD) CP")
-  field(INPE, "$(limit_prefix)$(LIME) CP")
-  field(INPF, "$(limit_prefix)$(LIMF) CP")
-  field(INPG, "$(limit_prefix)$(LIMG) CP")
+  field(INPA, "$(LIMIT_PREFIX)$(LIMIT1) CP")
+  field(INPB, "$(LIMIT_PREFIX)$(LIMIT2) CP")
+  field(INPC, "$(LIMIT_PREFIX)$(LIMIT3) CP")
+  field(INPD, "$(LIMIT_PREFIX)$(LIMIT4) CP")
+  field(INPE, "$(LIMIT_PREFIX)$(LIMIT5) CP")
+  field(INPF, "$(LIMIT_PREFIX)$(LIMIT6) CP")
+  field(INPG, "$(LIMIT_PREFIX)$(LIMIT7) CP")
   field(CALC, "A+B+C+D+E+F+G")
 }
 
@@ -55,6 +55,6 @@ record(ai, "$(P)$(R):AI1") {
 # Trigger the stop commands for both smarpods
 record(fanout, "$(P)$(R):FO1") {
   field(SCAN, "Passive")
-  field(LNK1, "$(stop_link_one)")
-  field(LNK2, "$(stop_link_two)")
+  field(LNK1, "$(STOPLINK1)")
+  field(LNK2, "$(STOPLINK2)")
 }

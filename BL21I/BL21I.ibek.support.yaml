@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/4.10.0/ibek.support.schema.json
 
-# Imported from DLS production support module: BL21I 3-11
-# Source: controls/support/BL21I (DLS GitLab), tag 3-11, BL21ISupportApp/Db
+# Imported from DLS production support module: BL21I 3-12
+# Source: controls/support/BL21I (DLS GitLab), tag 3-12, BL21ISupportApp/Db
 # Pristine copies of the EPICS templates from that release.
 #
 # BL21I is the I21 beamline's support module. Its templates are pure msi (no
@@ -19,6 +19,9 @@
 #   M4ADCSupport: tied to the EtherCAT IOC BL21I-DI-IOC-01 (asynInt32 records
 #   on EtherCAT asyn ports, links to EtherCAT GenericADC and ERIO PVs), whose
 #   EtherCAT support is being replaced.
+#
+# Only the templates and model entities an IOC actually needs may be vendored using:
+# 'ibek pattern add ibek-runtime-support:BL21I@<release> <service> --only <template> --model <entity_model>'
 #
 # To check for updates: diff this pattern's files against a newer tag of
 # controls/support/BL21I (BL21ISupportApp/Db).
@@ -38,15 +41,20 @@ entity_models:
       R:
         type: str
         description: EPICS name suffix
-      AirValveMasterCtrl:
+      MASTERCTLR:
         type: str
-        description: Record for master valve controller (Granite air ctrl)
-      AirValveSlaveCtrl:
+        description: |-
+          Record for master valve controller (Granite air ctrl)
+      SLAVECTLR:
         type: str
-        description: Record for slave valve controller (Marble air ctrl)
+        description: |-
+          Record for slave valve controller (Marble air ctrl)
       MOTORSTATUS:
         type: str
-        description: PV for the motor status bits
+        description: |-
+          PV for the motor status bits.
+          The motor status indicates whether air supply is on and the motor
+          is ready to move (problem status bit cleared).
     databases:
       - file: BL21I_ARM_Air_Control.template
         args:
@@ -54,7 +62,7 @@ entity_models:
 
   - name: AirBearingInterlockWait
     description: |-
-      Air bearing interlock wait.
+      Controls the interlock logic for the air bearings.
       Triggers valves to open and waits for motor interlock to clear
       with a specified timeout.
     parameters:
@@ -66,22 +74,30 @@ entity_models:
         description: EPICS name suffix
       OUT:
         type: str
-        description: Record for Air control
+        description: |-
+          Record for air control output
       TIMEOUT:
         type: float
-        description: Timeout for interlock wait
+        description: |-
+          Timeout for interlock wait
+        default: 10
       MOTORSTATUS:
         type: str
-        description: PV for the motor status bits
+        description: |-
+          PV for the motor status bits.
+          The motor status indicates whether air supply is on and the motor
+          is ready to move (problem status bit cleared).
       DESC:
         type: str
-        description: Description for the air control
+        description: |-
+          Description for the air control
+        default: "Air Bearing Control"
     databases:
       - file: BL21I_Air_Bearing_Interlock_Wait.template
         args:
           .*:
 
-  - name: SGMTravellerAirControl
+  - name: SGMr1AirControl
     description: |-
       SGM Traveller air bearing control.
       Sets the SGM Air bearing off and on with input of 0 and 1 respectively.
@@ -92,12 +108,16 @@ entity_models:
       R:
         type: str
         description: EPICS name suffix
-      SGMTravellerAirValve:
+      AIRVALVE:
         type: str
-        description: Record for SGM Traveller Air control
+        description: |-
+          Record for SGM Traveller air bearing valve control
       MOTORSTATUS:
         type: str
-        description: PV for the motor status bits
+        description: |-
+          PV for the motor status bits.
+          The motor status indicates whether air supply is on and the motor
+          is ready to move (problem status bit cleared).
     databases:
       - file: BL21I_SGM_Traveller_Air_Control.template
         args:
@@ -106,8 +126,17 @@ entity_models:
   - name: SMPLValveSequence
     description: |-
       Sample valve sequence control.
-      Triggers a defined sequence of valve controls for reinstating
-      vacuum after a change of sample.
+      Triggers a defined sequence of vacuum component controls
+      for reinstating vacuum after a change of sample.
+      If a fast valve is involved, an 'arm' delay is required
+      because no callback for this state is provided in dlsPLC;
+      a pause is also required once the 'open disarmed' state is
+      reached before the 'arm' command can take effect. From testing
+      on i21, a 30 seconds delay is recommended for a fast valve.
+      The status of each vacuum component is periodically monitored
+      and sequence steps are disabled accordingly.
+      Currently, the open sequence doesn't include the 5th component
+      in the sequence.
     parameters:
       P:
         type: str
@@ -115,60 +144,75 @@ entity_models:
       R:
         type: str
         description: EPICS name suffix
-      VAC1_NAME:
+      VACNAME1:
         type: str
-        description: Short name for first vacuum element
+        description: |-
+          Short name for first vacuum element in the sequence
         default: VALVE-01
-      VAC_ELEMENT1:
+      DEVICE1:
         type: str
-        description: PV for first element in the sequence
+        description: |-
+          PV for first vacuum element in the sequence
       DELAY1:
         type: float
-        description: ARM delay in seconds after open disarmed state
+        description: |-
+          ARM delay in seconds after open disarmed state
         default: 0
-      VAC2_NAME:
+      VACNAME2:
         type: str
-        description: Short name for second vacuum element
+        description: |-
+          Short name for second vacuum element in the sequence
         default: VALVE-01
-      VAC_ELEMENT2:
+      DEVICE2:
         type: str
-        description: PV for second element in the sequence
+        description: |-
+          PV for second vacuum element in the sequence
       DELAY2:
         type: float
-        description: ARM delay in seconds after open disarmed state
+        description: |-
+          ARM delay in seconds after open disarmed state
         default: 0
-      VAC3_NAME:
+      VACNAME3:
         type: str
-        description: Short name for third vacuum element
+        description: |-
+          Short name for third vacuum element in the sequence
         default: VALVE-01
-      VAC_ELEMENT3:
+      DEVICE3:
         type: str
-        description: PV for third element in the sequence
+        description: |-
+          PV for third vacuum element in the sequence
       DELAY3:
         type: float
-        description: ARM delay in seconds after open disarmed state
+        description: |-
+          ARM delay in seconds after open disarmed state
         default: 0
-      VAC4_NAME:
+      VACNAME4:
         type: str
-        description: Short name for fourth vacuum element
+        description: |-
+          Short name for fourth vacuum element in the sequence
         default: VALVE-01
-      VAC_ELEMENT4:
+      DEVICE4:
         type: str
-        description: PV for fourth element in the sequence
+        description: |-
+          PV for fourth vacuum element in the sequence
       DELAY4:
         type: float
-        description: ARM delay in seconds after open disarmed state
+        description: |-
+          ARM delay in seconds after open disarmed state
         default: 0
-      VAC5_NAME:
+      VACNAME5:
         type: str
-        description: Short name for fifth vacuum element
+        description: |-
+          Short name for fifth vacuum element in the sequence
         default: VALVE-01
-      VAC_ELEMENT5:
+      DEVICE5:
         type: str
-        description: PV for fifth element in the sequence
+        description: |-
+          PV for fifth vacuum element in the sequence
       DELAY5:
         type: float
-        description: ARM delay in seconds after open disarmed state
+        description: |-
+          ARM delay in seconds after open disarmed state
         default: 0
     databases:
       - file: BL21I_SMPL_Valve_Sequence.template
@@ -189,7 +233,8 @@ entity_models:
         description: Bumpstrip EPICS name suffix
       DESC:
         type: str
-        description: Bumpstrip description for GUI
+        description: |-
+          Bumpstrip description
     databases:
       - file: BL21I_TTH_Bumpstrip_Monitor.template
         args:
@@ -208,7 +253,8 @@ entity_models:
         description: EPICS name suffix
       LIMITS:
         type: str
-        description: EPICS Limit switch name prefix
+        description: |-
+          EPICS Limit switch name prefix
     databases:
       - file: BL21I_M5_Smarpod_Limit_Latch.template
         args:
@@ -225,36 +271,53 @@ entity_models:
       R:
         type: str
         description: EPICS name suffix
-      limit_prefix:
+      LIMIT_PREFIX:
         type: str
-        description: The prefix used for the smarpod limits
-      LIMA:
+        description: |-
+          The prefix used for the Smarpod limits
+      LIMIT1:
         type: str
-        description: Limit A suffix
-      LIMB:
+        description: |-
+          Limit A suffix
+        default: ":LIM1"
+      LIMIT2:
         type: str
-        description: Limit B suffix
-      LIMC:
+        description: |-
+          Limit B suffix
+        default: ":LIM2"
+      LIMIT3:
         type: str
-        description: Limit C suffix
-      LIMD:
+        description: |-
+          Limit C suffix
+        default: ":LIM3"
+      LIMIT4:
         type: str
-        description: Limit D suffix
-      LIME:
+        description: |-
+          Limit D suffix
+        default: ":LIM4"
+      LIMIT5:
         type: str
-        description: Limit E suffix
-      LIMF:
+        description: |-
+          Limit E suffix
+        default: ":LIM5"
+      LIMIT6:
         type: str
-        description: Limit F suffix
-      LIMG:
+        description: |-
+          Limit F suffix
+        default: ":LIM6"
+      LIMIT7:
         type: str
-        description: Limit G suffix
-      stop_link_one:
+        description: |-
+          Limit G suffix
+        default: ":LIM7"
+      STOPLINK1:
         type: str
-        description: The record used to stop smarpod one
-      stop_link_two:
+        description: |-
+          The record used to stop Smarpod one
+      STOPLINK2:
         type: str
-        description: The record used to stop smarpod two
+        description: |-
+          The record used to stop Smarpod two
     databases:
       - file: BL21I_M5_Smarpod_Limit_Stop.template
         args:
@@ -271,22 +334,28 @@ entity_models:
         description: EPICS PV prefix
       LAKESHORE:
         type: str
-        description: EPICS PV prefix for the Lakeshore336 records
-      INPUT_DESC_1:
+        description: |-
+          EPICS PV prefix for the Lakeshore336 device records
+      INPUT1:
         type: str
-        description: Descriptive name for temperature readback 1
-      INPUT_DESC_2:
+        description: |-
+          Descriptive name for temperature readback 1
+      INPUT2:
         type: str
-        description: Descriptive name for temperature readback 2
-      INPUT_DESC_3:
+        description: |-
+          Descriptive name for temperature readback 2
+      INPUT3:
         type: str
-        description: Descriptive name for temperature readback 3
-      INPUT_DESC_4:
+        description: |-
+          Descriptive name for temperature readback 3
+      INPUT4:
         type: str
-        description: Descriptive name for temperature readback 4
+        description: |-
+          Descriptive name for temperature readback 4
       DESC:
         type: str
-        description: Description of this template in IOC
+        description: |-
+          Description of this template in IOC
     databases:
       - file: BL21I_SMPL_Temps_Controller.template
         args:
@@ -304,21 +373,26 @@ entity_models:
       R:
         type: str
         description: EPICS name suffix
-      SMPL_X:
+      SMPLX:
         type: str
-        description: EPICS PV for Sample X axis
-      SMPL_Y:
+        description: |-
+          EPICS PV for Sample X axis
+      SMPLY:
         type: str
-        description: EPICS PV for Sample Y axis
-      DEFAULT_RADIUS:
+        description: |-
+          EPICS PV for Sample Y axis
+      RADIUS:
         type: float
-        description: Default XY radius of freedom (mm)
-      FIXED_XY_LLIM:
+        description: |-
+          Default XY radius of freedom (mm) around the centre set by the home positions
+      FIXED_LLIM:
         type: float
-        description: Fixed SMPL_X and SMPL_Y LLIM when dynamic limits are disabled (mm)
-      FIXED_XY_HLIM:
+        description: |-
+          Fixed SMPL_X and SMPL_Y LLIM when dynamic limits are disabled (mm)
+      FIXED_HLIM:
         type: float
-        description: Fixed SMPL_X and SMPL_Y HLIM when dynamic limits are disabled (mm)
+        description: |-
+          Fixed SMPL_X and SMPL_Y HLIM when dynamic limits are disabled (mm)
     databases:
       - file: BL21I_SMPL_Collision_Limits.template
         args:
@@ -337,16 +411,20 @@ entity_models:
         description: EPICS name suffix
       PREC:
         type: int
-        description: Precision for all values
+        description: |-
+          Precision for all values
       FEMTO1:
         type: str
-        description: Prefix for femto on negative side
+        description: |-
+          Prefix for femto on negative side
       FEMTO2:
         type: str
-        description: Prefix for femto on positive side
+        description: |-
+          Prefix for femto on positive side
       MINVAL:
         type: float
-        description: Minimum value for given ADC
+        description: |-
+          Minimum value for given ADC
     databases:
       - file: BL21I_S2_Diode_Difference.template
         args:
@@ -363,13 +441,17 @@ entity_models:
         description: EPICS PV prefix
       FEEDBACK_TIME:
         type: float
-        description: Duration of feedback, in seconds
+        description: |-
+          Duration of feedback, in seconds
       PULSE_DELAY:
         type: float
-        description: Number of seconds between feedback pulses in Pulsed mode
+        description: |-
+          Number of seconds between feedback pulses in Pulsed mode
       DESC:
         type: str
-        description: Description of this template in IOC
+        description: |-
+          Description of this template in IOC
+        default: "Feedback control"
     databases:
       - file: BL21I_Feedback_Auto_Pv.template
         args:
