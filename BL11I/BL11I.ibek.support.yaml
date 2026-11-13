@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/4.10.0/ibek.support.schema.json
 
 # Imported from DLS production support module: BL11I 26-3
-# Source: gitlab.diamond.ac.uk controls/support/BL11I, tag 26-3, BL11IApp/Db
+# Source: controls/support/BL11I (DLS GitLab), tag 26-3, BL11IApp/Db
 # Pristine copies of the EPICS databases from that release.
 #
 # BL11I is the I11 beamline's local support module.  Only the entity models
