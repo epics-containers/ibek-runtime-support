@@ -1,0 +1,25 @@
+record(seq, "BL19I-MO-LIGHT-01:IN")
+{
+  field(DO1, "0")
+  field(DO2, "1")
+  field(DO3, "1")
+  field(LNK1, "BL19I-DI-ATTN-04:F3TRIGGER PP")
+  field(LNK2, "BL19I-DI-ATTN-04:F4TRIGGER PP")
+  field(LNK3, "BL19I-MO-LIGHT-01:CMDSTATUS PP")
+}
+
+record(seq, "BL19I-MO-LIGHT-01:OUT")
+{
+  field(DO1, "0")
+  field(DO2, "1")
+  field(DO3, "0")
+  field(LNK1, "BL19I-DI-ATTN-04:F4TRIGGER PP")
+  field(LNK2, "BL19I-DI-ATTN-04:F3TRIGGER PP")
+  field(LNK3, "BL19I-MO-LIGHT-01:CMDSTATUS PP")
+}
+
+record(bi, "BL19I-MO-LIGHT-01:CMDSTATUS")
+{
+  field(ZNAM, "OUT")
+  field(ONAM, "IN")
+}

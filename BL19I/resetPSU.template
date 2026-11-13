@@ -1,0 +1,28 @@
+#% macro, P,    Base name of PV
+#% macro, MVAR, M-variable for Geobrick output
+#% macro, PORT, Geobrick port name
+
+record(seq, "$(P):RESET") {
+  field(DESC, "Process chain")
+  field(SCAN, "Passive")
+  field(SELM, "All")
+  field(DOL1, "1")
+  field(LNK1, "$(P):RESET:ON.PROC PP")
+  field(DLY2, "2")
+  field(DOL2, "1")
+  field(LNK2, "$(P):RESET:OFF.PROC PP")
+}
+
+record(asyn, "$(P):RESET:ON") {
+  field(DESC, "Send reset signal to PSU")
+  field(SCAN, "Passive")
+  field(AOUT, "$(MVAR)=1")
+  field(PORT, "$(PORT)")
+}
+
+record(asyn, "$(P):RESET:OFF") {
+  field(DESC, "Turn reset signal off")
+  field(SCAN, "Passive")
+  field(AOUT, "$(MVAR)=0")
+  field(PORT, "$(PORT)")
+}

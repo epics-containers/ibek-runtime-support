@@ -1,0 +1,18 @@
+
+
+record(asyn, "$(P):$(VAR)_RBV_READ") {
+  field(DESC, "Get $(VAR) $(PORT)")
+  field(SCAN, "$(SCAN)")
+  field(AOUT, "$(VAR)")
+  field(FLNK, "$(P):$(VAR)_RBV.PROC")
+  field(PORT, "$(PORT)")
+}
+
+record(scalcout, "$(P):$(VAR)_RBV") {
+  field(SCAN, "Passive")
+  field(PINI, "NO")
+  field(DTYP, "Soft Channel")
+  field(CALC, "SSCANF(AA, '%d')")
+  field(INAA, "$(P):$(VAR)_RBV_READ.AINP PP")
+  field(PREC, "0")
+}

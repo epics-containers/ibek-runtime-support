@@ -1,0 +1,453 @@
+#############################################
+#
+# I19 Chopper Control Template
+#
+# % macro, P,    Base PV name
+# % macro, PORT, PMAC port
+# % macro, FGEN, Agilent frequency generator base PV
+# % macro, PMAC, Base PV name
+#
+# Matthew Pearson, July 2011
+#
+#############################################
+
+## Frequency to run the chopper (in Hz user units)
+# % autosave 1 VAL
+record(ai, "$(P):FREQ_HZ") {
+  field(DTYP, "Soft Channel")
+  field(PINI, "YES")
+  field(VAL, "0")
+  field(FLNK, "$(P):CALCFREQ.PROC")
+  field(EGU, "Hz")
+}
+
+## Frequency to run the chopper (in Hz user units)
+# % autosave 1 VAL
+record(mbbo, "$(P):NUM_SLOTS") {
+  field(DTYP, "Soft Channel")
+  field(PINI, "YES")
+  field(ZRVL, "1")
+  field(ONVL, "20")
+  field(VAL, "1")
+  field(ZRST, "1 Slot")
+  field(ONST, "20 Slots")
+  field(FLNK, "$(P):CALCFREQ.PROC")
+}
+
+#Calculate the frequency to set the generator to, based
+#on the number of slots and the desired slot rate (in Hz).
+#The formula is FREQ=((FREQ_HZ) * 1000)/ (NUM_SLOTS) 
+record(calcout, "$(P):CALCFREQ")
+{
+  field(DESC,"Calc the freq")
+  field(INPA,"$(P):FREQ_HZ.VAL NPP")
+  field(INPB,"$(P):NUM_SLOTS.RVAL NPP")
+  field(INPC,"1000")
+  field(CALC,"(A*C)/B")
+  field(PREC,"4")
+  field(EGU, "Hz")
+  field(OUT, "$(P):FREQ.VAL")
+  field(FLNK, "$(P):FREQ.PROC")
+}
+
+
+## Frequency to run the chopper (for the Agilent frequency analyser)
+# % autosave 1 VAL
+record(ai, "$(P):FREQ") {
+  field(DTYP, "Soft Channel")
+  field(PINI, "YES")
+  field(VAL, "0")
+  field(EGU, "Hz")
+}
+
+## Record to ramp down the chopper.
+## Use sseq record to do this so we can wait for processing to complete.
+record(sseq, "$(P):RAMPDOWN") {
+  field(WAIT1, "Wait")
+  field(DOL1, "1")
+  field(LNK1, "$(P):DISABLERAMP.PROC CA MS")
+  field(WAIT2, "Wait")
+  field(DOL2, "1")
+  field(LNK2, "$(FGEN):RAMPTOZERO.PROC CA MS")
+  field(WAIT3, "Wait")
+  field(DOL3, "0")
+  field(LNK3, "$(FGEN):OUT.VAL CA MS")
+}
+
+## Record to ramp up the chopper.
+## Use sseq record to do this so we can wait for processing to complete.
+record(sseq, "$(P):RAMPUP") {
+  field(WAIT1, "Wait")
+  field(DOL1, "1")
+  field(LNK1, "$(P):ENABLERAMP.PROC CA MS")
+  field(WAIT2, "Wait")
+  field(DOL2, "$(P):FREQ")
+  field(LNK2, "$(FGEN):STOPFREQ CA MS")
+  field(WAIT3, "Wait")
+  field(DOL3, "1.0")
+  field(LNK3, "$(FGEN):STARTFREQ CA MS")
+  field(WAIT4, "Wait")
+  field(DOL4, "1")
+  field(LNK4, "$(FGEN):OUT.VAL CA MS")
+  field(WAIT5, "Wait")
+  field(DLY5, "1.0")
+  field(DOL5, "1")
+  field(LNK5, "$(FGEN):STARTRAMP.PROC CA MS")
+}
+
+record(asyn, "$(P):DISABLERAMP") {
+  field(DTYP,"asynRecordDevice")
+  field(SCAN, "Passive")
+  field(PORT, "$(PORT)")
+  field(ADDR,"0")
+  field(AOUT, "M3714=0")
+}
+
+record(asyn, "$(P):ENABLERAMP") {
+  field(DTYP,"asynRecordDevice")
+  field(SCAN, "Passive")
+  field(PORT, "$(PORT)")
+  field(ADDR,"0")
+  field(AOUT, "M3714=1")
+}
+
+## Record to reset the chopper and freq gen.
+
+record(sseq, "$(P):RESET") {
+  field(WAIT1, "Wait")
+  field(DOL1, "1")
+  field(LNK1, "$(P):DISABLERAMP.PROC CA MS")
+  field(WAIT2, "Wait")
+  field(DOL2, "1")
+  field(LNK2, "$(P):CLEARSTART.PROC CA MS")
+  field(WAIT3, "Wait")
+  field(DLY3, "0.5")
+  field(DOL3, "1")
+  field(LNK3, "$(P):RESETCMD.PROC CA MS")
+  field(WAIT4, "Wait")
+  field(DLY4, "5.0") #Added a wait here to take account of reset on PMAC
+  field(DOL4, "0.1")
+  field(LNK4, "$(FGEN):FREQ CA MS")
+  field(WAIT5, "Wait")
+  field(DOL5, "0")
+  field(LNK5, "$(FGEN):OUT.VAL CA MS")
+}
+
+record(asyn, "$(P):RESETCMD") {
+  field(DTYP,"asynRecordDevice")
+  field(SCAN, "Passive")
+  field(PORT, "$(PORT)")
+  field(ADDR,"0")
+  field(AOUT, "$$$")
+}
+
+## Record to start (will also do a re-phase and re-home)
+
+record(asyn, "$(P):START") {
+  field(DTYP,"asynRecordDevice")
+  field(SCAN, "Passive")
+  field(PORT, "$(PORT)")
+  field(ADDR,"0")
+  field(AOUT, "M3713=1")
+}
+
+record(asyn, "$(P):CLEARSTART") {
+  field(DTYP,"asynRecordDevice")
+  field(SCAN, "Passive")
+  field(PORT, "$(PORT)")
+  field(ADDR,"0")
+  field(AOUT, "M3713=0")
+}
+
+## Record to set 'use axis 1' (upstream disk)
+record(asyn, "$(P):ENABLEDISK1") {
+  field(DTYP,"asynRecordDevice")
+  field(SCAN, "Passive")
+  field(PORT, "$(PORT)")
+  field(ADDR,"0")
+  field(AOUT, "M3811=1")
+}
+
+## Record to set 'use axis 2' (downstream disk)
+record(asyn, "$(P):ENABLEDISK2") {
+  field(DTYP,"asynRecordDevice")
+  field(SCAN, "Passive")
+  field(PORT, "$(PORT)")
+  field(ADDR,"0")
+  field(AOUT, "M3812=1")
+}
+
+## Record to set 'disable axis 1' (upstream disk)
+record(asyn, "$(P):DISABLEDISK1") {
+  field(DTYP,"asynRecordDevice")
+  field(SCAN, "Passive")
+  field(PORT, "$(PORT)")
+  field(ADDR,"0")
+  field(AOUT, "M3811=0")
+}
+
+## Record to set 'disable axis 2' (downstream disk)
+record(asyn, "$(P):DISABLEDISK2") {
+  field(DTYP,"asynRecordDevice")
+  field(SCAN, "Passive")
+  field(PORT, "$(PORT)")
+  field(ADDR,"0")
+  field(AOUT, "M3812=0")
+}
+
+## Read enable/disable state of axis 1 and 2
+
+substitute "VAR=M3811"
+substitute "SCAN=2 second"
+include "pmac_read_var.template"
+
+substitute "VAR=M3812"
+substitute "SCAN=2 second"
+include "pmac_read_var.template"
+
+
+
+## Read P1000, which is the PLC10 state
+
+substitute "VAR=P1000"
+substitute "SCAN=.5 second"
+include "pmac_read_var.template"
+
+record(scalcout, "$(P):P1000_RBV") {
+  field(FLNK, "$(P):P1000_STR.PROC")
+}
+
+record(mbbi, "$(P):P1000_STR") {
+  field(DTYP, "Raw Soft Channel")
+  field(INP, "$(P):P1000_RBV.VAL PP")
+  field(ZRVL, "0")
+  field(ONVL, "1")
+  field(TWVL, "2")
+  field(THVL, "30")
+  field(FRVL, "31")
+  field(FVVL, "39")
+  field(SXVL, "4")
+  field(SVVL, "5")
+  field(EIVL, "99")
+  field(ZRST, "Initialise")
+  field(ONST, "Phasing")
+  field(TWST, "Stopped")
+  field(THST, "Power Up")
+  field(FRST, "Running")
+  field(FVST, "Ramp Down")
+  field(SXST, "Power Down")
+  field(SVST, "Error (Reset)")
+  field(EIST, "Limbo!")
+}
+
+
+## Read P1003, which is the fault code for Axis 1
+
+substitute "VAR=P1003"
+substitute "SCAN=2 second"
+include "pmac_read_var.template"
+
+record(scalcout, "$(P):P1003_RBV") {
+  field(FLNK, "$(P):P1003_STR.PROC")
+}
+
+record(mbbi, "$(P):P1003_STR") {
+  field(DTYP, "Raw Soft Channel")
+  field(INP, "$(P):P1003_RBV.VAL PP")
+  field(ZRVL, "0")
+  field(ONVL, "1")
+  field(TWVL, "2")
+  field(THVL, "4")
+  field(FRVL, "8")
+  field(FVVL, "16")
+  field(SXVL, "32")
+  field(SVVL, "64")
+  field(EIVL, "128")
+  field(NIVL, "6")
+  field(ZRST, "None")
+  field(ONST, "F Error")
+  field(TWST, "Amp Fault")
+  field(THST, "I2T")
+  field(FRST, "Phasing Error")
+  field(FVST, "Encoder Loss")
+  field(SXST, "Hard Stop")
+  field(SVST, "Low Cap Prb")
+  field(EIST, "High Cap Prb")
+  field(NIST, "F Err & Amp Err")
+}
+
+## Read P1004, which is the fault code for Axis 2
+
+substitute "VAR=P1004"
+substitute "SCAN=2 second"
+include "pmac_read_var.template"
+
+record(scalcout, "$(P):P1004_RBV") {
+  field(FLNK, "$(P):P1004_STR.PROC")
+}
+
+record(mbbi, "$(P):P1004_STR") {
+  field(DTYP, "Raw Soft Channel")
+  field(INP, "$(P):P1004_RBV.VAL PP")
+  field(ZRVL, "0")
+  field(ONVL, "1")
+  field(TWVL, "2")
+  field(THVL, "4")
+  field(FRVL, "8")
+  field(FVVL, "16")
+  field(SXVL, "32")
+  field(SVVL, "64")
+  field(EIVL, "128")
+  field(NIVL, "6")
+  field(ZRST, "None")
+  field(ONST, "F Error")
+  field(TWST, "Amp Fault")
+  field(THST, "I2T")
+  field(FRST, "Phasing Error")
+  field(FVST, "Encoder Loss")
+  field(SXST, "Hard Stop")
+  field(SVST, "Low Cap Prb")
+  field(EIST, "High Cap Prb")
+  field(NIST, "F Err & Amp Err")
+}
+
+## Read M3801, which is the fault LED
+## This can flash on and off when starting up and powering down.
+
+substitute "VAR=M3801"
+substitute "SCAN=.5 second"
+include "pmac_read_var.template"
+
+#Record to mask out the Fault bit (M3801_RBV) if we are in Phasing mode.
+record(calc, "$(P):FAULT")
+{
+  field(DESC,"Calc the fault LED")
+  field(INPA,"$(P):M3801_RBV.VAL CP")
+  field(INPB,"$(P):P1000_RBV.VAL CP")
+  field(CALC,"A&(B!=1)")
+  field(VAL,"0")
+  field(HIHI, "1")
+  field(HIGH, "1")
+  field(HHSV, "MAJOR")
+  field(HSV, "MAJOR")
+}
+
+
+#Scale the axis velocity to be rotation speed (in Hz)
+#There are 2048 counts per rev
+#The input is in counts per millisecond
+record(calc, "$(P):DISK1:SPEED")
+{
+  field(DESC,"Rotational Speed")
+  field(INPA,"$(PMAC):AXIS1:VELOCITY.VAL CP")
+  field(INPB,"2000")
+  field(INPC,"1000")
+  field(CALC,"((A*C)/B)*8")
+  field(PREC,"4")
+  field(EGU, "Hz")
+}
+
+#Scale the axis velocity to be rotation speed (in Hz)
+#There are 2048 counts per rev
+#The input is in counts per millisecond
+record(calc, "$(P):DISK2:SPEED")
+{
+  field(DESC,"Rotational Speed")
+  field(INPA,"$(PMAC):AXIS2:VELOCITY.VAL CP")
+  field(INPB,"2000")
+  field(INPC,"1000")
+  field(CALC,"((A*C)/B)*8")
+  field(PREC,"4")
+  field(EGU, "Hz")
+}
+
+#Calculate the position in deg: MOD(ABS(raw position)/2000)*360
+record(calc, "$(P):DISK1:POS")
+{
+  field(DESC,"Disk 1 Position")
+  field(INPA,"$(P):DISK1.RBV CP")
+  field(INPB,"360.0")
+  field(CALC,"(A%B)+(A-FLOOR(A))")
+  field(PREC,"2")
+  field(EGU, "deg")
+}
+
+#Calculate the position in deg: MOD(ABS(raw position)/2000)*360
+record(calc, "$(P):DISK2:POS")
+{
+  field(DESC,"Disk 2 Position")
+  field(INPA,"$(P):DISK2.RBV CP")
+  field(INPB,"360.0")
+  field(CALC,"(A%B)+(A-FLOOR(A))")
+  field(PREC,"2")
+  field(EGU, "deg")
+}
+
+
+#Records to monitor the MONV bit from the motor records.
+#This is used to indicate moving status on the GUI, without
+#being affected by the alarm status of the motor record.
+record(bi, "$(P):DISK1:MOVN")
+{
+  field(INP, "$(P):DISK1.MOVN CP")
+}
+record(bi, "$(P):DISK2:MOVN")
+{
+  field(INP, "$(P):DISK2.MOVN CP")
+}
+
+#Record to implement the position tweak via the motor records.
+#This is a seq record that first does a SYNC, to make the 
+#VAL equal to the RBV. This ensures the tweak works at any
+#position. Because normally when the chopper is running via the 
+#external clock, the motor record doesn't detect a move so it
+#doesn't set VAL equal to RBV at the end of the a move.
+record(sseq, "$(P):DISK1:TWF")
+{
+  field(WAIT1, "Wait")
+  field(DOL1, "1")
+  field(LNK1, "$(P):DISK1.SYNC CA MS")
+  field(WAIT2, "Wait")
+  field(DOL2, "1")
+  field(LNK2, "$(P):DISK1.TWF CA MS")
+}
+record(sseq, "$(P):DISK1:TWR")
+{
+  field(WAIT1, "Wait")
+  field(DOL1, "1")
+  field(LNK1, "$(P):DISK1.SYNC CA MS")
+  field(WAIT2, "Wait")
+  field(DOL2, "1")
+  field(LNK2, "$(P):DISK1.TWR CA MS")
+}
+record(sseq, "$(P):DISK2:TWF")
+{
+  field(WAIT1, "Wait")
+  field(DOL1, "1")
+  field(LNK1, "$(P):DISK2.SYNC CA MS")
+  field(WAIT2, "Wait")
+  field(DOL2, "1")
+  field(LNK2, "$(P):DISK2.TWF CA MS")
+}
+record(sseq, "$(P):DISK2:TWR")
+{
+  field(WAIT1, "Wait")
+  field(DOL1, "1")
+  field(LNK1, "$(P):DISK2.SYNC CA MS")
+  field(WAIT2, "Wait")
+  field(DOL2, "1")
+  field(LNK2, "$(P):DISK2.TWR CA MS")
+}
+
+
+#Record to determin if we are running, if either the status is in 'Running' or 'Ramp down' state
+#or if either of the MOVN records are on.
+record(calc, "$(P):RUNNING")
+{
+  field(DESC,"Chopper disks are moving")
+  field(INPA,"$(P):P1000_RBV.VAL CP")
+  field(INPB,"$(P):DISK1:MOVN.VAL CP")
+  field(INPB,"$(P):DISK2:MOVN.VAL CP")
+  field(CALC,"(A=31)||(A=39)||(B==1)||(C=1)")
+  field(VAL,"0")
+}

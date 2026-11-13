@@ -1,0 +1,481 @@
+# % macro, P, Base name of PV
+
+record(stringin, "$(P):GP1") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP2") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP3") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP4") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP5") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP6") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP7") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP8") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP9") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP10") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP11") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP12") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP13") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP14") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP15") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP16") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP17") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP18") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP19") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP20") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP21") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP22") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP23") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP24") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP25") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP26") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP27") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP28") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP29") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP30") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP31") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP32") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP33") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP34") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP35") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP36") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP37") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP38") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP39") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP40") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP41") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP42") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP43") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP44") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP45") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP46") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP47") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP48") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP49") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP50") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP51") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP52") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP53") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP54") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP55") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP56") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP57") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP58") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP59") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP60") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP61") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP62") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP63") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP64") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP65") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP66") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP67") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP68") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP69") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP70") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP71") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP72") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP73") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP74") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP75") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP76") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP77") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP78") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP79") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP80") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP81") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP82") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP83") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP84") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP85") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP86") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP87") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP88") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP89") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP90") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP91") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP92") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP93") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP94") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP95") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP96") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP97") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP98") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP99") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP100") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP101") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP102") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP103") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP104") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP105") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP106") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP107") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP108") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP109") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP110") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP111") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP112") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP113") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP114") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP115") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP116") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP117") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP118") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP119") {
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):GP120") {
+  field(PINI, "YES")
+}

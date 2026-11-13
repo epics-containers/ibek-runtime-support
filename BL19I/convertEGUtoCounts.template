@@ -1,0 +1,31 @@
+# % macro, P,      Base name of PV
+# % macro, NUM,    Count of which conversion we are doing
+# % macro, EGU,    Link to a PV holding a value in Engineering units
+# % macro, ERES,   Link to the ERES field of the associated motor record
+# % macro, COUNTS, P-variable to store counts
+# % macro, PORT,   Asyn port of the PMAC
+
+
+record(calc,  "$(P):getPosEGU$(NUM)") {
+  field(SCAN, "1 second")
+  field(INPA, "$(EGU)")
+  field(INPB, "$(ERES)")
+  field(CALC, "A/B")
+  field(FLNK, "$(P):fo:convertEtoC$(NUM)")
+}
+
+record(fanout, "$(P):fo:convertEtoC$(NUM)") {
+  field(LNK1,  "$(P):sc:writePosCounts$(NUM) PP")
+}
+
+record(scalcout, "$(P):sc:writePosCounts$(NUM)") {
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(INPA, "$(P):getPosEGU$(NUM)")
+  field(CALC, "PRINTF('$(COUNTS)=%f', A)")
+  field(OUT,  "$(P):asyn:writeCounts$(NUM).AOUT PP")
+}
+
+record(asyn, "$(P):asyn:writeCounts$(NUM)") {
+  field(PORT, "$(PORT)")
+}

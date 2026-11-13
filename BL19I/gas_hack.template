@@ -1,0 +1,4 @@
+record(stringin, "$(P)$(Q):GAS:STR:RDHACK") {
+  field(VAL,  "NO")
+  field(PINI, "YES")
+}

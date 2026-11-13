@@ -1,0 +1,35 @@
+# % macro, P,     Base name of PV
+# % macro, LABEL, Identifier for preset mirror positions: EH1-RH, EH1-SI, EH1-PT or EH2-PT
+# % macro, NUM,   Count of axis number being checked for tolerance
+# % macro, MR,    Motor Record base name
+
+
+#% autosave 0 VAL
+record(ao, "$(P):$(LABEL):pos:axis$(NUM)") {
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(PREC, "4") 
+}
+
+#% autosave 0 VAL
+record(ao, "$(P):tol:axis$(NUM)") {
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(PREC, "4") 
+}
+
+record(calc, "$(P):$(LABEL):checkAxis$(NUM)Pos") {
+  field(SCAN, ".1 second")
+  field(INPA, "$(MR).RBV")
+  field(INPB, "$(P):$(LABEL):pos:axis$(NUM)")
+  field(INPC, "$(P):tol:axis$(NUM)")
+  field(CALC, "(A>(B-C) & A<(B+C))?1:0")
+}
+
+record(mbbi, "$(P):$(LABEL):home:axis$(NUM)") {
+  field(DTYP, "Raw Soft Channel")
+  field(SCAN, ".1 second")
+  field(NOBT, "15")
+  field(SHFT, "14")
+  field(INP,  "$(MR).MSTA")
+}

@@ -1,0 +1,67 @@
+# % macro, P,          Base name of PV
+# % macro, VAR,        Which variable we are writing/reading to/from PMAC
+# % macro, WRITE_PINI, PINI to control writing of variables on IOC startup
+# % macro, PREC,       Precision to display variable
+# % macro, EGU,        Engineering units of variable
+# % macro, ZSTATE,     Zero string for binary output (writing to PMAC)
+# % macro, OSTATE,     One string for binary output (writing to PMAC)
+# % macro, ZSTATE_IN,  Zero string for binary input (reading from PMAC)
+# % macro, OSTATE_IN,  One string for binary input (reading from PMAC)
+# % macro, INITVAL,    Initial value for binary output (writing to PMAC)
+# % macro, PORT,       Asyn port for PMAC
+
+
+record(ao, "$(P):pmac:write:ao:$(VAR)") {
+  field(SCAN, "Passive")
+  field(PINI, "$(WRITE_PINI)")
+  field(PREC, "$(PREC)")
+  field(EGU,  "$(EGU)")
+  field(OUT,  "$(P):pmac:set:ao:$(VAR) PP")
+}
+
+record(ao, "$(P):pmac:set:ao:$(VAR)") {
+  field(DESC, "Write value to pmac")
+  field(DTYP, "asynFloat64")
+  field(OUT,  "@asyn($(PORT),0)PMAC_WD_$(VAR)")
+}
+
+record(bo, "$(P):pmac:write:bo:$(VAR)") {
+  field(SCAN, "Passive")
+  field(ZNAM, "$(ZSTATE)")
+  field(ONAM, "$(OSTATE)")
+  field(VAL,  "$(INITVAL)")
+  field(PINI, "$(WRITE_PINI)")
+  field(OUT,  "$(P):pmac:set:bo:$(VAR) PP")
+}
+
+record(ao, "$(P):pmac:set:bo:$(VAR)") {
+  field(DESC, "Write value to pmac")
+  field(DTYP, "asynInt32")
+  field(OUT, "@asyn($(PORT),0)PMAC_WI_$(VAR)")
+}
+
+
+record(ai, "$(P):pmac:read:$(VAR)") {
+  field(SCAN, "I/O Intr")
+  field(PINI, "NO")
+  field(DTYP, "$(DTYP=asynFloat64)")
+  field(PREC, "$(PREC)")
+  field(EGU,  "$(EGU)")
+  field(INP,  "@asyn($(PORT),0)PMAC_VDF_$(VAR)")
+  field(FLNK, "$(P):pmac:reverseSignal:$(VAR)")
+}
+
+# Processes when the above record processes because of the CP link
+record(bi, "$(P):pmac:read:bi:$(VAR)") {
+  field(SCAN, "Passive")
+  field(ZNAM, "$(ZSTATE_IN)")
+  field(ONAM, "$(OSTATE_IN)")
+  field(INP,  "$(P):pmac:read:$(VAR) CP")
+}
+
+record(calc, "$(P):pmac:reverseSignal:$(VAR)") {
+  field(CALC, "(A=1)?0:1")
+  field(PREC, "$(PREC)")
+  field(EGU,  "$(EGU)")
+  field(INPA, "$(P):pmac:read:$(VAR)")
+}

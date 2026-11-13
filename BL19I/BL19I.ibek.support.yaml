@@ -1,0 +1,570 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/4.10.0/ibek.support.schema.json
+
+# Imported from DLS production support module: BL19I 26-1
+# Source: DLS GitLab project controls/support/BL19I, tag 26-1, BL19IApp/Db
+# Pristine copies of the EPICS templates from that release.
+#
+# BL19I is the I19 beamline support module.  Only its soft-record templates
+# are carried here: every record type they use comes from base (ai, ao, bi,
+# bo, calc, calcout, fanout, mbbi, mbbo, seq, stringin, stringout), asyn (asyn
+# record, asynInt32, asynFloat64) or calc (scalcout, sseq), so they
+# load into a stock generic IOC with no BL19I code compiled in.
+#
+# Left out because they need code compiled from BL19I or VME device support:
+#   EHStatus, robotErrorCodes, setOmegaLimits, pneumaticProtection7,
+#   pneumaticProtection8, seqDummy, setEH2PinColLimits, stripeVoltageControl
+#     - aSub records whose SNAM routines are C in BL19IApp/src
+#   auto_gas_bottle_exchange
+#     - its channels use DTYP Hy8001 (Hytec VME digital IO)
+# Templates no IOC instantiates (asynPLCRecords, enableDisablePLC,
+# writeReadPMACVar, ZoomPositioner) are not carried; add them as wanted.
+#
+# Entity model names match the ibek-support-dls BL19I module and the
+# builder XML class names, so ioc.yaml files keep their BL19I.<model> types.
+# pmac_read_var.template has no entity of its own: chopper_control.db
+# includes it.
+# To check for updates: diff this pattern's files against the newest tag of
+# controls/support/BL19I.
+
+module: BL19I
+
+entity_models:
+  - name: chopper_control
+    description: |-
+      I19 chopper control template
+    parameters:
+      P:
+        type: str
+        description: |-
+          Base PV name
+      PORT:
+        type: str
+        description: |-
+          PMAC asyn port
+      FGEN:
+        type: str
+        description: |-
+          Agilent frequency generator base PV
+      PMAC:
+        type: str
+        description: |-
+          PMAC base PV name
+    databases:
+      - file: chopper_control.db
+        args:
+          P:
+          PORT:
+          FGEN:
+          PMAC:
+
+  - name: I24serial_readPvar
+    description: |-
+      Read a PMAC P-variable via an asyn record
+    parameters:
+      P:
+        type: str
+        description: |-
+          Base name of PV
+      MVAR:
+        type: str
+        description: |-
+          PMAC variable to read
+      PORT:
+        type: str
+        description: |-
+          Asyn port for PMAC
+    databases:
+      - file: I24serial_readPvar.template
+        args:
+          P:
+          MVAR:
+          PORT:
+
+  - name: I24serial_generalPurpose
+    description: |-
+      General purpose string records for serial crystallography
+    parameters:
+      P:
+        type: str
+        description: |-
+          Base name of PV
+    databases:
+      - file: I24serial_generalPurpose.template
+        args:
+          P:
+
+  - name: I24serial_stringRecords
+    description: |-
+      String records for serial crystallography
+    parameters:
+      P:
+        type: str
+        description: |-
+          Base name of PV
+    databases:
+      - file: I24serial_stringRecords.template
+        args:
+          P:
+
+  - name: I24serial_pmacCommands
+    description: |-
+      PMAC command string records for serial crystallography.
+      Sends to the asyn port BRICK<BRICKNUM>_S.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Base name of PV
+      BRICKNUM:
+        type: int
+        description: |-
+          Step number of Geobrick
+    databases:
+      - file: I24serial_pmacCommands.template
+        args:
+          P:
+          BRICKNUM:
+
+  - name: resetPSU
+    description: |-
+      Reset PSU via Geobrick M-variable output
+    parameters:
+      P:
+        type: str
+        description: |-
+          Base name of PV
+      MVAR:
+        type: str
+        description: |-
+          M-variable for Geobrick output
+      PORT:
+        type: str
+        description: |-
+          Geobrick asyn port name
+    databases:
+      - file: resetPSU.template
+        args:
+          P:
+          MVAR:
+          PORT:
+
+  - name: writeReadPMACVarNEW
+    description: |-
+      Write and read a PMAC variable with binary and analog control
+    parameters:
+      P:
+        type: str
+        description: |-
+          Base name of PV
+      VAR:
+        type: str
+        description: |-
+          Which variable we are writing/reading to/from PMAC
+      WRITE_PINI:
+        type: str
+        description: |-
+          PINI to control writing of variables on IOC startup
+      PREC:
+        type: int
+        description: |-
+          Precision to display variable
+      EGU:
+        type: str
+        description: |-
+          Engineering units of variable
+        default: ""
+      ZSTATE:
+        type: str
+        description: |-
+          Zero string for binary output (writing to PMAC)
+      OSTATE:
+        type: str
+        description: |-
+          One string for binary output (writing to PMAC)
+      ZSTATE_IN:
+        type: str
+        description: |-
+          Zero string for binary input (reading from PMAC)
+      OSTATE_IN:
+        type: str
+        description: |-
+          One string for binary input (reading from PMAC)
+      INITVAL:
+        type: int
+        description: |-
+          Initial value for binary output (writing to PMAC)
+      PORT:
+        type: str
+        description: |-
+          Asyn port for PMAC
+    databases:
+      - file: writeReadPMACVarNEW.template
+        args:
+          P:
+          VAR:
+          WRITE_PINI:
+          PREC:
+          EGU:
+          ZSTATE:
+          OSTATE:
+          ZSTATE_IN:
+          OSTATE_IN:
+          INITVAL:
+          PORT:
+
+  - name: auto_BL19I_zebraShutter
+    description: |-
+      Fast shutter driven by a Zebra output
+    parameters:
+      P:
+        type: str
+        description: |-
+          Shutter PV prefix
+      Z:
+        type: str
+        description: |-
+          Zebra PV prefix
+      ZRST:
+        type: str
+        description: |-
+          Zero state string
+        default: Closed
+      ONST:
+        type: str
+        description: |-
+          One state string
+        default: Open
+    # The template's only other macro, name, appears in a `% gui` comment;
+    # builder2ibek drops it, so it is not declared here.
+    databases:
+      - file: BL19I-zebraShutter.template
+        args:
+          P:
+          Z:
+          ZRST:
+          ONST:
+
+  - name: auto_dlsPLC_write
+    description: |-
+      Write an analog and a binary value to a PLC address over asyn
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device PV prefix
+      Q:
+        type: str
+        description: |-
+          Device PV suffix
+      port:
+        type: str
+        description: |-
+          Asyn port name
+      addr:
+        type: int
+        description: |-
+          Asyn address
+      timeout:
+        type: int
+        description: |-
+          Asyn timeout
+        default: 0
+    databases:
+      - file: dlsPLC_write.template
+        args:
+          P:
+          Q:
+          port:
+          addr:
+          timeout:
+
+  - name: auto_fastShutterStatus
+    description: |-
+      Fast shutter status from a Zebra
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device PV prefix
+      Z:
+        type: str
+        description: |-
+          Zebra PV prefix
+      ZNAM:
+        type: str
+        description: |-
+          Zero state name
+      ONAM:
+        type: str
+        description: |-
+          One state name
+    databases:
+      - file: fastShutterStatus.template
+        args:
+          P:
+          Z:
+          ZNAM:
+          ONAM:
+
+  - name: auto_gas_hack
+    description: |-
+      Gas name read-back string record (GAS:STR:RDHACK), initialised to NO
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device PV prefix
+      Q:
+        type: str
+        description: |-
+          Device PV suffix
+    databases:
+      - file: gas_hack.template
+        args:
+          P:
+          Q:
+
+  - name: auto_gas_strings
+    description: |-
+      Gas name string record of up to 40 characters
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device PV prefix
+      R:
+        type: str
+        description: |-
+          Record name suffix
+    databases:
+      - file: gas_strings.db
+        args:
+          P:
+          R:
+
+  - name: auto_hatch
+    description: |-
+      I19 hatch selection records (hardcoded PVs, no macros)
+    parameters: {}
+    databases:
+      - file: hatch.db
+        args: {}
+
+  - name: auto_motorState
+    description: |-
+      PMAC motor state and following error limit
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device PV prefix
+      AXIS:
+        type: str
+        description: |-
+          Motor axis name
+      FERROR:
+        type: int
+        description: |-
+          Following error limit value
+      IVAR:
+        type: str
+        description: |-
+          PMAC I-variable for following error
+      PORT:
+        type: str
+        description: |-
+          Asyn port for PMAC
+    databases:
+      - file: motorState.template
+        args:
+          P:
+          AXIS:
+          FERROR:
+          IVAR:
+          PORT:
+
+  - name: auto_readGPIO
+    description: |-
+      Read a Geobrick GPIO M-variable
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device PV prefix
+      MVAR:
+        type: str
+        description: |-
+          PMAC M-variable
+      PORT:
+        type: str
+        description: |-
+          Asyn port for PMAC
+    databases:
+      - file: readGPIO.template
+        args:
+          P:
+          MVAR:
+          PORT:
+
+  - name: auto_readGPIO_MO8
+    description: |-
+      Read a Geobrick GPIO M-variable (MO-IOC-08 variant)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device PV prefix
+      MVAR:
+        type: str
+        description: |-
+          PMAC M-variable
+      PORT:
+        type: str
+        description: |-
+          Asyn port for PMAC
+    databases:
+      - file: readGPIO_MO8.template
+        args:
+          P:
+          MVAR:
+          PORT:
+
+  - name: auto_writeGPIO
+    description: |-
+      Write a Geobrick GPIO M-variable
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device PV prefix
+      MVAR:
+        type: str
+        description: |-
+          PMAC M-variable
+      PORT:
+        type: str
+        description: |-
+          Asyn port for PMAC
+      ZNAM:
+        type: str
+        description: |-
+          Zero state name
+      ONAM:
+        type: str
+        description: |-
+          One state name
+    databases:
+      - file: writeGPIO.template
+        args:
+          P:
+          MVAR:
+          PORT:
+          ZNAM:
+          ONAM:
+
+  - name: auto_writeReadPvar
+    description: |-
+      Write and read back a PMAC P-variable
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device PV prefix
+      PORT:
+        type: str
+        description: |-
+          Asyn port for PMAC
+      PVAR:
+        type: str
+        description: |-
+          PMAC P-variable name
+    databases:
+      - file: writeReadPvar.template
+        args:
+          P:
+          PORT:
+          PVAR:
+
+  - name: convertEGUtoCounts
+    description: |-
+      Convert a position in engineering units to counts and write it to a
+      PMAC P-variable
+    parameters:
+      P:
+        type: str
+        description: |-
+          Base name of PV
+      NUM:
+        type: int
+        description: |-
+          Count of which conversion we are doing
+      EGU:
+        type: str
+        description: |-
+          Link to a PV holding a value in engineering units
+      ERES:
+        type: str
+        description: |-
+          Link to the ERES field of the associated motor record
+      COUNTS:
+        type: str
+        description: |-
+          P-variable to store counts
+      PORT:
+        type: str
+        description: |-
+          Asyn port of the PMAC
+    databases:
+      - file: convertEGUtoCounts.template
+        args:
+          P:
+          NUM:
+          EGU:
+          ERES:
+          COUNTS:
+          PORT:
+
+  - name: presetPositions
+    description: |-
+      Preset mirror position and tolerance check for one motor axis
+    parameters:
+      P:
+        type: str
+        description: |-
+          Base name of PV
+      LABEL:
+        type: str
+        description: |-
+          Label for a set of preset mirror positions, e.g. EH1-RH or Rh
+      NUM:
+        type: int
+        description: |-
+          Count of axis number being checked for tolerance
+      MR:
+        type: str
+        description: |-
+          Motor record base name
+    databases:
+      - file: presetPositions.template
+        args:
+          P:
+          LABEL:
+          NUM:
+          MR:
+
+  - name: auto_EH2BackLightControl
+    description: |-
+      EH2 back light in/out sequences (hardcoded PVs, no macros)
+    parameters: {}
+    databases:
+      - file: EH2BackLightControl.db
+        args: {}
+
+  - name: auto_FstageHMZ
+    description: |-
+      Send HMZ to the fine stage axes on asyn port PMAC_S2 (hardcoded PVs,
+      no macros)
+    parameters: {}
+    databases:
+      - file: FstageHMZ.db
+        args: {}

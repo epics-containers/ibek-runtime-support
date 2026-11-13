@@ -1,0 +1,61 @@
+# After BL23I_zebra-shutter.template
+# Ronaldo Mercado, June 2014
+#
+# Epics PVs to control a zebra shutter through the soft_in bits
+# of a zebra.
+#
+#  
+# % macro, P, shutter template prefix BL23I-EA-SHTR-01
+# % macro, Z, zebra prefix BL23I-EA-ZEBRA-01:ZEBRA
+# % macro, name, gui name
+
+# % gui, $(name), edm, BL23I_zebra-shutter.edl, P=$(P),Z=$(Z)
+
+record(mbbo, "$(P):CTRL1")
+{
+  field(DESC, "Mode select")
+  field(ZRST, "Manual")
+  field(ONST, "Auto")
+  field(OUT, "$(Z):SOFT_IN:B0 PP")
+  field(VAL, "0")
+  field(PINI, "YES")
+}
+record(mbbo, "$(P):CTRL2")
+{
+  field(DESC, "Open/Close")
+  field(ZRST, "$(ZRST)")
+  field(ONST, "$(ONST)")
+  field(OUT, "$(Z):SOFT_IN:B1 PP")
+  field(VAL, "0")
+  field(PINI, "YES")
+}
+record(mbbi, "$(P):STA")
+{
+  field(DESC, "Shutter state readback")
+  field(ZRST, "$(ZRST)")
+  field(ONST, "$(ONST)")
+}
+record(calcout, "$(P):STA:CALC")
+{
+  field(SCAN, "Passive")
+  field(INPA, "$(Z):OUT1_TTL:STA CP")
+  field(CALC, "A")
+  field(DOPT, "Use CALC")
+  field(OOPT, "On Change")
+  field(OUT, "$(P):STA PP")
+}
+record(ai, "$(P):STOP:RBV")
+{
+  field(SCAN, "Passive")
+  field(PREC, "4")
+}
+record(calcout, "$(P):STOP:CALC")
+{
+  field(INPA, "$(Z):PC_GATE_START CP")
+  field(INPB, "$(Z):PC_GATE_WID CP")
+  field(INPC, "$(Z):PC_DIR CP")
+  field(CALC, "(C=0)?A+B:A-B")
+  field(OUT,  "$(P):STOP:RBV.VAL PP")
+  field(DOPT, "Use CALC")
+  field(OOPT, "Every Time")
+}

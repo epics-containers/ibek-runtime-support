@@ -1,0 +1,25 @@
+record(ao, "$(P):write:$(PVAR)") {
+  field(SCAN, "Passive")
+  field(PREC, "4")
+  field(FLNK, "$(P):scalcout:$(PVAR)")
+}
+
+record(scalcout, "$(P):scalcout:$(PVAR)") {
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(INPA, "$(P):write:$(PVAR)")
+  field(CALC, "PRINTF('$(PVAR)=%f', A)")
+  field(OUT,  "$(P):$(PVAR).AOUT PP")
+}
+
+record(asyn, "$(P):$(PVAR)") {
+  field(PORT, "$(PORT)")
+}
+
+record(asyn, "$(P):read:$(PVAR)") {
+  field(DESC, "Read $(PVAR)")
+  field(SCAN, ".2 second")
+  field(PINI, "YES")
+  field(AOUT, "$(PVAR)")
+  field(PORT, "$(PORT)")
+}

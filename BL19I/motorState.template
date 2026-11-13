@@ -1,0 +1,30 @@
+record(asyn, "$(P):$(AXIS):DIS") {
+  field(AOUT, "$(IVAR)=1")
+  field(PORT, "$(PORT)")
+}
+
+record(asyn, "$(P):$(AXIS):ENA") {
+  field(AOUT, "$(IVAR)=$(FERROR)")
+  field(PORT, "$(PORT)")
+}
+
+
+record(asyn, "$(P):$(AXIS):READ:FE:LIMIT") {
+  field(SCAN, ".5 second")
+  field(AOUT, "$(IVAR)")
+  field(PORT, "$(PORT)")
+  field(FLNK, "$(P):$(AXIS):DECODE:FE:LIMIT")
+}
+
+record(calcout, "$(P):$(AXIS):DECODE:FE:LIMIT") {
+  field(INPA, "$(P):$(AXIS):READ:FE:LIMIT.AINP")
+  field(CALC, "(A=1)?0:1")
+  field(OUT, "$(P):$(AXIS):STATE .PP")
+}
+
+record(bi, "$(P):$(AXIS):STATE")
+{
+  field(DTYP, "Soft Channel")
+  field(ZNAM, "DISABLED")
+  field(ONAM, "ENABLED")
+}

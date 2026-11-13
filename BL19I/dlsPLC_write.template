@@ -1,0 +1,12 @@
+record(bo,"$(P):$(Q):choiceButton") {
+  field(ZNAM, "IN")
+  field(ONAM, "OUT")
+  field(OUT,  "$(P):$(Q):PLC1 PP")
+}
+
+record(ao, "$(P):$(Q):PLC1") {
+  field(DESC, "Control")
+  field(DTYP, "asynInt32")
+  field(OUT, "@asyn($(port), $(addr), $(timeout=0)) FINS_DM_WRITE")
+  field(PRIO, "HIGH")
+}
