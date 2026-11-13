@@ -5,7 +5,8 @@
 # Pristine copies of the EPICS templates from that release.
 #
 # BL19I is the I19 beamline support module.  Only its soft-record templates
-# are carried here: every record type they use comes from base, asyn (asyn
+# are carried here: every record type they use comes from base (ai, ao, bi,
+# bo, calc, calcout, fanout, mbbi, mbbo, seq, stringin, stringout), asyn (asyn
 # record, asynInt32, asynFloat64) or calc (scalcout, sseq), so they
 # load into a stock generic IOC with no BL19I code compiled in.
 #
@@ -307,7 +308,7 @@ entity_models:
 
   - name: auto_gas_hack
     description: |-
-      Gas name string record
+      Gas name read-back string record (GAS:STR:RDHACK), initialised to NO
     parameters:
       P:
         type: str
@@ -325,7 +326,7 @@ entity_models:
 
   - name: auto_gas_strings
     description: |-
-      Gas name string record
+      Gas name string record of up to 40 characters
     parameters:
       P:
         type: str
@@ -534,7 +535,7 @@ entity_models:
       LABEL:
         type: str
         description: |-
-          Identifier for preset mirror positions: EH1-RH, EH1-SI, EH1-PT or EH2-PT
+          Label for a set of preset mirror positions, e.g. EH1-RH or Rh
       NUM:
         type: int
         description: |-
