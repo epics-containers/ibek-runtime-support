@@ -1,0 +1,44 @@
+# BL11I-serial-trigger.template
+#
+# A template that provides the ability to output a timestamped
+# trigger message on a serial interface.
+#
+# copied from BL15I-serial-trigger.template
+# re jira I11-23
+#
+# Parameters:
+#  P      Prefix name
+#  PORT   The asyn port 
+
+# % gui, $(name=None), edm, BL11I-serial-trigger.edl, trigger=$(P)
+
+# Write the trigger command
+record(asyn, "$(P):ASYNTX") {
+  field(PINI, "NO")
+  field(DTYP, "asynRecordDevice")
+  field(PORT, "$(PORT)")
+}
+
+# Construct the trigger command
+record(scalcout, "$(P):CALC") {
+  field(SCAN, "Passive")
+  field(INAA, "$(P):COMMAND")
+  field(INBB, "$(P):TIMESTAMP PP")
+  field(CC,   "\r\n")
+  field(CALC, "AA+BB+CC")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+  field(OUT, "$(P):ASYNTX.AOUT PP")
+}
+
+# The command string to send
+record(stringout, "$(P):COMMAND") {
+  field(VAL,  "A")
+}
+
+# The timestamp
+record(stringin, "$(P):TIMESTAMP") {
+  field(DTYP, "Soft Timestamp")
+  field(INP,  "@%Y-%m-%dT%H:%M:%S")
+} 
+

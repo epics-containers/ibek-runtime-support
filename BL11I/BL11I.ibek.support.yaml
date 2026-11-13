@@ -1,0 +1,70 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/4.10.0/ibek.support.schema.json
+
+# Imported from DLS production support module: BL11I 26-3
+# Source: gitlab.diamond.ac.uk controls/support/BL11I, tag 26-3, BL11IApp/Db
+# Pristine copies of the EPICS databases from that release.
+#
+# BL11I is the I11 beamline's local support module.  Only the entity models
+# whose databases need nothing compiled are here: asyn records
+# (asynRecordDevice), scalcout (calc), calc, ao, stringin with the base
+# "Soft Timestamp" device support, stringout.  Every one of those is in a
+# stock generic IOC image that has asyn and calc.
+#
+# Two models of the module stay out, because they need compiled code:
+#   rebin       - SNL program (rebin.st) built into the module's library
+#   maxonDEC505 - Hytec VME device support (DTYP Hy8001, Hy8402ip)
+#
+# To check for updates: diff this pattern's files against the newest tag of
+# controls/support/BL11I.
+
+module: BL11I
+
+entity_models:
+  - name: BL11I_cryo_rocker
+    description: |-
+      Cryo stream rocking on PMAC axis 16: start, stop and speed (i1622).
+      PV names (BL11I-CG-CSTAT-02:ROCK:*) and the asyn port name PMAC_S1 are
+      hardcoded in the database; the IOC must provide an asyn port of that
+      name connected to the PMAC.
+    databases:
+      - file: BL11I-cryo-rocker.db
+        args: {}
+
+  - name: auto_BL11I_furnace_spinner
+    description: |-
+      Furnace sample spinner on PMAC axis 12: start, stop and speed (i1222).
+      PV names (BL11I-MO-ENV-03:SPIN:*) and the asyn port name PMAC_S0 are
+      hardcoded in the database; the IOC must provide an asyn port of that
+      name connected to the PMAC.
+    databases:
+      - file: BL11I-furnace-spinner.db
+        args: {}
+
+  - name: auto_BL11I_gas_spinner_gui
+    description: |-
+      Placeholder for the gas spinner EDM embed.  Its template holds no
+      records (only an EDM gui tag), so this entity loads no database.
+      It is kept so that IOC instances which list it still validate.
+
+  - name: auto_BL11I_serial_trigger
+    description: |-
+      Sends a timestamped trigger message on a serial (asyn octet) port:
+      writing $(P):CALC.PROC sends $(P):COMMAND followed by an ISO timestamp
+      and CR LF.
+    parameters:
+      P:
+        type: str
+        description: PV prefix
+      PORT:
+        type: object
+        description: The asyn port to write the trigger message to
+    databases:
+      - file: BL11I-serial-trigger.template
+        args:
+          P:
+          PORT:
+    pvi:
+      yaml_path: BL11I-serial-trigger.pvi.device.yaml
+      ui_macros:
+        P:
+      pv_prefix: "$(P):"
