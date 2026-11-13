@@ -1,0 +1,50 @@
+###########################################################
+#
+# Template to provide normalised difference between two slit
+# drain currents. This is used for BLFeedback.
+#
+# Martin Gaughran   26 Jul 2017
+#
+###########################################################
+
+# Macros:
+#% macro, P, EPICS name prefix
+#% macro, R, EPICS name suffix
+#% macro, PREC, Precision for all values.
+#% macro, FEMTO1, Prefix for femto on negative side.
+#% macro, FEMTO2, Prefix for femto on positive side.
+#% macro, MINVAL, Minimum value for given ADC. Will use this if femto val too low.
+# This returns (G) the feedback PV, as well as (H) an indication
+# that both PVs are below the given threshold.
+record(transform, "$(P)$(R):TRANS") {
+  field(SCAN, ".1 second")
+  field(CLCE, "MAX(A*B, $(MINVAL))")
+  field(CLCF, "MAX(C*D, $(MINVAL))")
+  field(INPA, "$(FEMTO1):I")
+  field(INPB, "$(FEMTO1):SCALE")
+  field(INPC, "$(FEMTO2):I")
+  field(INPD, "$(FEMTO2):SCALE")
+  field(CLCG, "(F-E)/(ABS(F)+ABS(E))")
+  field(OUTG, "$(P)$(R):AI PP")
+  field(CLCH, "!((E=$(MINVAL))&&(F=$(MINVAL)))")
+  field(PREC, "$(PREC)")
+}
+
+# Uses the combined interlock status signal to trigger
+# busy record completion
+record(ai , "$(P)$(R):AI") {
+  field(SCAN, "Passive")
+  field(INP, "$(P)$(R):TRANS.G PP")
+  field(PREC, "$(PREC)")
+}
+
+## Average the returned values, as they fluctuate.
+#record(compress, "$(P)$(R):AVG") {
+#  field(SCAN, ".1 second")
+#  field(DTYP, "Soft Channel")
+#  field(INP, "$(P)$(R):AI PP NMS")
+#  field(ALG, "Average")
+#  field(NSAM, "1")
+#  field(N, "10")
+#  field(PREC, "$(PREC)")
+#}

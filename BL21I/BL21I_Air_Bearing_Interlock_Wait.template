@@ -1,0 +1,99 @@
+###########################################################
+#
+# Template to cause callback from OUT Air On to only trigger
+# once the motor interlocks have cleared. There is a timeout.
+#
+# Martin Gaughran   26 Jul 2017
+#
+###########################################################
+
+# Macros:
+# % macro, P, EPICS name prefix
+# % macro, R, EPICS name suffix
+# % macro, OUT, Record for Air control
+# % macro, TIMEOUT, Timeout for interlock wait
+# % macro, MOTORSTATUS, PV for the motor status bits.
+# % macro, name, Object and gui association name
+# % macro, DESC, Description for the air control
+
+# This associates a BOY screen with the template
+# % gui, $(name=), boyembed, BL21ISupportApp_opi/air_control_embed_box.opi, DESC=$(DESC), device=$(P)$(R), vlvcontrol=$(OUT)
+# % gui, $(name=), boyembed, BL21ISupportApp_opi/air_control_embed.opi, DESC=$(DESC), device=$(P)$(R), vlvcontrol=$(OUT)
+
+# This is the record that is set On or Off to trigger air.
+record(bo, "$(P)$(R)") {
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(OMSL, "supervisory")
+  field(OUT, "$(OUT) PP")
+  field(ZNAM, "Air Off")
+  field(ONAM, "Air On")
+  field(FLNK, "$(P)$(R):CALC1.PROC")
+}
+
+# This decides whether to wait for interlocks.
+record(calcout, "$(P)$(R):CALC1") {
+  field(SCAN, "Passive")
+  field(INPA, "$(P)$(R).VAL")
+  field(OUT, "$(P)$(R):FO1.PROC PP")
+  field(CALC, "A")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "1")
+}
+
+# Trigger both the BUSY wait, as well as the timeout
+record(fanout, "$(P)$(R):FO1") {
+  field(SCAN, "Passive")
+  field(LNK1, "$(P)$(R):SSEQ1.PROC")
+  field(LNK2, "$(P)$(R):SSEQ2.PROC")
+}
+
+# Busy record to indicate status of interlock
+record(busy, "$(P)$(R):BSY1") {
+}
+
+# Sequence to start busy record, and abort
+# timeout if it returns.
+record(sseq, "$(P)$(R):SSEQ1") {
+  field(SCAN, "Passive")
+  field(STR1, "Busy")
+  field(LNK1, "$(P)$(R):BSY1 CA")
+  field(WAIT1, "Wait")
+  field(DOL2, "1")
+  field(LNK2, "$(P)$(R):CALC2 PP")
+}
+
+# Determines if SSEQ2 is currently waiting,
+# and if so will abort it.
+record(calcout, "$(P)$(R):CALC2") {
+  field(SCAN, "Passive")
+  field(INPA, "$(P)$(R):SSEQ2.PACT")
+  field(OUT, "$(P)$(R):SSEQ2.ABORT N")
+  field(CALC, "A")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "1")
+}
+
+# Triggers return if wait for interlocks
+# lasts longer than timeout.
+record(sseq, "$(P)$(R):SSEQ2") {
+  field(SCAN, "Passive")
+  field(STR1, "Done")
+  field(LNK1, "$(P)$(R):BSY1.VAL CA")
+  field(DLY1, "$(TIMEOUT)")
+}
+
+# Indicates when the motor can move, by considering the
+# 'problem' status bit on the motor axis.
+record(calcout, "$(P)$(R):CALC3") {
+  field(SCAN, ".1 second")
+  field(INPA, "$(MOTORSTATUS)")
+  field(CALC, "((A&512)#512)")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "0")
+  field(OUT, "$(P)$(R):BSY1.VAL CA")
+}
+

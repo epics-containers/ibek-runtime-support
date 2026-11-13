@@ -1,0 +1,376 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/4.10.0/ibek.support.schema.json
+
+# Imported from DLS production support module: BL21I 3-11
+# Source: controls/support/BL21I (DLS GitLab), tag 3-11, BL21ISupportApp/Db
+# Pristine copies of the EPICS templates from that release.
+#
+# BL21I is the I21 beamline's support module. Its templates are pure msi (no
+# VDCT expand()) and use only soft records: ai, ao, bi, bo, calc, calcout,
+# dfanout, fanout, mbbi, mbbo, seq, stringin and stringout from EPICS base,
+# sseq and transform from calc, and busy from busy. So they run on a stock
+# generic IOC image without compiling the module. The entity models and their parameters match
+# ibek-support-dls/BL21I so that existing ioc.yaml files validate unchanged,
+# except that the builder `name` parameter is not declared: it was never passed
+# to a template, and builder2ibek drops it.
+#
+# Not in this pattern:
+# - SCM10: the scientificInstSCM10 pattern in ibek-runtime-streamdevice.
+# - FS1Control, DewarScales, ADCAcquisition, ADCAcquisitionGroup and
+#   M4ADCSupport: tied to the EtherCAT IOC BL21I-DI-IOC-01 (asynInt32 records
+#   on EtherCAT asyn ports, links to EtherCAT GenericADC and ERIO PVs), whose
+#   EtherCAT support is being replaced.
+#
+# To check for updates: diff this pattern's files against a newer tag of
+# controls/support/BL21I (BL21ISupportApp/Db).
+
+module: BL21I
+
+entity_models:
+  - name: ARMAirControl
+    description: |-
+      Combined ARM air bearing control.
+      Sets both ARM air bearings off and on simultaneously via
+      master/slave valve controller configuration.
+    parameters:
+      P:
+        type: str
+        description: EPICS name prefix
+      R:
+        type: str
+        description: EPICS name suffix
+      AirValveMasterCtrl:
+        type: str
+        description: Record for master valve controller (Granite air ctrl)
+      AirValveSlaveCtrl:
+        type: str
+        description: Record for slave valve controller (Marble air ctrl)
+      MOTORSTATUS:
+        type: str
+        description: PV for the motor status bits
+    databases:
+      - file: BL21I_ARM_Air_Control.template
+        args:
+          .*:
+
+  - name: AirBearingInterlockWait
+    description: |-
+      Air bearing interlock wait.
+      Triggers valves to open and waits for motor interlock to clear
+      with a specified timeout.
+    parameters:
+      P:
+        type: str
+        description: EPICS name prefix
+      R:
+        type: str
+        description: EPICS name suffix
+      OUT:
+        type: str
+        description: Record for Air control
+      TIMEOUT:
+        type: float
+        description: Timeout for interlock wait
+      MOTORSTATUS:
+        type: str
+        description: PV for the motor status bits
+      DESC:
+        type: str
+        description: Description for the air control
+    databases:
+      - file: BL21I_Air_Bearing_Interlock_Wait.template
+        args:
+          .*:
+
+  - name: SGMTravellerAirControl
+    description: |-
+      SGM Traveller air bearing control.
+      Sets the SGM Air bearing off and on with input of 0 and 1 respectively.
+    parameters:
+      P:
+        type: str
+        description: EPICS name prefix
+      R:
+        type: str
+        description: EPICS name suffix
+      SGMTravellerAirValve:
+        type: str
+        description: Record for SGM Traveller Air control
+      MOTORSTATUS:
+        type: str
+        description: PV for the motor status bits
+    databases:
+      - file: BL21I_SGM_Traveller_Air_Control.template
+        args:
+          .*:
+
+  - name: SMPLValveSequence
+    description: |-
+      Sample valve sequence control.
+      Triggers a defined sequence of valve controls for reinstating
+      vacuum after a change of sample.
+    parameters:
+      P:
+        type: str
+        description: EPICS name prefix
+      R:
+        type: str
+        description: EPICS name suffix
+      VAC1_NAME:
+        type: str
+        description: Short name for first vacuum element
+        default: VALVE-01
+      VAC_ELEMENT1:
+        type: str
+        description: PV for first element in the sequence
+      DELAY1:
+        type: float
+        description: ARM delay in seconds after open disarmed state
+        default: 0
+      VAC2_NAME:
+        type: str
+        description: Short name for second vacuum element
+        default: VALVE-01
+      VAC_ELEMENT2:
+        type: str
+        description: PV for second element in the sequence
+      DELAY2:
+        type: float
+        description: ARM delay in seconds after open disarmed state
+        default: 0
+      VAC3_NAME:
+        type: str
+        description: Short name for third vacuum element
+        default: VALVE-01
+      VAC_ELEMENT3:
+        type: str
+        description: PV for third element in the sequence
+      DELAY3:
+        type: float
+        description: ARM delay in seconds after open disarmed state
+        default: 0
+      VAC4_NAME:
+        type: str
+        description: Short name for fourth vacuum element
+        default: VALVE-01
+      VAC_ELEMENT4:
+        type: str
+        description: PV for fourth element in the sequence
+      DELAY4:
+        type: float
+        description: ARM delay in seconds after open disarmed state
+        default: 0
+      VAC5_NAME:
+        type: str
+        description: Short name for fifth vacuum element
+        default: VALVE-01
+      VAC_ELEMENT5:
+        type: str
+        description: PV for fifth element in the sequence
+      DELAY5:
+        type: float
+        description: ARM delay in seconds after open disarmed state
+        default: 0
+    databases:
+      - file: BL21I_SMPL_Valve_Sequence.template
+        args:
+          .*:
+
+  - name: TTHBumpstripMonitor
+    description: |-
+      TTH bumpstrip monitoring.
+      Provides an archived counter incremented on each bumpstrip contact,
+      enabling identification of when the bumpstrip was last activated.
+    parameters:
+      P:
+        type: str
+        description: Bumpstrip EPICS name prefix
+      R:
+        type: str
+        description: Bumpstrip EPICS name suffix
+      DESC:
+        type: str
+        description: Bumpstrip description for GUI
+    databases:
+      - file: BL21I_TTH_Bumpstrip_Monitor.template
+        args:
+          .*:
+
+  - name: M5LimitLatch
+    description: |-
+      Latch for the M5 limit switches, plus a status and reset PV.
+      Provides STATUS and RESET PVs.
+    parameters:
+      P:
+        type: str
+        description: EPICS name prefix
+      R:
+        type: str
+        description: EPICS name suffix
+      LIMITS:
+        type: str
+        description: EPICS Limit switch name prefix
+    databases:
+      - file: BL21I_M5_Smarpod_Limit_Latch.template
+        args:
+          .*:
+
+  - name: M5LimitStop
+    description: |-
+      Template for sending stop commands when any of the limits is triggered.
+      This assumes that a limit is triggered when it equals 0.
+    parameters:
+      P:
+        type: str
+        description: EPICS name prefix
+      R:
+        type: str
+        description: EPICS name suffix
+      limit_prefix:
+        type: str
+        description: The prefix used for the smarpod limits
+      LIMA:
+        type: str
+        description: Limit A suffix
+      LIMB:
+        type: str
+        description: Limit B suffix
+      LIMC:
+        type: str
+        description: Limit C suffix
+      LIMD:
+        type: str
+        description: Limit D suffix
+      LIME:
+        type: str
+        description: Limit E suffix
+      LIMF:
+        type: str
+        description: Limit F suffix
+      LIMG:
+        type: str
+        description: Limit G suffix
+      stop_link_one:
+        type: str
+        description: The record used to stop smarpod one
+      stop_link_two:
+        type: str
+        description: The record used to stop smarpod two
+    databases:
+      - file: BL21I_M5_Smarpod_Limit_Stop.template
+        args:
+          .*:
+
+  - name: SMPLTempsController
+    description: |-
+      Improved Lakeshore336 control screen for the I21 Sample Chamber.
+      Provides user-friendly ramp rate control and temperature input selection
+      on top of the standard Lakeshore336 records.
+    parameters:
+      prefix:
+        type: str
+        description: EPICS PV prefix
+      LAKESHORE:
+        type: str
+        description: EPICS PV prefix for the Lakeshore336 records
+      INPUT_DESC_1:
+        type: str
+        description: Descriptive name for temperature readback 1
+      INPUT_DESC_2:
+        type: str
+        description: Descriptive name for temperature readback 2
+      INPUT_DESC_3:
+        type: str
+        description: Descriptive name for temperature readback 3
+      INPUT_DESC_4:
+        type: str
+        description: Descriptive name for temperature readback 4
+      DESC:
+        type: str
+        description: Description of this template in IOC
+    databases:
+      - file: BL21I_SMPL_Temps_Controller.template
+        args:
+          .*:
+
+  - name: SMPLCollisionLimits
+    description: |-
+      SMPL collision limits for preventing collision between the sample
+      manipulator and the M5 mirror system. Provides dynamic XY limits
+      based on current motor positions plus fixed safety limits.
+    parameters:
+      P:
+        type: str
+        description: EPICS name prefix
+      R:
+        type: str
+        description: EPICS name suffix
+      SMPL_X:
+        type: str
+        description: EPICS PV for Sample X axis
+      SMPL_Y:
+        type: str
+        description: EPICS PV for Sample Y axis
+      DEFAULT_RADIUS:
+        type: float
+        description: Default XY radius of freedom (mm)
+      FIXED_XY_LLIM:
+        type: float
+        description: Fixed SMPL_X and SMPL_Y LLIM when dynamic limits are disabled (mm)
+      FIXED_XY_HLIM:
+        type: float
+        description: Fixed SMPL_X and SMPL_Y HLIM when dynamic limits are disabled (mm)
+    databases:
+      - file: BL21I_SMPL_Collision_Limits.template
+        args:
+          .*:
+
+  - name: S2DiodeDifference
+    description: |-
+      Normalised difference between two slit drain currents.
+      Used for BLFeedback.
+    parameters:
+      P:
+        type: str
+        description: EPICS name prefix
+      R:
+        type: str
+        description: EPICS name suffix
+      PREC:
+        type: int
+        description: Precision for all values
+      FEMTO1:
+        type: str
+        description: Prefix for femto on negative side
+      FEMTO2:
+        type: str
+        description: Prefix for femto on positive side
+      MINVAL:
+        type: float
+        description: Minimum value for given ADC
+    databases:
+      - file: BL21I_S2_Diode_Difference.template
+        args:
+          .*:
+
+  - name: FeedbackAutoPv
+    description: |-
+      Shutter-like AutoPV for BLfeedback.
+      Triggers feedback for a given period of time, but not when TopUp
+      is about to occur.
+    parameters:
+      prefix:
+        type: str
+        description: EPICS PV prefix
+      FEEDBACK_TIME:
+        type: float
+        description: Duration of feedback, in seconds
+      PULSE_DELAY:
+        type: float
+        description: Number of seconds between feedback pulses in Pulsed mode
+      DESC:
+        type: str
+        description: Description of this template in IOC
+    databases:
+      - file: BL21I_Feedback_Auto_Pv.template
+        args:
+          .*:
