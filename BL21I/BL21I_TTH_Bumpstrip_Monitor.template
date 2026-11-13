@@ -1,0 +1,46 @@
+###########################################################
+#
+# This template is for the display and monitoring of the TTH
+# bumpstrips, which are used for detecting physical contact
+# with the arm.
+#
+# Upon triggering, they will cut power to all
+# motors on the beamline.
+#
+# This template is used to identify when the bumpstrip was
+# last activated.
+#
+# Martin Gaughran   02 Sep 2019
+#
+###########################################################
+
+# Macros:
+# % macro, P, Bumpstrip EPICS name prefix
+# % macro, R, Bumpstrip EPICS name suffix
+# % macro, DESC, Bumpstrip description for GUI
+# % macro, name, Object and gui association name
+
+# This associates a BOY screen with the template
+# % gui, $(name=), boyembed, BL21ISupportApp_opi/TTH_bumpstrip_monitor_embed_box.opi, P=$(P), R=$(R), DESC=$(DESC)
+# % gui, $(name=), boyembed, BL21ISupportApp_opi/TTH_bumpstrip_monitor_embed.opi, P=$(P), R=$(R), DESC=$(DESC)
+
+# Detects the rising edge of the bumpstrip and increments
+# the value of $(P)$(R):COUNT
+record(calcout, "$(P)$(R):EDGE") {
+  field(SCAN, "Passive")
+  field(CALC, "A")
+  field(INPA, "$(P)$(R) CP")
+  field(OOPT, "Transition To Non-zero")
+  field(DOPT, "Use OCAL")
+  field(INPB, "$(P)$(R):COUNT NPP")
+  field(OCAL, "B+1")
+  field(OUT,  "$(P)$(R):COUNT PP")
+}
+
+#% autosave 1 VAL
+#% archiver 10 Monitor
+record(ai, "$(P)$(R):COUNT") {
+  field(SCAN, "Passive")
+  field(VAL, 0)
+  field(PINI, "YES")
+}

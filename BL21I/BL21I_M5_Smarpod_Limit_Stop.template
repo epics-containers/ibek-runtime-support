@@ -1,0 +1,60 @@
+###########################################################
+#
+# Template to trigger M5 smarpod stops when any of the
+# limits is trigerred (by changing to Off)
+#
+# Macros:
+#% macro, P, EPICS name prefix
+#% macro, R, EPICS name suffix
+#% macro, limit_prefix, The prefix used for the smarpod limits
+#% macro, LIMA, Limit A suffix
+#% macro, LIMB, Limit B suffix
+#% macro, LIMC, Limit C suffix
+#% macro, LIMD, Limit D suffix
+#% macro, LIME, Limit E suffix
+#% macro, LIMF, Limit F suffix
+#% macro, LIMG, Limit G suffix
+#% macro, stop_link_one, The record used to stop smarpod one
+#% macro, stop_link_two, The record used to stop smarpod two
+#
+# Martin Gaughran   16 Feb 2017
+#
+###########################################################
+
+# Scan OUT (passive) PV when the sum of all limits has decreased
+record(calcout, "$(P)$(R):CALC2") {
+  field(SCAN, "Passive")
+  field(INPA, "$(P)$(R):AI1.VAL")
+  field(INPB, "$(P)$(R):AI1.VAL PP")
+  field(OUT, "$(P)$(R):FO1.VAL PP")
+  field(OOPT, "When Non-zero")
+  field(CALC, "(B<A)")
+}
+
+# Calculated the sum of all limits
+record(calc, "$(P)$(R):CALC1") {
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(FLNK, "$(P)$(R):CALC2")
+  field(INPA, "$(limit_prefix)$(LIMA) CP")
+  field(INPB, "$(limit_prefix)$(LIMB) CP")
+  field(INPC, "$(limit_prefix)$(LIMC) CP")
+  field(INPD, "$(limit_prefix)$(LIMD) CP")
+  field(INPE, "$(limit_prefix)$(LIME) CP")
+  field(INPF, "$(limit_prefix)$(LIMF) CP")
+  field(INPG, "$(limit_prefix)$(LIMG) CP")
+  field(CALC, "A+B+C+D+E+F+G")
+}
+
+# Store the previous sum of all limits
+record(ai, "$(P)$(R):AI1") {
+  field(SCAN, "Passive")
+  field(INP, "$(P)$(R):CALC1.VAL")
+}
+
+# Trigger the stop commands for both smarpods
+record(fanout, "$(P)$(R):FO1") {
+  field(SCAN, "Passive")
+  field(LNK1, "$(stop_link_one)")
+  field(LNK2, "$(stop_link_two)")
+}

@@ -1,0 +1,90 @@
+###########################################################
+#
+# This template is a latch for the M5 limit switches, plus
+# a status and reset PV
+#
+# Martin Gaughran   26 Jul 2017
+#
+###########################################################
+
+# Macros:
+# % macro, P, EPICS name prefix
+# % macro, R, EPICS name suffix
+# % macro, LIMITS, EPICS Limit switch name prefix
+# % macro, name, Object and gui association name
+
+# This associates a BOY screen with the template
+# % gui, $(name=), boyembed, BL21ISupportApp_opi/M5_limit_switches_embed_box.opi, P=$(P), R=$(R), DESC=M5 Limit Switches
+# % gui, $(name=), boyembed, BL21ISupportApp_opi/M5_limit_switches_embed.opi, P=$(P), R=$(R), DESC=M5 Limit Switches
+
+# This provides (O) the STATUS input to indicate if any limits
+# have been triggered.
+record(transform, "$(P)$(R):TRANS") {
+  field(SCAN, "Passive")
+  field(CLCB, "(B&&A)")
+  field(CLCD, "(D&&C)")
+  field(CLCF, "(F&&E)")
+  field(CLCH, "(H&&G)")
+  field(CLCJ, "(J&&I)")
+  field(CLCL, "(L&&K)")
+  field(CLCN, "(N&&M)")
+  field(CLCO, "(B&&D&&F&&H&&J&&L&&N)")
+  field(INPA, "$(LIMITS):LIM01 CP")
+  field(INPC, "$(LIMITS):LIM02 CP")
+  field(INPE, "$(LIMITS):LIM03 CP")
+  field(INPG, "$(LIMITS):LIM04 CP")
+  field(INPI, "$(LIMITS):LIM05 CP")
+  field(INPK, "$(LIMITS):LIM06 CP")
+  field(INPM, "$(LIMITS):LIM07 CP")
+  field(COPT, "Always")
+}
+
+# Resets all latched variables; if input values are still off,
+# the output will remain on.
+record(dfanout , "$(P)$(R):RESET") {
+  field(SCAN, "Passive")
+  field(SELM, "All")
+  field(OUTA, "$(P)$(R):TRANS.B PP")
+  field(OUTB, "$(P)$(R):TRANS.D PP")
+  field(OUTC, "$(P)$(R):TRANS.F PP")
+  field(OUTD, "$(P)$(R):TRANS.H PP")
+  field(OUTE, "$(P)$(R):TRANS.J PP")
+  field(OUTF, "$(P)$(R):TRANS.L PP")
+  field(OUTG, "$(P)$(R):TRANS.N PP")
+  field(DOL, "1")
+}
+
+# Indicate overall status of the latches
+record(bi, "$(P)$(R):STATUS") {
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(INP, "$(P)$(R):TRANS.O CP")
+  field(ZNAM, "Off")
+  field(ONAM, "On")
+}
+
+# Number to represent latched limits
+record(calc, "$(P)$(R):LATCHVAL") {
+  field(SCAN, ".1 second")
+  field(INPA, "$(P)$(R):TRANS.B")
+  field(INPB, "$(P)$(R):TRANS.D")
+  field(INPC, "$(P)$(R):TRANS.F")
+  field(INPD, "$(P)$(R):TRANS.H")
+  field(INPE, "$(P)$(R):TRANS.J")
+  field(INPF, "$(P)$(R):TRANS.L")
+  field(INPG, "$(P)$(R):TRANS.N")
+  field(CALC, "A+(B<<1)+(C<<2)+(D<<3)+(E<<4)+(F<<5)+(G<<6)")
+}
+
+# Number to represent current limits
+record(calc, "$(P)$(R):CURVAL") {
+  field(SCAN, ".1 second")
+  field(INPA, "$(LIMITS):LIM01")
+  field(INPB, "$(LIMITS):LIM02")
+  field(INPC, "$(LIMITS):LIM03")
+  field(INPD, "$(LIMITS):LIM04")
+  field(INPE, "$(LIMITS):LIM05")
+  field(INPF, "$(LIMITS):LIM06")
+  field(INPG, "$(LIMITS):LIM07")
+  field(CALC, "A+(B<<1)+(C<<2)+(D<<3)+(E<<4)+(F<<5)+(G<<6)")
+}

@@ -1,0 +1,187 @@
+###########################################################
+#
+# Template for AutoPV based on TopUp for BLfeedback
+#
+# Allows for switch between pure TopUp-based feedback enable,
+# and a record ($(prefix):START) that when processed triggers
+# feedback for given period of time.
+#
+# Martin Gaughran   29 Sep 2017
+#
+###########################################################
+
+# Macros:
+# % macro, prefix, EPICS PV prefix
+# % macro, FEEDBACK_TIME, Duration of feedback, in seconds
+# % macro, PULSE_DELAY, Number of seconds between feedback pulses in Pulsed mode
+# % macro, DESC, Description of this template in IOC
+# % macro, name, Object and gui association name
+
+# This associates a BOY screen with the template
+# % gui, $(name=), boyembed, BL21ISupportApp_opi/feedback_auto_pv_control_embed.opi, prefix=$(prefix), DESC=$(DESC)
+# % gui, $(name=), boyembed, BL21ISupportApp_opi/feedback_auto_pv_control_embed_box.opi, prefix=$(prefix), DESC=$(DESC)
+
+# Calculates whether to enable Post-Capture feedback, and processes countdown
+# A: TopUp countdown value
+# B: AutoPV countdown value
+# C: Override - set to 0 to disable feedback
+# D: Time duration of feedback
+# E: Whether Post-Capture (PC) feedback should be allowed, based on FEEDBACK_TIME
+# F: Switch AutoPV, to see if we should start the countdown (but will not stop it)
+# G: Calculation of whether the Switch PV allows Post-Capture feedback
+# G: Whether Post-Capture feedback is currently on
+# H: Whether Post-Capture feedback should be allowed, based on B and D
+record(transform, "$(prefix):CNTDWN") {
+    field(SCAN, ".1 second")
+    field(INPA, "SR-CS-FILL-01:COUNTDOWN")
+    field(CLCB, "(B==0)?0:(B-1)")
+    field(INPC, "1")
+    field(INPD, "$(prefix):FBTIME")
+    field(CLCE, "(A<(-0.5))?1:((A-D)>0)")
+    field(INPF, "$(prefix):MODE")
+    field(CLCG, "(F==3)")
+    field(CLCH, "E&C&G")
+    field(CLCI, "(B!=0)")
+    field(OUTI, "$(prefix):PCAUTOPV PP")
+    field(FLNK, "$(prefix):SETDONE.PROC")
+    field(PINI, "YES")
+}
+
+# Allows us to change the Feedback time
+record(ai, "$(prefix):FBTIME") {
+    field(SCAN, "Passive")
+    field(DTYP, "Soft Channel")
+    field(VAL, "$(FEEDBACK_TIME)")
+    field(EGU, "s")
+    field(PREC, "1")
+    field(PINI, "YES")
+}
+
+record(ai, "$(prefix):PCAUTOPV") {
+    field(SCAN, "Passive")
+    field(DTYP, "Soft Channel")
+    field(VAL, "0")
+    field(PINI, "YES")
+}
+
+# Set the countdown going, then start the busy record
+record(sseq, "$(prefix):START") {
+    field(SCAN, "Passive")
+    field(DO1, "1")
+    field(LNK1, "$(prefix):STARTCOUNT.PROC CA")
+    field(WAIT1, "Wait")
+    field(STR2, "Busy")
+    field(LNK2, "$(prefix):BUSY CA")
+    field(WAIT2, "Wait")
+}
+
+record(calcout, "$(prefix):STARTCOUNT") {
+    field(SCAN, "Passive")
+    field(INPA, "$(prefix):CNTDWN.H")
+    field(CALC, "A")
+    field(INPB, "$(prefix):FBTIME")
+    field(OCAL, "10 * B")
+    field(DOPT, "Use OCAL")
+    field(OUT, "$(prefix):CNTDWN.B PP NMS")
+    field(OOPT, "When Non-zero")
+}
+
+record(busy, "$(prefix):BUSY") {
+}
+
+# Set the Busy record to done when appropriate
+record(calcout, "$(prefix):SETDONE") {
+    field(SCAN, "Passive")
+    field(INPA, "$(prefix):CNTDWN.B")
+    field(OUT, "$(prefix):BUSY.VAL CA")
+    field(CALC, "A")
+    field(OOPT, "When Zero")
+}
+
+# Enable feedback unless TopUp in progress
+# Field B is override - set to 0 to disable feedback
+record(calc, "$(prefix):TOPUPAUTOPV") {
+    field(SCAN, ".1 second")
+    field(INPA, "SR-CS-FILL-01:COUNTDOWN")
+    field(INPB, "1")
+    field(CALC, "((A<(-0.5))?1:(A>0)) && B")
+}
+
+# Delay between pulses of feedback for 
+# 'Pulsed TopUp AutoPV mode'
+record(ai, "$(prefix):PULSE_DELAY") {
+    field(SCAN, "Passive")
+    field(VAL, "$(PULSE_DELAY)")
+}
+
+# Counts from 0 to PULSE_DELAY; when zero, the
+# 'Pulsed TopUp AutoPV mode' will trigger feedback,
+# otherwise it is off
+record(transform, "$(prefix):PULSECOUNT") {
+    field(SCAN, "1 second")
+    field(INPA,  "0")
+    field(INPB,  "1")
+    field(INPA, "$(prefix):PULSE_DELAY")
+    field(CLCB, "(B==ABS(A))?0:(B+1)")
+    field(CLCC, "(B==0)")
+    field(OUTC, "$(prefix):PULSE PP")
+}
+
+# Reset the pulse count the if the AutoPV turns on
+record(calcout, "$(prefix):RESETPULSECOUNT") {
+    field(SCAN, "Passive")
+    field(INPA, "$(prefix):TOPUPAUTOPV CP")
+    field(INPB, "$(prefix):PULSE_DELAY CP")
+    field(CALC, "A")
+    field(OOPT, "Transition To Non-zero")
+    field(DOPT, "Use OCAL")
+    field(OCAL, "ABS(B)")
+    field(OUT, "$(prefix):PULSECOUNT.B PP")
+}
+
+# Indicates whether pulse is active
+record(bi, "$(prefix):PULSE") {
+    field(SCAN, "Passive")
+    field(DTYP, "Soft Channel")
+    field(ZNAM, "Off")
+    field(ONAM, "On")
+}
+
+# Switch AutoPV settings
+#% autosave 1 VAL
+record(mbbi, "$(prefix):MODE") {
+    field(SCAN, "Passive")
+    field(DTYP, "Soft Channel")
+    field(ZRST, "Off (override)")
+    field(ONST, "On (override)")
+    field(TWST, "TopUp AutoPV mode")
+    field(THST, "Post-Capture AutoPV mode")
+    field(FRST, "Pulsed TopUp AutoPV mode")
+    field(VAL, "0")
+    field(PINI, "YES")
+}
+
+# Calculate the resultant AutoPV output
+# The output is the result of one of the main AutoPVs if
+# C is -1, otherwise 1 sets it enabled, and any other number
+# sets it disabled
+record(calcout, "$(prefix):CALCAUTOPV") {
+    field(SCAN, "Passive")
+    field(INPA, "$(prefix):PCAUTOPV CP")
+    field(INPB, "$(prefix):TOPUPAUTOPV CP")
+    field(INPC, "$(prefix):MODE CP")
+    field(INPD, "$(prefix):PULSE CP")
+    field(CALC, "(C==1)||((C==2)&&(B))||((C==3)&&(A))||((C==4)&&(B)&&(D))")
+    field(OUT, "$(prefix):AUTOPV PP")
+    field(VAL, "0")
+    field(PINI, "YES")
+}
+
+record(bi, "$(prefix):AUTOPV") {
+    field(SCAN, "Passive")
+    field(DTYP, "Soft Channel")
+    field(ZNAM, "Feedback Off")
+    field(ONAM, "Feedback On")
+    field(VAL, "0")
+    field(PINI, "YES")
+}

@@ -1,0 +1,93 @@
+###########################################################
+#
+# Template for SMPL Temperature control
+#
+# Martin Gaughran   03 Apr 2018
+#
+###########################################################
+
+# Macros:
+# % macro, prefix, EPICS PV prefix
+# % macro, LAKESHORE, EPICS PV prefix for the Lakeshore336 records
+# % macro, INPUT_DESC_1, Descriptive name for temperature readback 1
+# % macro, INPUT_DESC_2, Descriptive name for temperature readback 2
+# % macro, INPUT_DESC_3, Descriptive name for temperature readback 3
+# % macro, INPUT_DESC_4, Descriptive name for temperature readback 4
+# % macro, DESC, Description of this template in IOC
+# % macro, name, Object and gui association name
+
+# This associates a BOY screen with the template
+# % gui, $(name=), boyembed, BL21ISupportApp_opi/SMPL_Temps_Controller_embed.opi, prefix=$(prefix), LAKESHORE=$(LAKESHORE), INPUT_DESC_1=$(INPUT_DESC_1), INPUT_DESC_2=$(INPUT_DESC_2), INPUT_DESC_3=$(INPUT_DESC_3), INPUT_DESC_4=$(INPUT_DESC_4), DESC=$(DESC)
+# % gui, $(name=), boyembed, BL21ISupportApp_opi/SMPL_Temps_Controller_embed_box.opi, prefix=$(prefix), LAKESHORE=$(LAKESHORE), INPUT_DESC_1=$(INPUT_DESC_1), INPUT_DESC_2=$(INPUT_DESC_2), INPUT_DESC_3=$(INPUT_DESC_3), INPUT_DESC_4=$(INPUT_DESC_4), DESC=$(DESC)
+
+# Sets the ramp rate, with a small positive value as a minimum to prevent ramping being turned off.
+record(ai, "$(prefix):USER:RAMP_RATE") {
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(PREC, "3")
+  field(EGU, "K/min")
+  field(FLNK, "$(prefix):USER:VALIDATE_RAMP_RATE")
+}
+
+record(calcout, "$(prefix):USER:VALIDATE_RAMP_RATE") {
+  field(SCAN, "Passive")
+  field(INPA, "$(prefix):USER:RAMP_RATE")
+  field(OUT, "$(LAKESHORE):RAMP_S1 PP")
+  field(CALC, "(A<0.001)?0.001:A")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+}
+
+# Used to display the currently selected input used by the PID controller.
+record(mbbi, "$(prefix):USER:OMINPUT") {
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(INP, "$(LAKESHORE):OMINPUT1 CP")
+  field(ZRST, "None")
+  field(ZRVL, "0")
+  field(ONST, "$(INPUT_DESC_1)")
+  field(ONVL, "1")
+  field(TWST, "$(INPUT_DESC_2)")
+  field(TWVL, "2")
+  field(THST, "$(INPUT_DESC_3)")
+  field(THVL, "3")
+  field(FRST, "$(INPUT_DESC_4)")
+  field(FRVL, "4")
+}
+
+record(ai, "$(prefix):USER:RAMP_END") {
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(VAL, "0")
+  field(EGU, "K")
+  field(PREC, "3")
+}
+
+record(calc, "$(prefix):USER:SELECTED_TEMP_RBV") {
+  field(SCAN, "Passive")
+  field(VAL, "0")
+  field(EGU, "K")
+  field(PREC, "3")
+  field(INPA, "$(LAKESHORE):OMINPUT1 CP")
+  field(INPB, "$(LAKESHORE):KRDG0 CP")
+  field(INPC, "$(LAKESHORE):KRDG1 CP")
+  field(INPD, "$(LAKESHORE):KRDG2 CP")
+  field(INPE, "$(LAKESHORE):KRDG3 CP")
+  field(CALC, "(A=1)?B:(A=2)?C:(A=3)?D:(A=4)?E:0")
+}
+
+
+record(sseq, "$(prefix):USER:RAMP_SEQ") {
+  field(SCAN, "Passive")
+  field(DO1, "0")
+  field(LNK1, "$(LAKESHORE):RAMPST_S1 CA")
+  field(WAIT1, "Wait")
+  field(DOL2, "$(prefix):USER:SELECTED_TEMP_RBV")
+  field(LNK2, "$(LAKESHORE):SETP_S1 CA")
+  field(WAIT2, "Wait")
+  field(DO3, "1")
+  field(LNK3, "$(LAKESHORE):RAMPST_S1 CA")
+  field(WAIT3, "Wait")
+  field(DOL4, "$(prefix):USER:RAMP_END")
+  field(LNK4, "$(LAKESHORE):SETP_S1 CA")
+}

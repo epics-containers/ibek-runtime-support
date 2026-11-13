@@ -1,0 +1,189 @@
+###########################################################
+#
+# This template provides full control over the SMPL collision limits
+# applied to SMPL X, Y, RZ.
+#
+# (10/2023)- Limits related on M5 Rotation were found unecessary and removed.
+#
+# Potential collision between the sample manipulator and the M5 mirror system is linked to
+# the sample XY position. To prevent collision, X and Y limits are calculated dynamically
+# depending on their current relative motor positions.
+# An additional safety measure with fixed limits is also put in place in case
+# that dynamic limit gets disabled inadvertently (which shouldn't happen!).
+#
+# Martin Gaughran   02/01/2019
+# Rev.1: Gregory Gay    12/06/2023
+# Rev.2: Gregory Gay    06/11/2023
+#
+###########################################################
+
+# Macros:
+# % macro, P, EPICS name prefix
+# % macro, R, EPICS name suffix
+# % macro, SMPL_X, EPICS PV for Sample X axis
+# % macro, SMPL_Y, EPICS PV for Sample Y axis
+# % macro, DEFAULT_RADIUS, Default XY radius of freedom (mm)
+# % macro, FIXED_XY_LLIM, Fixed SMPL_X and SMPL_Y LLIM when dynamic limits are disabled (mm)
+# % macro, FIXED_XY_HLIM, Fixed SMPL_X and SMPL_Y HLIM when dynamic limits are disabled (mm)
+# % macro, name, Object and gui association name
+
+# This associates a BOY screen with the template
+# % gui, $(name=), boyembed, BL21ISupportApp_opi/SMPL_Collision_Limits_embed_box.opi, P=$(P), R=$(R), DESC=SMPL Collision Limits
+# % gui, $(name=), boyembed, BL21ISupportApp_opi/SMPL_Collision_Limits_embed.opi, P=$(P), R=$(R), DESC=SMPL Collision Limits
+
+
+###########################################################
+#
+# Calculate XY Collision Limits (dynamically):
+# A change in one of X or Y position will modify the soft limit values of the other axis.
+# Any authorised position (X,Y) must be within the circular area defined by
+# centre (0,0) and radius ($DEFAULT_RADIUS)mm which are specific to the system setup.
+
+# This record is monitored by the following limit PVs (HLIM and LLIM),
+# and is used to enable/disable the calculation of the SMPL XY limits.
+#% autosave 1 VAL
+record(bo, "$(P)$(R):XY:CTRL") {
+    field(DESC, "Enable XY Limits Calc")
+    field(SCAN, "Passive")
+    field(DTYP, "Soft Channel")
+    field(ZNAM, "On")
+    field(ONAM, "Off")
+    field(VAL, "0")
+    field(PINI, "YES")
+    field(FLNK, "$(P)$(R):XY:SET")
+}
+
+# Low limit calculation PV for SMPL_X.
+record(calcout, "$(P)$(R):XY:X_LLIM") {
+    field(DESC, "Calculate X low limit")
+    field(SCAN, "2 second")
+    field(DTYP, "Soft Channel")
+    field(SDIS, "$(P)$(R):XY:CTRL")
+    field(CALC, "(A**2>B**2) ? 0 : - SQR(B**2 - A**2)")
+    field(INPA, "$(SMPL_Y).RBV CPP")
+    field(INPB, "$(P)$(R):XY:RADIUS:CONF")
+    field(OUT, "$(SMPL_X).LLM CP")
+    field(OOPT, "On Change")
+}
+
+# High limit calculation PV for SMPL_X.
+record(calcout, "$(P)$(R):XY:X_HLIM") {
+    field(DESC, "Calculate X high limit")
+    field(SCAN, "2 second")
+    field(DTYP, "Soft Channel")
+    field(SDIS, "$(P)$(R):XY:CTRL")
+    field(CALC, "(A**2>B**2) ? 0 : SQR(B**2 - A**2)")
+    field(INPA, "$(SMPL_Y).RBV CPP")
+    field(INPB, "$(P)$(R):XY:RADIUS:CONF")
+    field(OUT, "$(SMPL_X).HLM CP")
+    field(OOPT, "On Change")
+}
+
+# Low limit calculation PV for SMPL_Y.
+record(calcout, "$(P)$(R):XY:Y_LLIM") {
+    field(DESC, "Calculate Y low limit")
+    field(SCAN, "2 second")
+    field(DTYP, "Soft Channel")
+    field(SDIS, "$(P)$(R):XY:CTRL")
+    field(CALC, "(A**2>B**2) ? 0 : - SQR(B**2 - A**2)")
+    field(INPA, "$(SMPL_X).RBV CPP")
+    field(INPB, "$(P)$(R):XY:RADIUS:CONF")
+    field(OUT, "$(SMPL_Y).LLM CP")
+    field(OOPT, "On Change")
+}
+
+# High limit calculation PV for SMPL_Y.
+record(calcout, "$(P)$(R):XY:Y_HLIM") {
+    field(DESC, "Calculate Y high limit")
+    field(SCAN, "2 second")
+    field(DTYP, "Soft Channel")
+    field(SDIS, "$(P)$(R):XY:CTRL")
+    field(CALC, "(A**2>B**2) ? 0 : SQR(B**2 - A**2)")
+    field(INPA, "$(SMPL_X).RBV CPP")
+    field(INPB, "$(P)$(R):XY:RADIUS:CONF")
+    field(OUT, "$(SMPL_Y).HLM CP")
+    field(OOPT, "On Change")
+}
+
+# Radius of limits on SMPL_X and SMPL_Y axes.
+#% autosave 1 VAL
+record(ai, "$(P)$(R):XY:RADIUS:CONF") {
+    field(DESC, "Radius of allowed XY area")
+    field(SCAN, "Passive")
+    field(DTYP, "Soft Channel")
+    field(PREC, "3")
+    field(EGU, "mm")
+    field(VAL, "$(DEFAULT_RADIUS)")
+    field(PINI, "YES")
+}
+
+
+###########################################################
+#
+# Enforce fixed XY Collision limits in case the dynamic check gets disabled.
+# This is used as an extra safety layer to prevent possible collision.
+# 
+# When the dynamic limits get disabled, the SMPL_RZ will be in a safe position (no collision).
+# If X or Y currently outside the fixed value limits, then only option will be
+# to bring them back within a very safe range.
+# Once in that XY zone, SMPL_RZ can be left where it is or moved to any other position
+# as it has access to the full range without possible collision.
+
+# Enable/disable fixed XY limits.
+record(calcout, "$(P)$(R):XY:SET") {
+    field(DESC, "Set fixed XY limits")
+    field(SCAN, "Passive")
+    field(DTYP, "Soft Channel")
+    field(CALC, "!A")
+    field(INPA, "$(P)$(R):XY:CTRL")
+    field(OUT, "$(P)$(R):XY:SET:FANOUT.SDIS CP")
+}
+
+# Fanout limit enforcement to SMPL_X and SMPL_Y.
+# No need to enforce SMPL_RZ
+record(fanout, "$(P)$(R):XY:SET:FANOUT") {
+    field(DESC, "Fanout of limit processing")
+    field(SCAN, "2 second")
+    field(SDIS, "$(P)$(R):XY:SET")
+    field(LNK1, "$(P)$(R):XY:SET:X_LLIM PP")
+    field(LNK2, "$(P)$(R):XY:SET:X_HLIM PP")
+    field(LNK3, "$(P)$(R):XY:SET:Y_LLIM PP")
+    field(LNK4, "$(P)$(R):XY:SET:Y_HLIM PP")
+    field(SELM, "All")
+}
+
+# Set SMPL_X low limit to a fixed value.
+record(ao, "$(P)$(R):XY:SET:X_LLIM") {
+    field(DESC, "Set smpl X low limit")
+    field(SCAN, "Passive")
+    field(DTYP, "Soft Channel")
+    field(VAL, "$(FIXED_XY_LLIM)")
+    field(OUT, "$(SMPL_X).LLM CP")
+}
+
+# Set SMPL_X high limit to a fixed value.
+record(ao, "$(P)$(R):XY:SET:X_HLIM") {
+    field(DESC, "Set smpl X high limit")
+    field(SCAN, "Passive")
+    field(DTYP, "Soft Channel")
+    field(VAL, "$(FIXED_XY_HLIM)")
+    field(OUT, "$(SMPL_X).HLM CP")
+}
+
+# Set SMPL_Y low limit to a fixed value.
+record(ao, "$(P)$(R):XY:SET:Y_LLIM") {
+    field(DESC, "Set smpl Y low limit")
+    field(SCAN, "Passive")
+    field(DTYP, "Soft Channel")
+    field(VAL, "$(FIXED_XY_LLIM)")
+    field(OUT, "$(SMPL_Y).LLM CP")
+}
+
+# Set SMPL_Y high limit to a fixed value.
+record(ao, "$(P)$(R):XY:SET:Y_HLIM") {
+    field(DESC, "Set smpl Y high limit")
+    field(SCAN, "Passive")
+    field(DTYP, "Soft Channel")
+    field(VAL, "$(FIXED_XY_HLIM)")
+    field(OUT, "$(SMPL_Y).HLM CP")
+}

@@ -1,0 +1,4 @@
+version: 1
+vendor:
+  - src: '[^/]+\.(template|db|req|ibek\.support\.yaml|pvi\.device\.yaml)$'
+    dest: config
