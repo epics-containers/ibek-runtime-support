@@ -1,0 +1,27 @@
+
+record(asyn, "$(dom)-MO-GONIO-01:PHI:SAFE_POS:READ") 
+{
+  field(DESC, "Phi Safe Position")
+  field(SCAN, ".5 second")
+  field(PINI, "YES")
+  field(PORT, "BRICK_3")
+  field(AOUT, "P809")
+  field(IEOS, "\r")
+}
+
+record(ai, "$(dom)-MO-GONIO-01:PHI:SAFE_POS")
+{
+  field(DESC, "Phi Safe Position")
+  field(INP,  "$(dom)-MO-GONIO-01:PHI:SAFE_POS:READ.TINP CP")
+}
+
+record(calc, "$(dom)-MO-GONIO-01:READY")
+{
+  field(DESC, "Gonio Ready")
+  field(INPA, "$(dom)-MO-GONIO-01:CENTREY:SAFE_POS CP")
+  field(INPB, "$(dom)-MO-GONIO-01:CENTREZ:SAFE_POS CP")
+  field(INPC, "$(dom)-MO-GONIO-01:KAPPA.LLS CP")
+  field(INPD, "$(dom)-MO-GONIO-01:PHI:SAFE_POS CP")
+  field(CALC, "A&&B&&C&&D")
+}
+

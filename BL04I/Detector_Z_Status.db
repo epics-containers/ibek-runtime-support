@@ -1,0 +1,16 @@
+record(ai, "$(dom)-MO-DET-01:Z:DISABLED")
+{ 
+  field(DESC, "Detector Z Disabled")
+  field(INP,  "$(dom)-MO-DET-01:Z:DISABLED:READ.TINP CP")
+}
+
+record(asyn, "$(dom)-MO-DET-01:Z:DISABLED:READ")
+{ 
+  field(DESC, "Detector Z Disabled")
+  field(SCAN, ".5 second")
+  field(PINI, "YES")
+  field(PORT, "PMAC_S0")
+  field(AOUT, "P807")
+  field(IEOS, "\r")
+}
+
