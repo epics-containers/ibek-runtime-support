@@ -1,0 +1,40 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/pvi/releases/latest/download/pvi.device.schema.json
+# Grouped from the DLS EDM screen BL11I-serial-trigger.edl (BL11I 26-3).
+# Generated from that screen. Hand edits may be overwritten by regeneration.
+
+label: BL11I-serial-trigger
+children:
+- type: Group
+  name: General
+  layout:
+    type: Grid
+    labelled: true
+  children:
+  - type: SignalW
+    name: Command
+    label: Command
+    write_pv: $(P):COMMAND
+    write_widget:
+      type: TextWrite
+      format: string
+  - type: SignalW
+    name: Command2
+    write_pv: $(P):CALC.PROC
+    write_widget:
+      type: ButtonPanel
+      actions:
+        Send: '1'
+  - type: SignalW
+    name: TimestampInp
+    label: Time Format
+    write_pv: $(P):TIMESTAMP.INP
+    write_widget:
+      type: TextWrite
+      format: string
+  - type: SignalR
+    name: CalcSval
+    label: Sent
+    read_pv: $(P):CALC.SVAL
+    read_widget:
+      type: TextRead
+      format: string

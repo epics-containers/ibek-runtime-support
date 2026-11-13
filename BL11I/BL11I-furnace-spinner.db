@@ -1,0 +1,76 @@
+record(asyn, BL11I-MO-ENV-03:SPIN:START) {
+  field(SCAN, "Passive")
+  field(DTYP, "asynRecordDevice")
+  field(DESC, "Start")
+  field(PORT, "PMAC_S0")
+  field(AOUT, "#12hmz#12j+")
+}
+
+
+record(asyn, BL11I-MO-ENV-03:SPIN:STOP) {
+  field(SCAN, "Passive")
+  field(DTYP, "asynRecordDevice")
+  field(DESC, "Stop")
+  field(PORT, "PMAC_S0")
+  field(AOUT, "#12j/#12k")
+}
+
+
+record(ao, BL11I-MO-ENV-03:SPIN:SPEED:PERC) {
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(VAL, "0")
+  field(PREC, "1")
+  field(DRVL, "0")
+  field(DRVH, "100")  
+  field(LINR, "NO CONVERSION")
+  field(FLNK, "BL11I-MO-ENV-03:SPIN:SPEED:CTS-MS")
+  field(EGU, "%")
+}
+
+record(calc, BL11I-MO-ENV-03:SPIN:SPEED:CTS-MS) {
+  field(CALC, "B * A/100")
+  field(INPA, "BL11I-MO-ENV-03:SPIN:SPEED:PERC")
+  field(INPB, "8.333") # max cts/ms
+  field(INPC, "500")   # max RPM
+  field(FLNK, "BL11I-MO-ENV-03:SPIN:SPEED:SET")
+}
+
+record(scalcout, BL11I-MO-ENV-03:SPIN:SPEED:RBV) {
+  field(SCAN, "Passive")
+  field(PINI, "NO")
+  field(DTYP, "Soft Channel")
+  field(CALC, "SSCANF(AA, '%f')")
+  field(INAA, "BL11I-MO-ENV-03:SPIN:SPEED:ARBV.AINP PP")
+  field(PREC, "0")
+  field(EGU, "cts/ms")
+}
+
+record(asyn, BL11I-MO-ENV-03:SPIN:SPEED:ARBV) {
+  field(DESC, "Get i1222")
+  field(SCAN, "2 second")
+  field(AOUT, "i1222")
+  field(FLNK, "BL11I-MO-ENV-03:SPIN:SPEED:RBV")
+  field(PORT, "PMAC_S0")
+} 
+record(scalcout, BL11I-MO-ENV-03:SPIN:SPEED:SET) {
+  field(DTYP, "Soft Channel")
+  field(CALC, "A*C/B") # rpm for display
+  field(INPA, "BL11I-MO-ENV-03:SPIN:SPEED:CTS-MS")   # cts/ms
+  field(INPB, "BL11I-MO-ENV-03:SPIN:SPEED:CTS-MS.B") # max cts/ms
+  field(INPC, "BL11I-MO-ENV-03:SPIN:SPEED:CTS-MS.C") # max RPM
+  field(OUT, "BL11I-MO-ENV-03:SPIN:SPEED:ASET.AOUT PP")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "PRINTF('i1222=%f#12hmz#12j+', A)")
+  field(EGU, "RPM")
+}
+
+record(asyn, BL11I-MO-ENV-03:SPIN:SPEED:ASET) {
+  field(SCAN, "Passive")
+  field(DTYP, "asynRecordDevice")
+  field(DESC, "Asyn set i1222")
+  field(PORT, "PMAC_S0")
+  field(FLNK, "BL11I-MO-ENV-03:SPIN:SPEED:ARBV")
+}
+
