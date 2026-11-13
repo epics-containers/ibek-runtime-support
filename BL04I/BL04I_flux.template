@@ -1,0 +1,331 @@
+#% macro, dom, Beamline domain
+
+### calculate flux ###
+
+#% autosave 1 A B C D E CALC
+record(calc, "$(dom)-MO-FSWT-01:FLUX:SLOPE")
+{
+  field(A, "0.000118") 
+  field(B, "-0.006587")
+  field(C, "0.140603")
+  field(D, "-1.436759")
+  field(E, "-11.370252")
+  field(INPF, "$(dom)-MO-DCM-01:ENERGY.RBV CP")
+  field(PREC, "15")
+  field(CALC, "10^((A*F**4)+(B*F**3)+(C*F**2)+(D*F)+E)")
+}
+
+#% autosave 1 CALC
+record(calc, "$(dom)-MO-FSWT-01:FLUX")
+{
+  field(INPA, "$(dom)-MO-FSWT-01:FLUX:SLOPE CP")
+  field(INPB, "$(dom)-EA-XBPM-02:SumAll:MeanValue_RBV CP")
+  field(CALC, "B>6*10^-9?B/A:0")
+}
+
+record(calc, "$(dom)-MO-FLUX-01:SAMP")
+{
+    field(CALC, "A*B*C")
+    field(DESC, "curr flux with scaty&mapt")
+    field(INPA, "$(dom)-MO-SCAT-01:Y:CURR_FACTOR CP")
+    field(INPB, "$(dom)-MO-FSWT-01:FLUX CP")
+    field(INPC, "$(dom)-MO-MAPT-01:Y:CURR_FACTOR CP")
+}
+
+record(calc, "$(dom)-MO-FLUX-01:PRED")
+{
+    field(CALC, "A*B*C")
+    field(DESC, "predicted flux with scaty&mapt")
+    field(INPA, "$(dom)-MO-SCAT-01:Y:REQ_FACTOR CP")
+    field(INPB, "$(dom)-MO-FSWT-01:FLUX CP")
+    field(INPC, "$(dom)-MO-MAPT-01:Y:REQ_FACTOR CP")
+}
+
+record(calc, "$(dom)-MO-MAPT-01:Y:CURR_FACTOR")
+{
+    field(CALC, "A*E + B*F+C*G+D*H")
+    field(DESC, "mapty current factor")
+    field(INPA, "$(dom)-MO-MAPT-01:Y:SMALL_FACTOR CP")
+    field(INPB, "$(dom)-MO-MAPT-01:Y:MEDIUM_FACTOR CP")
+    field(INPC, "$(dom)-MO-MAPT-01:Y:LARGE_FACTOR CP")
+    field(INPD, "$(dom)-MO-MAPT-01:Y:OTHER_FACTOR CP")
+    field(INPE, "$(dom)-MO-MAPT-01:Y:SMALL_CALC CP")
+    field(INPF, "$(dom)-MO-MAPT-01:Y:MEDIUM_CALC CP")
+    field(INPG, "$(dom)-MO-MAPT-01:Y:LARGE_CALC CP")
+    field(INPH, "$(dom)-MO-MAPT-01:Y:OTHER_CALC CP")
+    field(PINI, "YES")
+}
+
+#% autosave 1 VAL
+record(ai, "$(dom)-MO-MAPT-01:Y:LARGE")
+{
+    field(DESC, "mapty large")
+    field(VAL,  "41.88")
+}
+
+record(calc, "$(dom)-MO-MAPT-01:Y:LARGE_CALC")
+{
+    field(CALC, "(B<=A+C && B>=A-C)?1:0")
+    field(DESC, "mapty in lagre range")
+    field(INPA, "$(dom)-MO-MAPT-01:Y:LARGE CP")
+    field(INPB, "$(dom)-MO-MAPT-01:Y.RBV CP")
+    field(INPC, "$(dom)-MO-MAPT-01:Y:MARGIN CP")
+}
+
+#% autosave 1 VAL
+record(ai, "$(dom)-MO-MAPT-01:Y:LARGE_FACTOR")
+{
+    field(DESC, "mapty large factor")
+    field(VAL,  "1")
+}
+
+#% autosave 1 VAL
+record(ai, "$(dom)-MO-MAPT-01:Y:MARGIN")
+{
+    field(DESC, "mapty margin ")
+    field(VAL,  "1")
+}
+
+#% autosave 1 VAL
+record(ai, "$(dom)-MO-MAPT-01:Y:MEDIUM")
+{
+    field(DESC, "mapty medium")
+    field(VAL,  "45.245")
+}
+
+record(calc, "$(dom)-MO-MAPT-01:Y:MEDIUM_CALC")
+{
+    field(CALC, "(B<=A+C && B>=A-C)?1:0")
+    field(DESC, "mapty in medium range")
+    field(INPA, "$(dom)-MO-MAPT-01:Y:MEDIUM CP")
+    field(INPB, "$(dom)-MO-MAPT-01:Y.RBV CP")
+    field(INPC, "$(dom)-MO-MAPT-01:Y:MARGIN CP")
+}
+
+#% autosave 1 VAL
+record(ai, "$(dom)-MO-MAPT-01:Y:MEDIUM_FACTOR")
+{
+    field(DESC, "mapty medium factor")
+    field(VAL,  "1")
+}
+
+#% autosave 1 VAL
+record(mbbi, "$(dom)-MO-MAPT-01:Y:MODE")
+{
+    field(DESC, "Mini app y mode")
+    field(ONST, "SMALL_APERTURE")
+    field(THST, "LARGE_APERTURE")
+    field(TWST, "MEDIUM_APERTURE")
+    field(ZRST, "NO_APERTURE")
+}
+
+record(calc, "$(dom)-MO-MAPT-01:Y:OTHER_CALC")
+{
+    field(CALC, "(A||B||C)?0:1")
+    field(DESC, "mapty in open range")
+    field(INPA, "$(dom)-MO-MAPT-01:Y:SMALL_CALC CP")
+    field(INPB, "$(dom)-MO-MAPT-01:Y:MEDIUM_CALC CP")
+    field(INPC, "$(dom)-MO-MAPT-01:Y:LARGE_CALC CP")
+}
+
+#% autosave 1 VAL
+record(ai, "$(dom)-MO-MAPT-01:Y:OTHER_FACTOR")
+{
+    field(DESC, "mapty other factor")
+    field(VAL,  "1")
+}
+
+record(calc, "$(dom)-MO-MAPT-01:Y:REQ_FACTOR")
+{
+    field(CALC, "E=1?A:(E=2?B:(E=3?C:D))")
+    field(DESC, "mapty requested factor")
+    field(INPA, "$(dom)-MO-MAPT-01:Y:SMALL_FACTOR CP")
+    field(INPB, "$(dom)-MO-MAPT-01:Y:MEDIUM_FACTOR CP")
+    field(INPC, "$(dom)-MO-MAPT-01:Y:LARGE_FACTOR CP")
+    field(INPD, "$(dom)-MO-MAPT-01:Y:OTHER_FACTOR CP")
+    field(INPE, "$(dom)-MO-MAPT-01:Y:MODE CP")
+}
+
+#% autosave 1 VAL
+record(ai, "$(dom)-MO-MAPT-01:Y:SMALL")
+{
+    field(DESC, "mapty small")
+    field(VAL,  "49.795")
+}
+
+record(calc, "$(dom)-MO-MAPT-01:Y:SMALL_CALC")
+{
+    field(CALC, "(B<=A+C && B>=A-C)?1:0")
+    field(DESC, "mapty in small rage")
+    field(INPA, "$(dom)-MO-MAPT-01:Y:SMALL CP")
+    field(INPB, "$(dom)-MO-MAPT-01:Y.RBV CP")
+    field(INPC, "$(dom)-MO-MAPT-01:Y:MARGIN CP")
+}
+
+#% autosave 1 VAL
+record(ai, "$(dom)-MO-MAPT-01:Y:SMALL_FACTOR")
+{
+    field(DESC, "mapty small factor")
+    field(VAL,  "1")
+}
+
+record(calc, "$(dom)-MO-SCAT-01:Y:CURR_FACTOR")
+{
+    field(CALC, "A*E + B*F+C*G+D*H")
+    field(DESC, "scaty current factor")
+    field(INPA, "$(dom)-MO-SCAT-01:Y:SMALL_FACTOR CP")
+    field(INPB, "$(dom)-MO-SCAT-01:Y:MEDIUM_FACTOR CP")
+    field(INPC, "$(dom)-MO-SCAT-01:Y:LARGE_FACTOR CP")
+    field(INPD, "$(dom)-MO-SCAT-01:Y:OTHER_FACTOR CP")
+    field(INPE, "$(dom)-MO-SCAT-01:Y:SMALL_CALC CP")
+    field(INPF, "$(dom)-MO-SCAT-01:Y:MEDIUM_CALC CP")
+    field(INPG, "$(dom)-MO-SCAT-01:Y:LARGE_CALC CP")
+    field(INPH, "$(dom)-MO-SCAT-01:Y:OTHER_CALC CP")
+    field(PINI, "YES")
+}
+
+#% autosave 1 VAL
+record(ai, "$(dom)-MO-SCAT-01:Y:LARGE")
+{
+    field(DESC, "scaty large")
+    field(VAL,  "4.637")
+}
+
+record(calc, "$(dom)-MO-SCAT-01:Y:LARGE_CALC")
+{
+    field(CALC, "(B<=A+C && B>=A-C)?1:0")
+    field(DESC, "scaty in lagre range")
+    field(INPA, "$(dom)-MO-SCAT-01:Y:LARGE CP")
+    field(INPB, "$(dom)-MO-SCAT-01:Y.RBV CP")
+    field(INPC, "$(dom)-MO-SCAT-01:Y:MARGIN CP")
+}
+
+#% autosave 1 VAL
+record(ai, "$(dom)-MO-SCAT-01:Y:LARGE_FACTOR")
+{
+    field(DESC, "scaty large factor")
+    field(VAL,  "1")
+}
+
+#% autosave 1 VAL
+record(ai, "$(dom)-MO-SCAT-01:Y:MARGIN")
+{
+    field(DESC, "scaty margin ")
+    field(VAL,  "1")
+}
+
+#% autosave 1 VAL
+record(ai, "$(dom)-MO-SCAT-01:Y:MEDIUM")
+{
+    field(DESC, "scaty medium")
+    field(VAL,  "0.15")
+}
+
+record(calc, "$(dom)-MO-SCAT-01:Y:MEDIUM_CALC")
+{
+    field(CALC, "(B<=A+C && B>=A-C)?1:0")
+    field(DESC, "scaty in medium range")
+    field(INPA, "$(dom)-MO-SCAT-01:Y:MEDIUM CP")
+    field(INPB, "$(dom)-MO-SCAT-01:Y.RBV CP")
+    field(INPC, "$(dom)-MO-SCAT-01:Y:MARGIN CP")
+}
+
+#% autosave 1 VAL
+record(ai, "$(dom)-MO-SCAT-01:Y:MEDIUM_FACTOR")
+{
+    field(DESC, "scaty medium factor")
+    field(VAL,  "1")
+}
+
+#% autosave 1 VAL
+record(mbbi, "$(dom)-MO-SCAT-01:Y:MODE")
+{
+    field(DESC, "Mini app y mode")
+    field(ONST, "SMALL")
+    field(THST, "LARGE")
+    field(TWST, "MEDIUM")
+    field(ZRST, "NO_APERTURE")
+}
+
+record(calc, "$(dom)-MO-SCAT-01:Y:OTHER_CALC")
+{
+    field(CALC, "(A||B||C)?0:1")
+    field(DESC, "scaty in open range")
+    field(INPA, "$(dom)-MO-SCAT-01:Y:SMALL_CALC CP")
+    field(INPB, "$(dom)-MO-SCAT-01:Y:MEDIUM_CALC CP")
+    field(INPC, "$(dom)-MO-SCAT-01:Y:LARGE_CALC CP")
+}
+
+#% autosave 1 VAL
+record(ai, "$(dom)-MO-SCAT-01:Y:OTHER_FACTOR")
+{
+    field(DESC, "scaty other factor")
+    field(VAL,  "1")
+}
+
+record(calc, "$(dom)-MO-SCAT-01:Y:REQ_FACTOR")
+{
+    field(CALC, "E=1?A:(E=2?B:(E=3?C:D))")
+    field(DESC, "scaty requested factor")
+    field(INPA, "$(dom)-MO-SCAT-01:Y:SMALL_FACTOR CP")
+    field(INPB, "$(dom)-MO-SCAT-01:Y:MEDIUM_FACTOR CP")
+    field(INPC, "$(dom)-MO-SCAT-01:Y:LARGE_FACTOR CP")
+    field(INPD, "$(dom)-MO-SCAT-01:Y:OTHER_FACTOR CP")
+    field(INPE, "$(dom)-MO-SCAT-01:Y:MODE CP")
+}
+
+#% autosave 1 VAL
+record(ai, "$(dom)-MO-SCAT-01:Y:SMALL")
+{
+    field(DESC, "scaty small")
+    field(VAL,  "-4.25")
+}
+
+record(calc, "$(dom)-MO-SCAT-01:Y:SMALL_CALC")
+{
+    field(CALC, "(B<=A+C && B>=A-C)?1:0")
+    field(DESC, "scaty in small rage")
+    field(INPA, "$(dom)-MO-SCAT-01:Y:SMALL CP")
+    field(INPB, "$(dom)-MO-SCAT-01:Y.RBV CP")
+    field(INPC, "$(dom)-MO-SCAT-01:Y:MARGIN CP")
+}
+
+#% autosave 1 VAL
+record(ai, "$(dom)-MO-SCAT-01:Y:SMALL_FACTOR")
+{
+    field(DESC, "scaty small factor")
+    field(VAL,  "1")
+}
+
+#% autosave 1 VAL
+record(ao, "$(dom)-MO-FLUX-01:COEFFICIENT_0")
+{
+  field(VAL, 0.9688301610579236)
+  field(PREC, "15")
+}
+
+#% autosave 1 VAL
+record(ao, "$(dom)-MO-FLUX-01:COEFFICIENT_1")
+{
+  field(VAL, 0.00030809868912308263)
+  field(PREC, "15")
+}
+
+#% autosave 1 VAL
+record(ao, "$(dom)-MO-FLUX-01:COEFFICIENT_2")
+{
+  field(VAL, -1.043972819498316e-05)
+  field(PREC, "15")
+}
+
+record(calcout, "$(dom)-MO-FLUX-01:ATTENUATION")
+{
+  field(INPA, "$(dom)-MO-FLUX-01:COEFFICIENT_0 CP")
+  field(INPB, "$(dom)-MO-FLUX-01:COEFFICIENT_1 CP")
+  field(INPC, "$(dom)-MO-FLUX-01:COEFFICIENT_2 CP")
+  field(INPD, "$(dom)-MO-FSWT-01:VER CP")
+  field(PREC, "14")
+  field(CALC, "(A+B*D+C*D^2)")
+  field(OUT,  "$(dom)-MO-MAPT-01:Y:LARGE_FACTOR PP")
+}
+ 

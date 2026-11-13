@@ -1,0 +1,90 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/4.10.0/ibek.support.schema.json
+
+# Imported from DLS production support module: BL04I 2025-Run4-1
+# Source: controls/support/BL04I (DLS GitLab), tag 2025-Run4-1, BL04IApp/Db
+# Pristine copies of the EPICS databases from that release.
+#
+# BL04I is the I04 beamline's support module.  It carries no dbd, libraries or
+# SNL - BL04IApp/src only installs a spreadsheet - so nothing here needs
+# compiling.  The databases are pure msi (no VDCT expand()) and use only record
+# types a generic IOC image already has: ai, ao, calc, calcout and mbbi records
+# and alias() from EPICS base, plus the asyn record from asyn.  That is why it is vendored
+# as a runtime pattern rather than built into an IOC image.
+#
+# The asyn records in Detector_Z_Status.db and GonioReady.template read a PMAC
+# variable through a fixed asyn port name (PMAC_S0 and BRICK_3), so the IOC must
+# create a port with that name.  BL04I-MO-IOC-03 (Linux) creates BRICK_3 with
+# pmacAsynIPPort.  PMAC_S0 is created today only by BL04I-MO-IOC-02, a vxWorks
+# IOC that uses a VME PMAC, so Detector_Z_Status has no container user until
+# that IOC moves to a networked brick whose port is named PMAC_S0.
+#
+# RobotInterface_PLC_Statuses.template from the same release is not vendored:
+# IOCs instantiate it through mxEH.RobotInterface_PLC_Statuses.
+# To check for updates: diff this pattern's files against the newest tag of
+# controls/support/BL04I.
+
+module: BL04I
+
+entity_models:
+  - name: auto_BL04I_flux
+    description: |-
+      I04 flux calculation: the flux from the energy and XBPM sum, and the
+      current and predicted flux factors of the mini-aperture (MAPT) and
+      scatter guard (SCAT) Y positions.
+    parameters:
+      dom:
+        type: str
+        description: |-
+          Beamline domain, e.g. BL04I
+    databases:
+      - file: BL04I_flux.template
+        args:
+          dom:
+
+  - name: auto_asynMotorAlias
+    description: |-
+      Aliases for a motor record PV and the asyn motor support PVs that
+      accompany it.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Motor record PV
+      alias:
+        type: str
+        description: |-
+          Alias PV name
+    databases:
+      - file: asynMotorAlias.template
+        args:
+          P:
+          alias:
+
+  - name: auto_GonioReady
+    description: |-
+      Goniometer ready: reads the phi safe-position variable P809 from the
+      asyn port BRICK_3 and combines it with the centre Y/Z safe positions and
+      the kappa low limit.
+    parameters:
+      dom:
+        type: str
+        description: |-
+          Beamline domain, e.g. BL04I
+    databases:
+      - file: GonioReady.template
+        args:
+          dom:
+
+  - name: auto_Detector_Z_Status
+    description: |-
+      Detector Z disabled status: reads variable P807 from the asyn port
+      PMAC_S0.
+    parameters:
+      dom:
+        type: str
+        description: |-
+          Beamline domain, e.g. BL04I
+    databases:
+      - file: Detector_Z_Status.db
+        args:
+          dom:
