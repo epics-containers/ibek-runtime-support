@@ -14,8 +14,8 @@
 # Macros:
 # % macro, P, EPICS name prefix
 # % macro, R, EPICS name suffix
-# % macro, AirValveMasterCtrl, Record for master valve controller (Granite air ctrl)
-# % macro, AirValveSlaveCtrl, Record for slave valve controller (Marble air ctrl)
+# % macro, MASTERCTLR, Record for master valve controller (Granite air ctrl)
+# % macro, SLAVECTLR, Record for slave valve controller (Marble air ctrl)
 # % macro, MOTORSTATUS, PV for the motor status bits.
 # % macro, name, Object and gui association name
 
@@ -26,10 +26,10 @@
 record(sseq, "$(P)$(R):OPEN") {
   field(SCAN, "Passive")
   field(STR1, "Reset")
-  field(LNK1, "$(AirValveMasterCtrl):CON CA")
+  field(LNK1, "$(MASTERCTLR):CON CA")
   field(WAIT1, "Wait")
   field(STR2, "Open")
-  field(LNK2, "$(AirValveMasterCtrl):CON CA")
+  field(LNK2, "$(MASTERCTLR):CON CA")
   field(WAIT2, "Wait")
   field(DLY3, "5")
   field(STR3, "Dummy")
@@ -41,7 +41,7 @@ record(sseq, "$(P)$(R):CLOSE") {
   field(SCAN, "Passive")
   field(DLY1, "3")
   field(STR1, "Close")
-  field(LNK1, "$(AirValveMasterCtrl):CON CA")
+  field(LNK1, "$(MASTERCTLR):CON CA")
   field(WAIT1, "Wait")
   field(DLY2, "3")
   field(STR2, "Dummy")
@@ -76,8 +76,8 @@ record(calcout, "$(P)$(R):VALVE:STATUS:CALC") {
   field(SCAN, "Passive")
   field(DTYP, "Soft Channel")
   field(OUT, "$(P)$(R):VALVE:STATUS PP")
-  field(INPA, "$(AirValveMasterCtrl):STA CP")
-  field(INPB, "$(AirValveSlaveCtrl):STA CP")
+  field(INPA, "$(MASTERCTLR):STA CP")
+  field(INPB, "$(SLAVECTLR):STA CP")
   field(CALC, "(A!=1)+(2*(B!=1))")
   field(OOPT, "On Change")
   field(DOPT, "Use CALC")

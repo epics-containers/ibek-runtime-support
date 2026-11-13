@@ -20,11 +20,11 @@
 # Macros:
 # % macro, P, EPICS name prefix
 # % macro, R, EPICS name suffix
-# % macro, SMPL_X, EPICS PV for Sample X axis
-# % macro, SMPL_Y, EPICS PV for Sample Y axis
-# % macro, DEFAULT_RADIUS, Default XY radius of freedom (mm)
-# % macro, FIXED_XY_LLIM, Fixed SMPL_X and SMPL_Y LLIM when dynamic limits are disabled (mm)
-# % macro, FIXED_XY_HLIM, Fixed SMPL_X and SMPL_Y HLIM when dynamic limits are disabled (mm)
+# % macro, SMPLX, EPICS PV for Sample X axis
+# % macro, SMPLY, EPICS PV for Sample Y axis
+# % macro, RADIUS, Default XY radius of freedom (mm)
+# % macro, FIXED_LLIM, Fixed SMPLX and SMPLY LLIM when dynamic limits are disabled (mm)
+# % macro, FIXED_HLIM, Fixed SMPLX and SMPLY HLIM when dynamic limits are disabled (mm)
 # % macro, name, Object and gui association name
 
 # This associates a BOY screen with the template
@@ -37,7 +37,7 @@
 # Calculate XY Collision Limits (dynamically):
 # A change in one of X or Y position will modify the soft limit values of the other axis.
 # Any authorised position (X,Y) must be within the circular area defined by
-# centre (0,0) and radius ($DEFAULT_RADIUS)mm which are specific to the system setup.
+# centre (0,0) and radius ($RADIUS)mm which are specific to the system setup.
 
 # This record is monitored by the following limit PVs (HLIM and LLIM),
 # and is used to enable/disable the calculation of the SMPL XY limits.
@@ -53,59 +53,59 @@ record(bo, "$(P)$(R):XY:CTRL") {
     field(FLNK, "$(P)$(R):XY:SET")
 }
 
-# Low limit calculation PV for SMPL_X.
+# Low limit calculation PV for SMPLX.
 record(calcout, "$(P)$(R):XY:X_LLIM") {
     field(DESC, "Calculate X low limit")
     field(SCAN, "2 second")
     field(DTYP, "Soft Channel")
     field(SDIS, "$(P)$(R):XY:CTRL")
     field(CALC, "(A**2>B**2) ? 0 : - SQR(B**2 - A**2)")
-    field(INPA, "$(SMPL_Y).RBV CPP")
+    field(INPA, "$(SMPLY).RBV CPP")
     field(INPB, "$(P)$(R):XY:RADIUS:CONF")
-    field(OUT, "$(SMPL_X).LLM CP")
+    field(OUT, "$(SMPLX).LLM CP")
     field(OOPT, "On Change")
 }
 
-# High limit calculation PV for SMPL_X.
+# High limit calculation PV for SMPLX.
 record(calcout, "$(P)$(R):XY:X_HLIM") {
     field(DESC, "Calculate X high limit")
     field(SCAN, "2 second")
     field(DTYP, "Soft Channel")
     field(SDIS, "$(P)$(R):XY:CTRL")
     field(CALC, "(A**2>B**2) ? 0 : SQR(B**2 - A**2)")
-    field(INPA, "$(SMPL_Y).RBV CPP")
+    field(INPA, "$(SMPLY).RBV CPP")
     field(INPB, "$(P)$(R):XY:RADIUS:CONF")
-    field(OUT, "$(SMPL_X).HLM CP")
+    field(OUT, "$(SMPLX).HLM CP")
     field(OOPT, "On Change")
 }
 
-# Low limit calculation PV for SMPL_Y.
+# Low limit calculation PV for SMPLY.
 record(calcout, "$(P)$(R):XY:Y_LLIM") {
     field(DESC, "Calculate Y low limit")
     field(SCAN, "2 second")
     field(DTYP, "Soft Channel")
     field(SDIS, "$(P)$(R):XY:CTRL")
     field(CALC, "(A**2>B**2) ? 0 : - SQR(B**2 - A**2)")
-    field(INPA, "$(SMPL_X).RBV CPP")
+    field(INPA, "$(SMPLX).RBV CPP")
     field(INPB, "$(P)$(R):XY:RADIUS:CONF")
-    field(OUT, "$(SMPL_Y).LLM CP")
+    field(OUT, "$(SMPLY).LLM CP")
     field(OOPT, "On Change")
 }
 
-# High limit calculation PV for SMPL_Y.
+# High limit calculation PV for SMPLY.
 record(calcout, "$(P)$(R):XY:Y_HLIM") {
     field(DESC, "Calculate Y high limit")
     field(SCAN, "2 second")
     field(DTYP, "Soft Channel")
     field(SDIS, "$(P)$(R):XY:CTRL")
     field(CALC, "(A**2>B**2) ? 0 : SQR(B**2 - A**2)")
-    field(INPA, "$(SMPL_X).RBV CPP")
+    field(INPA, "$(SMPLX).RBV CPP")
     field(INPB, "$(P)$(R):XY:RADIUS:CONF")
-    field(OUT, "$(SMPL_Y).HLM CP")
+    field(OUT, "$(SMPLY).HLM CP")
     field(OOPT, "On Change")
 }
 
-# Radius of limits on SMPL_X and SMPL_Y axes.
+# Radius of limits on SMPLX and SMPLY axes.
 #% autosave 1 VAL
 record(ai, "$(P)$(R):XY:RADIUS:CONF") {
     field(DESC, "Radius of allowed XY area")
@@ -113,7 +113,7 @@ record(ai, "$(P)$(R):XY:RADIUS:CONF") {
     field(DTYP, "Soft Channel")
     field(PREC, "3")
     field(EGU, "mm")
-    field(VAL, "$(DEFAULT_RADIUS)")
+    field(VAL, "$(RADIUS)")
     field(PINI, "YES")
 }
 
@@ -139,7 +139,7 @@ record(calcout, "$(P)$(R):XY:SET") {
     field(OUT, "$(P)$(R):XY:SET:FANOUT.SDIS CP")
 }
 
-# Fanout limit enforcement to SMPL_X and SMPL_Y.
+# Fanout limit enforcement to SMPLX and SMPLY.
 # No need to enforce SMPL_RZ
 record(fanout, "$(P)$(R):XY:SET:FANOUT") {
     field(DESC, "Fanout of limit processing")
@@ -152,38 +152,38 @@ record(fanout, "$(P)$(R):XY:SET:FANOUT") {
     field(SELM, "All")
 }
 
-# Set SMPL_X low limit to a fixed value.
+# Set SMPLX low limit to a fixed value.
 record(ao, "$(P)$(R):XY:SET:X_LLIM") {
     field(DESC, "Set smpl X low limit")
     field(SCAN, "Passive")
     field(DTYP, "Soft Channel")
-    field(VAL, "$(FIXED_XY_LLIM)")
-    field(OUT, "$(SMPL_X).LLM CP")
+    field(VAL, "$(FIXED_LLIM)")
+    field(OUT, "$(SMPLX).LLM CP")
 }
 
-# Set SMPL_X high limit to a fixed value.
+# Set SMPLX high limit to a fixed value.
 record(ao, "$(P)$(R):XY:SET:X_HLIM") {
     field(DESC, "Set smpl X high limit")
     field(SCAN, "Passive")
     field(DTYP, "Soft Channel")
-    field(VAL, "$(FIXED_XY_HLIM)")
-    field(OUT, "$(SMPL_X).HLM CP")
+    field(VAL, "$(FIXED_HLIM)")
+    field(OUT, "$(SMPLX).HLM CP")
 }
 
-# Set SMPL_Y low limit to a fixed value.
+# Set SMPLY low limit to a fixed value.
 record(ao, "$(P)$(R):XY:SET:Y_LLIM") {
     field(DESC, "Set smpl Y low limit")
     field(SCAN, "Passive")
     field(DTYP, "Soft Channel")
-    field(VAL, "$(FIXED_XY_LLIM)")
-    field(OUT, "$(SMPL_Y).LLM CP")
+    field(VAL, "$(FIXED_LLIM)")
+    field(OUT, "$(SMPLY).LLM CP")
 }
 
-# Set SMPL_Y high limit to a fixed value.
+# Set SMPLY high limit to a fixed value.
 record(ao, "$(P)$(R):XY:SET:Y_HLIM") {
     field(DESC, "Set smpl Y high limit")
     field(SCAN, "Passive")
     field(DTYP, "Soft Channel")
-    field(VAL, "$(FIXED_XY_HLIM)")
-    field(OUT, "$(SMPL_Y).HLM CP")
+    field(VAL, "$(FIXED_HLIM)")
+    field(OUT, "$(SMPLY).HLM CP")
 }

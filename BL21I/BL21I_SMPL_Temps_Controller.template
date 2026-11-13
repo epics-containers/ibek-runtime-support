@@ -9,16 +9,16 @@
 # Macros:
 # % macro, prefix, EPICS PV prefix
 # % macro, LAKESHORE, EPICS PV prefix for the Lakeshore336 records
-# % macro, INPUT_DESC_1, Descriptive name for temperature readback 1
-# % macro, INPUT_DESC_2, Descriptive name for temperature readback 2
-# % macro, INPUT_DESC_3, Descriptive name for temperature readback 3
-# % macro, INPUT_DESC_4, Descriptive name for temperature readback 4
+# % macro, INPUT1, Descriptive name for temperature readback 1
+# % macro, INPUT2, Descriptive name for temperature readback 2
+# % macro, INPUT3, Descriptive name for temperature readback 3
+# % macro, INPUT4, Descriptive name for temperature readback 4
 # % macro, DESC, Description of this template in IOC
 # % macro, name, Object and gui association name
 
 # This associates a BOY screen with the template
-# % gui, $(name=), boyembed, BL21ISupportApp_opi/SMPL_Temps_Controller_embed.opi, prefix=$(prefix), LAKESHORE=$(LAKESHORE), INPUT_DESC_1=$(INPUT_DESC_1), INPUT_DESC_2=$(INPUT_DESC_2), INPUT_DESC_3=$(INPUT_DESC_3), INPUT_DESC_4=$(INPUT_DESC_4), DESC=$(DESC)
-# % gui, $(name=), boyembed, BL21ISupportApp_opi/SMPL_Temps_Controller_embed_box.opi, prefix=$(prefix), LAKESHORE=$(LAKESHORE), INPUT_DESC_1=$(INPUT_DESC_1), INPUT_DESC_2=$(INPUT_DESC_2), INPUT_DESC_3=$(INPUT_DESC_3), INPUT_DESC_4=$(INPUT_DESC_4), DESC=$(DESC)
+# % gui, $(name=), boyembed, BL21ISupportApp_opi/SMPL_Temps_Controller_embed.opi, prefix=$(prefix), LAKESHORE=$(LAKESHORE), INPUT1=$(INPUT1), INPUT2=$(INPUT2), INPUT3=$(INPUT3), INPUT4=$(INPUT4), DESC=$(DESC)
+# % gui, $(name=), boyembed, BL21ISupportApp_opi/SMPL_Temps_Controller_embed_box.opi, prefix=$(prefix), LAKESHORE=$(LAKESHORE), INPUT1=$(INPUT1), INPUT2=$(INPUT2), INPUT3=$(INPUT3), INPUT4=$(INPUT4), DESC=$(DESC)
 
 # Sets the ramp rate, with a small positive value as a minimum to prevent ramping being turned off.
 record(ai, "$(prefix):USER:RAMP_RATE") {
@@ -45,13 +45,13 @@ record(mbbi, "$(prefix):USER:OMINPUT") {
   field(INP, "$(LAKESHORE):OMINPUT1 CP")
   field(ZRST, "None")
   field(ZRVL, "0")
-  field(ONST, "$(INPUT_DESC_1)")
+  field(ONST, "$(INPUT1)")
   field(ONVL, "1")
-  field(TWST, "$(INPUT_DESC_2)")
+  field(TWST, "$(INPUT2)")
   field(TWVL, "2")
-  field(THST, "$(INPUT_DESC_3)")
+  field(THST, "$(INPUT3)")
   field(THVL, "3")
-  field(FRST, "$(INPUT_DESC_4)")
+  field(FRST, "$(INPUT4)")
   field(FRVL, "4")
 }
 

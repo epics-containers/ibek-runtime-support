@@ -11,7 +11,7 @@
 # Macros:
 # % macro, P, EPICS name prefix
 # % macro, R, EPICS name suffix
-# % macro, SGMTravellerAirValve, Record for SGM Traveller Air control
+# % macro, AIRVALVE, Record for SGM Traveller Air control
 # % macro, MOTORSTATUS, PV for the motor status bits.
 # % macro, name, Object and gui association name
 
@@ -22,17 +22,17 @@
 record(sseq, "$(P)$(R):OPEN") {
   field(SCAN, "Passive")
   field(STR1, "Reset")
-  field(LNK1, "$(SGMTravellerAirValve):CON CA")
+  field(LNK1, "$(AIRVALVE):CON CA")
   field(WAIT1, "Wait")
   field(STR2, "Open")
-  field(LNK2, "$(SGMTravellerAirValve):CON CA")
+  field(LNK2, "$(AIRVALVE):CON CA")
   field(WAIT2, "Wait")
 }
 
 record(sseq, "$(P)$(R):CLOSE") {
   field(SCAN, "Passive")
   field(STR1, "Close")
-  field(LNK1, "$(SGMTravellerAirValve):CON CA")
+  field(LNK1, "$(AIRVALVE):CON CA")
   field(WAIT1, "Wait")
 }
 
@@ -59,7 +59,7 @@ record(calcout, "$(P)$(R):VALVE:STATUS:CALC") {
   field(SCAN, "Passive")
   field(DTYP, "Soft Channel")
   field(OUT, "$(P)$(R):VALVE:STATUS PP")
-  field(INPA, "$(SGMTravellerAirValve):STA CP")
+  field(INPA, "$(AIRVALVE):STA CP")
   field(CALC, "(A!=1)")
   field(OOPT, "On Change")
   field(DOPT, "Use CALC")
