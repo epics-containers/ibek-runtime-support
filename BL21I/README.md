@@ -4,9 +4,10 @@ Runtime pattern imported from the DLS support module `BL21I` (the I21 beamline's
 support module), release `3-11` (GitLab `controls/support/BL21I`). Its templates are
 pristine copies of that release.
 
-The templates use only soft records from EPICS base, calc (`sseq`, `scalcout`,
-`transform`) and busy (`busy`), so the pattern needs no compiled code: any generic IOC
-image that builds calc and busy can load it.
+The templates use only soft records: `ai`, `ao`, `bi`, `bo`, `calc`, `calcout`,
+`dfanout`, `fanout`, `mbbi`, `mbbo`, `seq`, `stringin` and `stringout` from EPICS base,
+`sseq` and `transform` from calc, and `busy` from busy. The pattern needs no compiled
+code: any generic IOC image that builds calc and busy can load it.
 
 How each file was obtained is recorded in the header of
 [`BL21I.ibek.support.yaml`](BL21I.ibek.support.yaml). That header is vendored with the

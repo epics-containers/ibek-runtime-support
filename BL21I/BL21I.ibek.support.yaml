@@ -1,13 +1,14 @@
 # yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/4.10.0/ibek.support.schema.json
 
 # Imported from DLS production support module: BL21I 3-11
-# Source: gitlab.diamond.ac.uk controls/support/BL21I, tag 3-11
+# Source: controls/support/BL21I (DLS GitLab), tag 3-11, BL21ISupportApp/Db
 # Pristine copies of the EPICS templates from that release.
 #
 # BL21I is the I21 beamline's support module. Its templates are pure msi (no
-# VDCT expand()) and use only soft records from EPICS base, calc (sseq,
-# scalcout, transform) and busy, so they run on a stock generic IOC image
-# without compiling the module. The entity models and their parameters match
+# VDCT expand()) and use only soft records: ai, ao, bi, bo, calc, calcout,
+# dfanout, fanout, mbbi, mbbo, seq, stringin and stringout from EPICS base,
+# sseq and transform from calc, and busy from busy. So they run on a stock
+# generic IOC image without compiling the module. The entity models and their parameters match
 # ibek-support-dls/BL21I so that existing ioc.yaml files validate unchanged,
 # except that the builder `name` parameter is not declared: it was never passed
 # to a template, and builder2ibek drops it.
