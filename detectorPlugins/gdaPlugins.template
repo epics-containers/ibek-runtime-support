@@ -114,6 +114,8 @@ record(mbbo, "$(P):Over:1:Shape")
 # Enable FIMG and MJPG at startup, as the builder does (ENABLED=1). The
 # ffmpegServer entity models take no ENABLED, so this sets the startup value
 # of the records their templates define; autosave still restores over it.
+# Remove these two blocks once the ibek-support ffmpegServer models
+# (ffmpegFile, ffmpegStream) take an ENABLED parameter.
 record("*", "$(P):FIMG:EnableCallbacks")
 {
     field(VAL,  "1")
@@ -127,6 +129,8 @@ record("*", "$(P):MJPG:EnableCallbacks")
 # Enable the time series plugins of STAT1-STAT6 at startup, as the DLS ADCore
 # builder does for every NDStats (ENABLED=1). The ADCore.NDStats entity model
 # gives its time series the ENABLED of the NDStats, which is 0 for these.
+# Remove these blocks once the ibek-support ADCore.NDStats model loads its
+# NDTimeSeries with ENABLED=1.
 
 record("*", "$(P):STAT1:TS:EnableCallbacks")
 {

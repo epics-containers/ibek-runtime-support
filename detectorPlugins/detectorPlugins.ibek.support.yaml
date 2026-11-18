@@ -54,9 +54,15 @@ entity_models:
         description: Data format of NDStdArrays waveform
         default: UCHAR
       ARRTYPE:
-        type: str
+        type: enum
         description: Asyn Array type of NDStdArrays waveform
         default: Int8
+        values:
+          Int8:
+          Int16:
+          Int32:
+          Float32:
+          Float64:
       HTTP_PORT:
         type: int
         description: Port used for ffmpegStream plugin
