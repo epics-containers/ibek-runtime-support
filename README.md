@@ -44,6 +44,8 @@ Each pattern is a top-level folder, for example:
 ```
 detectorPlugins/
   detectorPlugins.ibek.support.yaml   # entity_models "gdaPlugins" and "detectorPlugins"
+  gdaPlugins.template                 # GDA helper records for gdaPlugins
+  gdaPluginsStats.xml                 # NDAttributes file for gdaPlugins' NDStats
 BL15I-BUILDER/
   BL15I-BUILDER.ibek.support.yaml
   BL15I-SumTheDiode.template
@@ -54,34 +56,32 @@ support yaml declares two entity models, each a curated collection of AreaDetect
 plugins wired together:
 
 - **`gdaPlugins`** — the full plugin set for GDA (ROIs, stats, std-arrays, process,
-  overlay, TIFF/HDF5 file writers, PVA, ffmpeg stream, …).
+  overlay, ffmpeg file and stream, TIFF/HDF5 file writers, PVA). It replaces the DLS
+  builder object `adUtil.gdaPlugins` (adUtil 2-44) with the same PV names, parameters,
+  defaults and startup settings, so the IOC presents the same API to GDA.
 - **`detectorPlugins`** — the lighter plugin set for Ophyd (PVA, stats, ROI-stat,
   HDF5).
 
-It is a **single `*.ibek.support.yaml`** with no proto/template/DB of its own — the
-plugins it references are compiled into the AreaDetector IOC image; this pattern only
-adds the `ibek` entities that instantiate and connect them at runtime.
+The plugins these reference are compiled into the AreaDetector IOC image (`gdaPlugins`
+also needs ffmpegServer); this pattern adds the `ibek` entities that instantiate and
+connect them at runtime. `gdaPlugins` also ships two files of its own:
+`gdaPlugins.template`, the soft records GDA uses alongside the plugins, and
+`gdaPluginsStats.xml`, the NDAttributes file its NDStats plugins load from the
+instance's `config/` folder.
 
-## Pristine storage and the vendored header
+## Pristine storage
 
-**Files in this repo are stored PRISTINE.** They contain exactly the `ibek` support
-content, with **no provenance header**.
+**Files in this repo are stored PRISTINE.** They contain exactly the content an IOC
+instance needs, with no provenance header.
 
-When `ibek pattern` vendors a file into an IOC instance, it injects a deterministic
-provenance header as the first line **before hashing**:
+`ibek pattern` (ibek 4.8.0 or later) vendors each file **byte-identical** to the
+library at the pinned tag: nothing is injected or rewritten. The instance's
+`runtime-lock.yaml` records where the files came from and a `sha256` of each, so
+integrity checking on the consumer side is a trivial `sha256(file) == lock`.
 
-```
-# Vendored from github.com/epics-containers/ibek-runtime-support@v0.1.0 — DO NOT EDIT
-```
-
-(note: em dash `—`). Because the header is added at vendor time and is part of the
-content that is hashed into the instance's lock file, integrity checking on the
-consumer side is a trivial `sha256(file_as_written) == lock`. The header is
-deterministic (no timestamps or absolute paths) so it is reproducible.
-
-**Do not commit this header here.** It is a consumer-side artifact. Patterns in this
-repo must stay header-free and pristine; the header you see in a vendored copy belongs
-to the IOC instance, not to this library.
+Earlier ibek releases injected a `# Vendored from …` header as each file's first line.
+That breaks any file whose format has no `#` comment, such as
+`detectorPlugins/gdaPluginsStats.xml`, so vendor this library with ibek 4.8.0 or later.
 
 ## Versioning
 
@@ -118,7 +118,7 @@ ibek pattern add ibek-runtime-support:detectorPlugins@v0.1.0 services/bl01t-di-c
 This:
 
 1. fetches the pattern's file-set at tag `v0.1.0`,
-2. writes each file into `services/bl01t-di-cam-01/config/` with the vendored header,
+2. writes each file, byte-identical, into `services/bl01t-di-cam-01/config/`,
 3. records `version`, `source` and a per-file `sha256` in
    `services/bl01t-di-cam-01/runtime-lock.yaml`,
 4. merges the pattern's entity models into the instance's
@@ -140,11 +140,15 @@ entities:
 The resulting `runtime-lock.yaml` looks like:
 
 ```yaml
-detectorPlugins:
-  version: v0.1.0
-  source: github.com/epics-containers/ibek-runtime-support
-  files:
-    detectorPlugins.ibek.support.yaml: "sha256:…"
+version: 1
+patterns:
+  detectorPlugins:
+    version: v0.1.0
+    source: github.com/epics-containers/ibek-runtime-support
+    files:
+      config/detectorPlugins.ibek.support.yaml: "sha256:…"
+      config/gdaPlugins.template: "sha256:…"
+      config/gdaPluginsStats.xml: "sha256:…"
 ```
 
 (a hash value may be `"DIRTY # <reason>"` for a deliberately locally-modified file).
@@ -220,8 +224,7 @@ instance's `config/` as a `*.ibek.support.yaml`. It is not recorded in
    - `mydetector.ibek.support.yaml` — the `ibek` support module (module name, one or
      more `entity_models` with their parameters and `sub_entities`/`databases`),
    - any `*.template`/`*.db`/`*.req` files that support yaml references.
-3. Keep every file **pristine** — no vendored header (that is added by `ibek pattern`
-   at vendor time).
+3. Keep every file **pristine**: exactly the content an IOC instance needs.
 4. Validate locally by vendoring into a scratch IOC instance:
    `ibek pattern add ibek-runtime-support:mydetector@HEAD <instance>` (or test against a
    branch) and run `ibek pattern check`.
