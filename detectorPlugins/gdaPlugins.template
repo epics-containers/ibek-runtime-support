@@ -1,0 +1,159 @@
+# GDA helper records of the gdaPlugins pattern.
+#
+# The records up to the record("*") sections are the records.* elements of
+# DLS adUtil 2-44's etc/makeIocs/gdaPlugins.xml, which the builder writes into
+# the IOC's own database. The record("*") sections set the startup values of
+# records the plugins' templates define, so this template must load after them.
+#
+# % macro, P, PV prefix for all plugins
+# % macro, CentroidThreshold, Threshold for calculating centroids in NDStats plugins
+# % macro, ComputeProfiles, Toggle computation of profiles in NDStats plugins
+# % macro, ComputeStatistics, Toggle computation of basic statistics in NDStats plugins
+# % macro, ComputeCentroid, Toggle computation of centroids in NDStats plugins
+
+# Sync STAT cursor position with grid position
+record(longout, "$(P):Mjpg:GX")
+{
+    field(OUT,  "$(P):STAT:CursorX PP")
+}
+
+record(longout, "$(P):Mjpg:GY")
+{
+    field(OUT,  "$(P):STAT:CursorY PP")
+}
+
+record(longout, "$(P):Over:1:PositionXLink")
+{
+    field(DOL,  "$(P):STAT:CentroidX_RBV CP")
+}
+
+record(longout, "$(P):Over:1:PositionYLink")
+{
+    field(DOL,  "$(P):STAT:CentroidY_RBV CP")
+}
+
+record(longout, "$(P):Over:1:SizeXLink")
+{
+    field(DOL,  "$(P):STAT:SigmaX_RBV CP")
+}
+
+record(longout, "$(P):Over:1:SizeYLink")
+{
+    field(DOL,  "$(P):STAT:SigmaY_RBV CP")
+}
+
+record(longout, "$(P):Roi:SizeX")
+{
+    field(DRVL, "4")
+    field(VAL,  "100000")
+}
+
+record(longout, "$(P):Roi:SizeY")
+{
+    field(DRVL, "4")
+    field(VAL,  "100000")
+}
+
+record(longout, "$(P):Roi:SizeZ")
+{
+    field(DRVL, "0")
+    field(VAL,  "100000")
+}
+
+record(longout, "$(P):Proc:NumFilter")
+{
+    field(VAL,  "5")
+}
+
+record(longout, "$(P):Over:1:Green")
+{
+    field(VAL,  "255")
+}
+
+record(ao, "$(P):Stat:CentroidThreshold")
+{
+    field(VAL,  "$(CentroidThreshold)")
+}
+
+record(bo, "$(P):Over:1:Use")
+{
+    field(DOL,  "$(P):STAT:ComputeCentroid_RBV CP")
+    field(OMSL, "closed_loop")
+}
+
+record(bo, "$(P):Hdf:AutoSave")
+{
+    field(VAL,  "0")
+}
+
+record(bo, "$(P):Stat:ComputeProfiles")
+{
+    field(VAL,  "$(ComputeProfiles)")
+}
+
+record(bo, "$(P):Stat:ComputeStatistics")
+{
+    field(VAL,  "$(ComputeStatistics)")
+}
+
+record(bo, "$(P):Stat:ComputeCentroid")
+{
+    field(VAL,  "$(ComputeCentroid)")
+}
+
+record(mbbo, "$(P):Hdf:FileWriteMode")
+{
+    field(VAL,  "2")
+}
+
+record(mbbo, "$(P):Over:1:Shape")
+{
+    field(VAL,  "0")
+}
+
+# Enable FIMG and MJPG at startup, as the builder does (ENABLED=1). The
+# ffmpegServer entity models take no ENABLED, so this sets the startup value
+# of the records their templates define; autosave still restores over it.
+record("*", "$(P):FIMG:EnableCallbacks")
+{
+    field(VAL,  "1")
+}
+
+record("*", "$(P):MJPG:EnableCallbacks")
+{
+    field(VAL,  "1")
+}
+
+# Enable the time series plugins of STAT1-STAT6 at startup, as the DLS ADCore
+# builder does for every NDStats (ENABLED=1). The ADCore.NDStats entity model
+# gives its time series the ENABLED of the NDStats, which is 0 for these.
+
+record("*", "$(P):STAT1:TS:EnableCallbacks")
+{
+    field(VAL,  "1")
+}
+
+record("*", "$(P):STAT2:TS:EnableCallbacks")
+{
+    field(VAL,  "1")
+}
+
+record("*", "$(P):STAT3:TS:EnableCallbacks")
+{
+    field(VAL,  "1")
+}
+
+record("*", "$(P):STAT4:TS:EnableCallbacks")
+{
+    field(VAL,  "1")
+}
+
+record("*", "$(P):STAT5:TS:EnableCallbacks")
+{
+    field(VAL,  "1")
+}
+
+record("*", "$(P):STAT6:TS:EnableCallbacks")
+{
+    field(VAL,  "1")
+}

@@ -4,64 +4,96 @@ module: detectorPlugins
 
 entity_models:
   - name: gdaPlugins
-    description: Standard set of AreaDetector plugins for GDA
+    description: |-
+      Standard set of AreaDetector plugins for GDA.
+      Replaces the DLS builder object adUtil.gdaPlugins (adUtil 2-44): the same
+      plugins, PV names, parameters and defaults, the GDA helper records of
+      gdaPlugins.template, and the same post-iocInit settings. STAT1-STAT6 are
+      fed from ROI1-ROI6 (the builder feeds them all from ROI1) and PVA uses
+      NDPvxsPlugin in place of NDPvaPlugin.
     parameters:
       P:
         type: str
-        description: Prefix for the AreaDetector PVs
+        description: PV prefix for all plugins
       CAM:
         type: str
         description: AreaDetector NDArray port name of the camera
       PORTPREFIX:
         type: str
-        description: Prefix for all plugin ports
+        description: Asyn port name prefix for each plugin
       PLUGINQUEUE:
         type: int
-        description: Queue size for all plugins
+        description: Size of queue for each plugin (except NDStdArrays and ffmpegStream)
         default: 16
       DISPLAYQUEUE:
         type: int
-        description: Queue size for display plugins
+        description: Size of queue for the NDStdArrays and ffmpegStream plugins
         default: 2
       HIST_SIZE:
         type: int
-        description: Histogram size for NDStats plugin
+        description: Size of histogram in NDStats plugins
         default: 256
       NCHANS:
         type: int
-        description: Number of channels for NDStats plugin
-        default: 20000
+        description: Number of elements in the NDStats waveforms for past statistics
+        default: 1024
       XSIZE:
         type: int
-        description: X size for NDStats plugin
+        description: Size of NDStats X Histograms
         default: 1024
       YSIZE:
         type: int
-        description: Y size for NDStats plugin
-        default: 768
+        description: Size of NDStats Y Histograms
+        default: 1024
       NELEMENTS:
         type: int
-        description: Number of elements for NDStdArrays plugin
+        description: Size of NDStdArrays waveform (should equal the number of pixels in the image)
         default: 786432
       ARRFTVL:
         type: str
-        description: FTVL for NDStdArrays plugin
+        description: Data format of NDStdArrays waveform
         default: UCHAR
       ARRTYPE:
         type: str
-        description: TYPE for NDStdArrays plugin
+        description: Asyn Array type of NDStdArrays waveform
         default: Int8
       HTTP_PORT:
         type: int
-        description: HTTP port for ffmpegServer plugin
+        description: Port used for ffmpegStream plugin
         default: 8080
-      MAX_ROIS:
+      CentroidThreshold:
         type: int
-        description: Number of ROISTATs
-        default: 8
+        description: Threshold for calculating centroids in NDStats plugins
+        default: 50
+      ComputeProfiles:
+        type: int
+        description: Toggle computation of profiles in NDStats plugins (0 or 1)
+        default: 1
+      ComputeStatistics:
+        type: int
+        description: Toggle computation of basic statistics in NDStats plugins (0 or 1)
+        default: 0
+      ComputeCentroid:
+        type: int
+        description: Toggle computation of centroids in NDStats plugins (0 or 1)
+        default: 0
+      threads:
+        type: int
+        description: Number of threads (1-16) to use for the Stat and ROI plugins
+        default: 1
+      threadSortTime:
+        type: float
+        description: Time to allow for correct uniqueID arrival for sorting NDArrays
+        default: 1.0
+      threadSortSize:
+        type: int
+        description: Max size of queue used to keep threads in the correct output order
+        default: 1000
 
     sub_entities:
       - type: ADCore.NDROI
+        ENABLED: 1
+        MAX_THREADS: 16
         NDARRAY_PORT: "{{ CAM }}"
         P: "{{ P }}"
         PORT: "{{ PORTPREFIX }}.roi"
@@ -69,6 +101,7 @@ entity_models:
         R: ":ROI:"
 
       - type: ADCore.NDROI
+        MAX_THREADS: 16
         NDARRAY_PORT: "{{ CAM }}"
         P: "{{ P }}"
         PORT: "{{ PORTPREFIX }}.rois.roi1"
@@ -76,6 +109,7 @@ entity_models:
         R: ":ROI1:"
 
       - type: ADCore.NDROI
+        MAX_THREADS: 16
         NDARRAY_PORT: "{{ CAM }}"
         P: "{{ P }}"
         PORT: "{{ PORTPREFIX }}.rois.roi2"
@@ -83,6 +117,7 @@ entity_models:
         R: ":ROI2:"
 
       - type: ADCore.NDROI
+        MAX_THREADS: 16
         NDARRAY_PORT: "{{ CAM }}"
         P: "{{ P }}"
         PORT: "{{ PORTPREFIX }}.rois.roi3"
@@ -90,6 +125,7 @@ entity_models:
         R: ":ROI3:"
 
       - type: ADCore.NDROI
+        MAX_THREADS: 16
         NDARRAY_PORT: "{{ CAM }}"
         P: "{{ P }}"
         PORT: "{{ PORTPREFIX }}.rois.roi4"
@@ -97,6 +133,7 @@ entity_models:
         R: ":ROI4:"
 
       - type: ADCore.NDROI
+        MAX_THREADS: 16
         NDARRAY_PORT: "{{ CAM }}"
         P: "{{ P }}"
         PORT: "{{ PORTPREFIX }}.rois.roi5"
@@ -104,6 +141,7 @@ entity_models:
         R: ":ROI5:"
 
       - type: ADCore.NDROI
+        MAX_THREADS: 16
         NDARRAY_PORT: "{{ CAM }}"
         P: "{{ P }}"
         PORT: "{{ PORTPREFIX }}.rois.roi6"
@@ -111,7 +149,10 @@ entity_models:
         R: ":ROI6:"
 
       - type: ADCore.NDStats
+        ATTRIBUTES_FILE: gdaPluginsStats.xml
+        ENABLED: 1
         HIST_SIZE: "{{ HIST_SIZE }}"
+        MAX_THREADS: 16
         NCHANS: "{{ NCHANS }}"
         NDARRAY_PORT: "{{ CAM }}"
         P: "{{ P }}"
@@ -122,7 +163,9 @@ entity_models:
         YSIZE: "{{ YSIZE }}"
 
       - type: ADCore.NDStats
+        ATTRIBUTES_FILE: gdaPluginsStats.xml
         HIST_SIZE: "{{ HIST_SIZE }}"
+        MAX_THREADS: 16
         NCHANS: "{{ NCHANS }}"
         NDARRAY_PORT: "{{ PORTPREFIX }}.rois.roi1"
         P: "{{ P }}"
@@ -133,7 +176,9 @@ entity_models:
         YSIZE: "{{ YSIZE }}"
 
       - type: ADCore.NDStats
+        ATTRIBUTES_FILE: gdaPluginsStats.xml
         HIST_SIZE: "{{ HIST_SIZE }}"
+        MAX_THREADS: 16
         NCHANS: "{{ NCHANS }}"
         NDARRAY_PORT: "{{ PORTPREFIX }}.rois.roi2"
         P: "{{ P }}"
@@ -144,7 +189,9 @@ entity_models:
         YSIZE: "{{ YSIZE }}"
 
       - type: ADCore.NDStats
+        ATTRIBUTES_FILE: gdaPluginsStats.xml
         HIST_SIZE: "{{ HIST_SIZE }}"
+        MAX_THREADS: 16
         NCHANS: "{{ NCHANS }}"
         NDARRAY_PORT: "{{ PORTPREFIX }}.rois.roi3"
         P: "{{ P }}"
@@ -155,7 +202,9 @@ entity_models:
         YSIZE: "{{ YSIZE }}"
 
       - type: ADCore.NDStats
+        ATTRIBUTES_FILE: gdaPluginsStats.xml
         HIST_SIZE: "{{ HIST_SIZE }}"
+        MAX_THREADS: 16
         NCHANS: "{{ NCHANS }}"
         NDARRAY_PORT: "{{ PORTPREFIX }}.rois.roi4"
         P: "{{ P }}"
@@ -166,7 +215,9 @@ entity_models:
         YSIZE: "{{ YSIZE }}"
 
       - type: ADCore.NDStats
+        ATTRIBUTES_FILE: gdaPluginsStats.xml
         HIST_SIZE: "{{ HIST_SIZE }}"
+        MAX_THREADS: 16
         NCHANS: "{{ NCHANS }}"
         NDARRAY_PORT: "{{ PORTPREFIX }}.rois.roi5"
         P: "{{ P }}"
@@ -177,7 +228,9 @@ entity_models:
         YSIZE: "{{ YSIZE }}"
 
       - type: ADCore.NDStats
+        ATTRIBUTES_FILE: gdaPluginsStats.xml
         HIST_SIZE: "{{ HIST_SIZE }}"
+        MAX_THREADS: 16
         NCHANS: "{{ NCHANS }}"
         NDARRAY_PORT: "{{ PORTPREFIX }}.rois.roi6"
         P: "{{ P }}"
@@ -198,6 +251,7 @@ entity_models:
         TYPE: "{{ ARRTYPE }}"
 
       - type: ADCore.NDProcess
+        ENABLED: 1
         NDARRAY_PORT: "{{ CAM }}"
         P: "{{ P }}"
         PORT: "{{ PORTPREFIX }}.proc"
@@ -205,13 +259,23 @@ entity_models:
         R: ":PROC:"
 
       - type: ADCore.NDOverlay
+        ENABLED: 1
         NDARRAY_PORT: "{{ PORTPREFIX }}.proc"
         P: "{{ P }}"
         PORT: "{{ PORTPREFIX }}.over"
         QUEUE: "{{ PLUGINQUEUE }}"
         R: ":OVER:"
 
+      # ffmpegFile has no ENABLED parameter: gdaPlugins.template enables it
+      - type: ffmpegServer.ffmpegFile
+        NDARRAY_PORT: "{{ CAM }}"
+        P: "{{ P }}"
+        PORT: "{{ PORTPREFIX }}.fimg"
+        QUEUE: "{{ PLUGINQUEUE }}"
+        R: ":FIMG:"
+
       - type: ADCore.NDFileTIFF
+        ENABLED: 1
         NDARRAY_PORT: "{{ CAM }}"
         P: "{{ P }}"
         PORT: "{{ PORTPREFIX }}.tiff"
@@ -219,39 +283,81 @@ entity_models:
         R: ":TIFF:"
 
       - type: ADCore.NDFileHDF5
+        ENABLED: 1
         NDARRAY_PORT: "{{ CAM }}"
         P: "{{ P }}"
         PORT: "{{ PORTPREFIX }}.hdf"
         QUEUE: "{{ PLUGINQUEUE }}"
         R: ":HDF5:"
 
-      - type: epics.PostStartupCommand
-        command: 'dbpf "{{ P }}:HDF5:FileTemplate", "%s/%s_%d.h5"'
-
-      - type: ADCore.NDPvxsPlugin
-        NDARRAY_PORT: "{{ CAM }}"
-        P: "{{ P }}"
-        PORT: "{{ PORTPREFIX }}.pva"
-        QUEUE: "{{ PLUGINQUEUE }}"
-        R: ":PVA:"
-        PVNAME: "{{ P }}:PVA:OUTPUT"
-
-      - type: ADCore.NDROIStat
-        NDARRAY_PORT: "{{ PORTPREFIX }}.stat"
-        P: "{{ P }}"
-        R: ":ROISTAT:"
-        PORT: "{{ PORTPREFIX }}.roistat"
-        QUEUE: "{{ PLUGINQUEUE }}"
-        MAX_ROIS: "{{ MAX_ROIS }}"
-        NCHANS: "{{ NCHANS }}"
-
+      # ffmpegStream has no ENABLED parameter: gdaPlugins.template enables it
       - type: ffmpegServer.ffmpegStream
         P: "{{ P }}"
         R: ":MJPG:"
         PORT: "{{ PORTPREFIX }}.mjpg"
         NDARRAY_PORT: "{{ PORTPREFIX }}.over"
-        QUEUE: "{{ PLUGINQUEUE }}"
+        QUEUE: "{{ DISPLAYQUEUE }}"
         HTTP_PORT: "{{ HTTP_PORT }}"
+
+      - type: ADCore.NDPvxsPlugin
+        ENABLED: 1
+        NDARRAY_PORT: "{{ CAM }}"
+        P: "{{ P }}"
+        PORT: "{{ PORTPREFIX }}.pva"
+        QUEUE: "{{ PLUGINQUEUE }}"
+        R: ":PVA:"
+        PVNAME: "{{ P }}:PVA:ARRAY"
+
+      # last, so that its records load after the plugins' records they modify
+      - type: detectorPlugins._gdaPluginsRecords
+        P: "{{ P }}"
+        CentroidThreshold: "{{ CentroidThreshold }}"
+        ComputeProfiles: "{{ ComputeProfiles }}"
+        ComputeStatistics: "{{ ComputeStatistics }}"
+        ComputeCentroid: "{{ ComputeCentroid }}"
+
+    # as adUtil 2-44's gdaPlugins emits them; SortMode is on only with threads > 1
+    post_init:
+      - value: |
+          dbpf "{{ P }}:FIMG:FileTemplate", "%s/%s_%d.avi"
+          dbpf "{{ P }}:HDF5:FileTemplate", "%s/%s_%d.h5"
+          {%- for plugin in ["STAT", "ROI"] %}
+          {%- for setting, value in [("NumThreads", threads), ("SortMode", 1 if threads > 1 else 0), ("SortTime", threadSortTime), ("SortSize", threadSortSize)] %}
+          {%- for n in ["", "1", "2", "3", "4", "5", "6"] %}
+          dbpf "{{ P }}:{{ plugin }}{{ n }}:{{ setting }}", "{{ value }}"
+          {%- endfor %}
+          {%- endfor %}
+          {%- endfor %}
+
+  - name: _gdaPluginsRecords
+    description: |-
+      The GDA helper records of gdaPlugins. Do not instantiate this directly:
+      gdaPlugins creates it.
+    parameters:
+      P:
+        type: str
+        description: PV prefix for all plugins
+      CentroidThreshold:
+        type: int
+        description: Threshold for calculating centroids in NDStats plugins
+      ComputeProfiles:
+        type: int
+        description: Toggle computation of profiles in NDStats plugins (0 or 1)
+      ComputeStatistics:
+        type: int
+        description: Toggle computation of basic statistics in NDStats plugins (0 or 1)
+      ComputeCentroid:
+        type: int
+        description: Toggle computation of centroids in NDStats plugins (0 or 1)
+
+    databases:
+      - file: gdaPlugins.template
+        args:
+          P:
+          CentroidThreshold:
+          ComputeProfiles:
+          ComputeStatistics:
+          ComputeCentroid:
 
   - name: detectorPlugins
     description: Standard set of AreaDetector plugins for Ophyd

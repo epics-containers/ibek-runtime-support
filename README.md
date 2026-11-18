@@ -44,6 +44,8 @@ Each pattern is a top-level folder, for example:
 ```
 detectorPlugins/
   detectorPlugins.ibek.support.yaml   # entity_models "gdaPlugins" and "detectorPlugins"
+  gdaPlugins.template                 # GDA helper records for gdaPlugins
+  gdaPluginsStats.xml                 # NDAttributes file for gdaPlugins' NDStats
 BL15I-BUILDER/
   BL15I-BUILDER.ibek.support.yaml
   BL15I-SumTheDiode.template
@@ -54,13 +56,18 @@ support yaml declares two entity models, each a curated collection of AreaDetect
 plugins wired together:
 
 - **`gdaPlugins`** — the full plugin set for GDA (ROIs, stats, std-arrays, process,
-  overlay, TIFF/HDF5 file writers, PVA, ffmpeg stream, …).
+  overlay, ffmpeg file and stream, TIFF/HDF5 file writers, PVA). It replaces the DLS
+  builder object `adUtil.gdaPlugins` (adUtil 2-44) with the same PV names, parameters,
+  defaults and startup settings, so the IOC presents the same API to GDA.
 - **`detectorPlugins`** — the lighter plugin set for Ophyd (PVA, stats, ROI-stat,
   HDF5).
 
-It is a **single `*.ibek.support.yaml`** with no proto/template/DB of its own — the
-plugins it references are compiled into the AreaDetector IOC image; this pattern only
-adds the `ibek` entities that instantiate and connect them at runtime.
+The plugins these reference are compiled into the AreaDetector IOC image (`gdaPlugins`
+also needs ffmpegServer); this pattern adds the `ibek` entities that instantiate and
+connect them at runtime. `gdaPlugins` also ships two files of its own:
+`gdaPlugins.template`, the soft records GDA uses alongside the plugins, and
+`gdaPluginsStats.xml`, the NDAttributes file its NDStats plugins load from the
+instance's `config/` folder.
 
 ## Pristine storage and the vendored header
 
