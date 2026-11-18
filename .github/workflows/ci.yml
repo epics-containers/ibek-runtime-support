@@ -23,7 +23,7 @@ jobs:
 
       - name: Load every pattern's ibek.support.yaml and check its database files
         run: |
-          uv run --no-project --with 'ibek>=4.10' python - <<'PY'
+          uv run --no-project --with 'ibek>=4.8.0' python - <<'PY'
           from pathlib import Path
           from ruamel.yaml import YAML
           from ibek.entity_factory import EntityFactory

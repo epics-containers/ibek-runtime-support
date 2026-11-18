@@ -74,14 +74,14 @@ instance's `config/` folder.
 **Files in this repo are stored PRISTINE.** They contain exactly the content an IOC
 instance needs, with no provenance header.
 
-`ibek pattern` (ibek 4.10.0 or later) vendors each file **byte-identical** to the
+`ibek pattern` (ibek 4.8.0 or later) vendors each file **byte-identical** to the
 library at the pinned tag: nothing is injected or rewritten. The instance's
 `runtime-lock.yaml` records where the files came from and a `sha256` of each, so
 integrity checking on the consumer side is a trivial `sha256(file) == lock`.
 
 Earlier ibek releases injected a `# Vendored from …` header as each file's first line.
 That breaks any file whose format has no `#` comment, such as
-`detectorPlugins/gdaPluginsStats.xml`, so vendor this library with ibek 4.10 or later.
+`detectorPlugins/gdaPluginsStats.xml`, so vendor this library with ibek 4.8.0 or later.
 
 ## Versioning
 
