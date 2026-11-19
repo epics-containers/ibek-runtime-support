@@ -6,7 +6,7 @@
 record(calc, "$(P)$(R):VAC1:CALCSTA") {
   field(DESC, "Calculate vac_1 status")
   field(CALC, "(A=0)?2:((A=1)?1:0)")
-  field(INPA, "$(VAC_ELEMENT1):STA")
+  field(INPA, "$(DEVICE1):STA")
   field(HIHI, "1.5")
   field(HHSV, "MAJOR")
 }
@@ -14,7 +14,7 @@ record(calc, "$(P)$(R):VAC1:CALCSTA") {
 record(calc, "$(P)$(R):VAC2:CALCSTA") {
   field(DESC, "Calculate vac_2 status")
   field(CALC, "(A=0)?2:((A=1)?1:0)")
-  field(INPA, "$(VAC_ELEMENT2):STA")
+  field(INPA, "$(DEVICE2):STA")
   field(HIHI, "1.5")
   field(HHSV, "MAJOR")
 }
@@ -22,7 +22,7 @@ record(calc, "$(P)$(R):VAC2:CALCSTA") {
 record(calc, "$(P)$(R):VAC3:CALCSTA") {
   field(DESC, "Calculate vac_3 status")
   field(CALC, "(A=0)?2:((A=1)?1:0)")
-  field(INPA, "$(VAC_ELEMENT3):STA")
+  field(INPA, "$(DEVICE3):STA")
   field(HIHI, "1.5")
   field(HHSV, "MAJOR")
 }
@@ -30,7 +30,7 @@ record(calc, "$(P)$(R):VAC3:CALCSTA") {
 record(calc, "$(P)$(R):VAC4:CALCSTA") {
   field(DESC, "Calculate vac_4 status")
   field(CALC, "(A=0)?2:((A=1)?1:0)")
-  field(INPA, "$(VAC_ELEMENT4):STA")
+  field(INPA, "$(DEVICE4):STA")
   field(HIHI, "1.5")
   field(HHSV, "MAJOR")
 }
@@ -93,28 +93,28 @@ record(mbbi, "$(P)$(R):CTRL:STATE_RBV") {
 record(stringout, "$(P)$(R):VAC1:NAME_RBV") {
   field(DESC, "Vacuum element1 name")
   field(PINI, "YES")
-  field(VAL, "$(VAC1_NAME=VALVE-01)")
+  field(VAL, "$(VACNAME1=VALVE-01)")
   field(OMSL, "supervisory")
 }
 
 record(stringout, "$(P)$(R):VAC2:NAME_RBV") {
   field(DESC, "Vacuum element2 name")
   field(PINI, "YES")
-  field(VAL, "$(VAC2_NAME=VALVE-01)")
+  field(VAL, "$(VACNAME2=VALVE-01)")
   field(OMSL, "supervisory")
 }
 
 record(stringout, "$(P)$(R):VAC3:NAME_RBV") {
   field(DESC, "Vacuum element3 name")
   field(PINI, "YES")
-  field(VAL, "$(VAC3_NAME=VALVE-01)")
+  field(VAL, "$(VACNAME3=VALVE-01)")
   field(OMSL, "supervisory")
 }
 
 record(stringout, "$(P)$(R):VAC4:NAME_RBV") {
   field(DESC, "Vacuum element4 name")
   field(PINI, "YES")
-  field(VAL, "$(VAC4_NAME=VALVE-01)")
+  field(VAL, "$(VACNAME4=VALVE-01)")
   field(OMSL, "supervisory")
 }
 
@@ -138,20 +138,20 @@ record(stringout, "$(P)$(R):VAC4:NAME_RBV") {
 # % macro, name, Object and gui association name
 # % macro, P, EPICS name prefix
 # % macro, R, EPICS name suffix
-# % macro, VAC1_NAME, short name used to identify the first vacuum element
-# % macro, VAC_ELEMENT1, PV for the first element in the sequence
+# % macro, VACNAME1, short name used to identify the first vacuum element
+# % macro, DEVICE1, PV for the first element in the sequence
 # % macro, DELAY1, ARM delay in seconds after the 'open disarmed' state (required for a fast valve, 30s recommended)
-# % macro, VAC2_NAME, short name used to identify the second vacuum element
-# % macro, VAC_ELEMENT2, PV for the second element in the sequence
+# % macro, VACNAME2, short name used to identify the second vacuum element
+# % macro, DEVICE2, PV for the second element in the sequence
 # % macro, DELAY2, ARM delay in seconds after the 'open disarmed' state (required for a fast valve, 30s recommended)
-# % macro, VAC3_NAME, short name used to identify the third vacuum element
-# % macro, VAC_ELEMENT3, PV for the third element in the sequence
+# % macro, VACNAME3, short name used to identify the third vacuum element
+# % macro, DEVICE3, PV for the third element in the sequence
 # % macro, DELAY3, ARM delay in seconds after the 'open disarmed' state (required for a fast valve, 30s recommended)
-# % macro, VAC4_NAME, short name used to identify the fourth vacuum element
-# % macro, VAC_ELEMENT4, PV for the fourth element in the sequence
+# % macro, VACNAME4, short name used to identify the fourth vacuum element
+# % macro, DEVICE4, PV for the fourth element in the sequence
 # % macro, DELAY4, ARM delay in seconds after the 'open disarmed' state (required for a fast valve, 30s recommended)
-# % macro, VAC5_NAME, short name used to identify the fifth vacuum element
-# % macro, VAC_ELEMENT5, PV for the fifth element in the sequence
+# % macro, VACNAME5, short name used to identify the fifth vacuum element
+# % macro, DEVICE5, PV for the fifth element in the sequence
 # % macro, DELAY5, ARM delay in seconds after the 'open disarmed' state (required for a fast valve, 30s recommended)
 # 
 # This associates a BOY screen with the template
@@ -204,16 +204,16 @@ record(sseq, "$(P)$(R):CLOSE:ALL") {
   field(DESC, "Close Valves")
   field(SCAN, "Passive")
   field(SELM, "All")
-  field(LNK1, "$(VAC_ELEMENT5):CON CA")
+  field(LNK1, "$(DEVICE5):CON CA")
   field(WAIT1, "Wait")
   field(DOL2, "$(P)$(R):CTRL.VAL")
-  field(LNK2, "$(VAC_ELEMENT4):CON CA")
+  field(LNK2, "$(DEVICE4):CON CA")
   field(WAIT2, "Wait")
   field(DOL3, "$(P)$(R):CTRL.VAL")
-  field(LNK3, "$(VAC_ELEMENT3):CON CA")
+  field(LNK3, "$(DEVICE3):CON CA")
   field(WAIT3, "Wait")
   field(DOL4, "$(P)$(R):CTRL.VAL")
-  field(LNK4, "$(VAC_ELEMENT2):CON CA")
+  field(LNK4, "$(DEVICE2):CON CA")
   field(WAIT4, "Wait")
   field(FLNK, "$(P)$(R):END")
   field(DOL1, "$(P)$(R):CTRL.VAL")
@@ -223,7 +223,7 @@ record(sseq, "$(P)$(R):CLOSE:ALL") {
   field(DLY4, "1")
   field(DLY5, "1")
   field(DOL5, "$(P)$(R):CTRL.VAL")
-  field(LNK5, "$(VAC_ELEMENT1):CON CA")
+  field(LNK5, "$(DEVICE1):CON CA")
   field(WAIT5, "Wait")
 }
 
@@ -233,14 +233,14 @@ record(sseq, "$(P)$(R):OPEN:VAC4") {
   field(FLNK, "$(P)$(R):END")
   field(SELM, "All")
   field(DO1, "2")
-  field(LNK1, "$(VAC_ELEMENT4):CON CA")
+  field(LNK1, "$(DEVICE4):CON CA")
   field(WAIT1, "Wait")
   field(DO2, "0")
-  field(LNK2, "$(VAC_ELEMENT4):CON CA")
+  field(LNK2, "$(DEVICE4):CON CA")
   field(WAIT2, "Wait")
   field(DLY3, "$(DELAY4=0)")
   field(DO3, "3")
-  field(LNK3, "$(VAC_ELEMENT4):CON CA")
+  field(LNK3, "$(DEVICE4):CON CA")
   field(WAIT3, "Wait")
   field(DLY1, "1")
 }
@@ -251,14 +251,14 @@ record(sseq, "$(P)$(R):OPEN:VAC3") {
   field(FLNK, "$(P)$(R):OPEN:VAC4")
   field(SELM, "All")
   field(DO1, "2")
-  field(LNK1, "$(VAC_ELEMENT3):CON CA")
+  field(LNK1, "$(DEVICE3):CON CA")
   field(WAIT1, "Wait")
   field(DO2, "0")
-  field(LNK2, "$(VAC_ELEMENT3):CON CA")
+  field(LNK2, "$(DEVICE3):CON CA")
   field(WAIT2, "Wait")
   field(DLY3, "$(DELAY3=0)")
   field(DO3, "3")
-  field(LNK3, "$(VAC_ELEMENT3):CON CA")
+  field(LNK3, "$(DEVICE3):CON CA")
   field(WAIT3, "Wait")
   field(DLY1, "1")
 }
@@ -269,14 +269,14 @@ record(sseq, "$(P)$(R):OPEN:VAC2") {
   field(FLNK, "$(P)$(R):OPEN:VAC3")
   field(SELM, "All")
   field(DO1, "2")
-  field(LNK1, "$(VAC_ELEMENT2):CON CA")
+  field(LNK1, "$(DEVICE2):CON CA")
   field(WAIT1, "Wait")
   field(DO2, "0")
-  field(LNK2, "$(VAC_ELEMENT2):CON CA")
+  field(LNK2, "$(DEVICE2):CON CA")
   field(WAIT2, "Wait")
   field(DLY3, "$(DELAY2=0)")
   field(DO3, "3")
-  field(LNK3, "$(VAC_ELEMENT2):CON CA")
+  field(LNK3, "$(DEVICE2):CON CA")
   field(WAIT3, "Wait")
   field(DLY1, "1")
 }
@@ -287,13 +287,13 @@ record(sseq, "$(P)$(R):OPEN:VAC1") {
   field(FLNK, "$(P)$(R):OPEN:VAC2")
   field(SELM, "All")
   field(DO1, "2")
-  field(LNK1, "$(VAC_ELEMENT1):CON CA")
+  field(LNK1, "$(DEVICE1):CON CA")
   field(WAIT1, "Wait")
   field(DO2, "0")
-  field(LNK2, "$(VAC_ELEMENT1):CON CA")
+  field(LNK2, "$(DEVICE1):CON CA")
   field(WAIT2, "Wait")
   field(DO3, "3")
-  field(LNK3, "$(VAC_ELEMENT1):CON CA")
+  field(LNK3, "$(DEVICE1):CON CA")
   field(WAIT3, "Wait")
   field(DLY1, "1")
   field(DLY3, "$(DELAY1=0)")
@@ -345,7 +345,7 @@ record(calcout, "$(P)$(R):ABORT:VAC4") {
 record(calc, "$(P)$(R):VAC5:CALCSTA") {
   field(DESC, "Calculate vac_5 status")
   field(CALC, "(A=0)?2:((A=1)?1:0)")
-  field(INPA, "$(VAC_ELEMENT5):STA")
+  field(INPA, "$(DEVICE5):STA")
   field(HIHI, "1.5")
   field(HHSV, "MAJOR")
 }
@@ -375,7 +375,7 @@ record(mbbi, "$(P)$(R):VAC5:STATE_RBV") {
 record(stringout, "$(P)$(R):VAC5:NAME_RBV") {
   field(DESC, "Vacuum element5 name")
   field(PINI, "YES")
-  field(VAL, "$(VAC5_NAME=VALVE-01)")
+  field(VAL, "$(VACNAME5=VALVE-01)")
   field(OMSL, "supervisory")
 }
 

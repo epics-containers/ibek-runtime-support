@@ -1,7 +1,7 @@
 # BL21I
 
 Runtime pattern imported from the DLS support module `BL21I` (the I21 beamline's
-support module), release `3-11` (GitLab `controls/support/BL21I`). Its templates are
+support module), release `3-12` (GitLab `controls/support/BL21I`). Its templates are
 pristine copies of that release.
 
 The templates use only soft records: `ai`, `ao`, `bi`, `bo`, `calc`, `calcout`,
@@ -19,7 +19,7 @@ pattern, so the provenance travels into every IOC instance that uses it.
 |---|---|---|
 | `BL21I.ARMAirControl` | `BL21I_ARM_Air_Control.template` | Combined ARM air bearing control |
 | `BL21I.AirBearingInterlockWait` | `BL21I_Air_Bearing_Interlock_Wait.template` | Opens the air valves and waits for the motor interlock to clear |
-| `BL21I.SGMTravellerAirControl` | `BL21I_SGM_Traveller_Air_Control.template` | SGM traveller air bearing control |
+| `BL21I.SGMr1AirControl` | `BL21I_SGM_Traveller_Air_Control.template` | SGM traveller air bearing control |
 | `BL21I.SMPLValveSequence` | `BL21I_SMPL_Valve_Sequence.template` | Valve sequence for reinstating vacuum after a sample change |
 | `BL21I.TTHBumpstripMonitor` | `BL21I_TTH_Bumpstrip_Monitor.template` | Counter of TTH bumpstrip contacts |
 | `BL21I.M5LimitLatch` | `BL21I_M5_Smarpod_Limit_Latch.template` | Latch for the M5 limit switches |
