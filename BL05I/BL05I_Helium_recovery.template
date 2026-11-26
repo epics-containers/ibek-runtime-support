@@ -1,0 +1,637 @@
+############################
+# Diamond Light Source Ltd
+############################
+
+# BL05I_Helium_recovery.template
+#
+# Template for the Helium recovery on BL05I beamline
+# Calculation of Helium recovery rate by comparing Liquid He weight consumption (Dewar)
+# to the returned He gas monitor (Diamond/Services/Helium Recovery)
+
+# % macro, __doc__, 	Template 	Calculates the Helium gas recovery percentage and the liquid Helium consumption rate.
+
+# Substitutions:
+#% macro, name, Object and gui association name
+#% macro, P, Device PV Prefix  
+#% macro, R, Device PV Suffix
+#% macro, GAS_VOLUME, The calc PV that provides the gas volume recorded at the recovery plant
+#% macro, LIQUID_WEIGHT, The analogue input PV that provides the liquid gas weight in the Dewar at the beamline
+#% macro, M3_TO_LTR, Coefficient factor used to convert from meter-cubes to liters, i.e. taking into account the material density in its gas phase (e.g. 1m3 = 1.3245L for Helium)
+#% macro, KG_TO_LTR, Coefficient factor used to convert from kilograms to liters, i.e. taking into account the material density in its liquid phase (e.g. 1kg = 8.0L for Helium)
+#% macro, AVG_PERIOD, The averaging period (in seconds) used to calculate each gas recovery data point
+
+# This associates an edm screen with the template
+# % gui, $(name=), edm, HeRecovery.edl, P=$(P), R=$(R)
+
+
+#########################################################################################
+#        TIMESTAMP INITIALISATION
+#########################################################################################
+
+# Initialise the timestamp values to n/a
+record(fanout, "$(P)$(R)TIMESTAMP:INIT") {
+  field(DESC, "Initialise timestamps")
+  field(PINI, "YES")
+  field(SELM, "All")
+  field(LNK1, "$(P)$(R)TARE:TSTMP:RESET PP")
+  field(LNK2, "$(P)$(R)PERIOD:TSTMP:RESET PP")
+  field(LNK3, "$(P)$(R)TOTAL:TSTMP:RESET PP")
+}
+
+# Set the 'Tare' timestamp value to n/a
+record(stringout, "$(P)$(R)TARE:TSTMP:RESET") {
+  field(DESC, "Reset Tare Timestamp")
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(OMSL, "supervisory")
+  field(VAL, "n/a")
+  field(OUT, "$(P)$(R)TARE:TIMESTAMP_RBV NPP")
+}
+
+# Set the 'Period' timestamp value to n/a
+record(stringout, "$(P)$(R)PERIOD:TSTMP:RESET") {
+  field(DESC, "Reset Period Timestamp")
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(OMSL, "supervisory")
+  field(VAL, "n/a")
+  field(OUT, "$(P)$(R)PERIOD:TIMESTAMP_RBV NPP")
+}
+
+# Set the 'Total' timestamp value to n/a
+record(stringout, "$(P)$(R)TOTAL:TSTMP:RESET") {
+  field(DESC, "Reset Total Timestamp")
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(OMSL, "supervisory")
+  field(VAL, "n/a")
+  field(OUT, "$(P)$(R)TOTAL:TIMESTAMP_RBV NPP")
+}
+
+#########################################################################################
+#        TARE MEASUREMENT -> RESET ALL CALCULATIONS
+#########################################################################################
+
+# Enable the measurements only if system was tared and if Dewar is present on the scale
+#% archiver 10 Monitor
+record(bo, "$(P)$(R)MEAS:ENABLE") {
+  field(DESC, "Enable the measurements")
+  field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(VAL,  "0")
+  field(ZNAM, "Disable")
+  field(ONAM, "Enable")
+}
+
+# Tare the gas values used as the measurement starting point
+#% archiver 300 Monitor
+record(bo, "$(P)$(R)RESET") {
+  field(DESC, "Initialise start values")
+  field(SCAN, "Passive")
+  field(PINI, "NO")
+  field(VAL,  "1")
+  field(OUT, "$(P)$(R)START:FANOUT PP")
+}
+
+# Trigger the capture of the initial gas values which measurements will be based on
+record(fanout, "$(P)$(R)START:FANOUT") {
+  field(DESC, "Trigger gas readbacks")
+  field(SCAN, "Passive")
+  field(SELM, "All")
+  field(LNK1, "$(P)$(R)MEAS:ENABLE PP")
+  field(LNK2, "$(P)$(R)RETURNED:INIT_RBV PP")
+  field(LNK3, "$(P)$(R)WEIGHT:INIT_RBV PP")
+  field(LNK4, "$(P)$(R)TARE:TIMESTAMP_RBV PP")
+}
+
+# Record the timestamp associated with the 'Tare' event
+#% autosave 0 VAL
+#% archiver 300 Monitor
+record(timestamp, "$(P)$(R)TARE:TIMESTAMP_RBV") {
+  field(DESC, "Tare event timestamp")
+  field(SCAN, "Passive")
+  field(TST, "YY/MM/DD HH:MM:SS")
+}
+
+# Initial returned gas value used for the recovery measurement
+#% autosave 0 VAL
+record(ao, "$(P)$(R)RETURNED:INIT_RBV") {
+  field(DESC, "Initial returned gas")
+  field(DTYP, "Soft Channel")
+  field(OMSL, "closed_loop")
+  field(DOL, "$(GAS_VOLUME)")
+  field(SCAN, "Passive")
+  field(OUT, "$(P)$(R)RETURNED:AT_T0_RBV.VAL NPP")
+  field(PREC, "3")
+  field(EGU, "m3")
+  field(FLNK, "$(P)$(R)RETURNED:LTR:INIT_RBV")
+}
+
+# Initial liquid gas value used for the recovery measurement
+#% autosave 0 VAL
+record(ao, "$(P)$(R)WEIGHT:INIT_RBV") {
+  field(DESC, "Initial beamline gas")
+  field(DTYP, "Soft Channel")
+  field(OMSL, "closed_loop")
+  field(DOL, "$(LIQUID_WEIGHT)")
+  field(SCAN, "Passive")
+  field(OUT, "$(P)$(R)WEIGHT:AT_T0_RBV.VAL NPP")
+  field(PREC, "3")
+  field(EGU, "kg")
+  field(FLNK, "$(P)$(R)WEIGHT:LTR:INIT_RBV")
+}
+
+# Initial returned gas value in liters
+#% archiver 60 Monitor
+record(calc, "$(P)$(R)RETURNED:LTR:INIT_RBV") {
+  field(DESC, "Initial returned gas in L")
+  field(SCAN, "Passive")
+  field(INPA, "$(P)$(R)RETURNED:INIT_RBV NPP")
+  field(CALC, "A*$(M3_TO_LTR=1.3245)")
+  field(PREC, "6")
+  field(EGU, "L")
+}
+
+# Initial liquid gas value in liters 
+#% archiver 60 Monitor
+record(calc, "$(P)$(R)WEIGHT:LTR:INIT_RBV") {
+  field(DESC, "Initial beamline gas in L")
+  field(SCAN, "Passive")
+  field(INPA, "$(P)$(R)WEIGHT:INIT_RBV NPP")
+  field(CALC, "A*$(KG_TO_LTR=8.0)")
+  field(PREC, "6")
+  field(EGU, "L")
+}
+
+# Liquid gas value at the start of each period (used for the recovery rate)
+record(ai, "$(P)$(R)RETURNED:AT_T0_RBV") {
+  field(DESC, "Returned gas at start")
+  field(DTYP, "Soft Channel")
+  field(INP, "$(P)$(R)RETURNED:CURRENT_RBV NPP")
+  field(SCAN, "Passive")
+  field(PREC, "3")
+  field(EGU, "m3")
+}
+
+# Returned gas value at the start of each period (used for the consumption rate)
+record(ai, "$(P)$(R)WEIGHT:AT_T0_RBV") {
+  field(DESC, "Beamline gas at start")
+  field(DTYP, "Soft Channel")
+  field(INP, "$(P)$(R)WEIGHT:CURRENT_RBV NPP")
+  field(SCAN, "Passive")
+  field(PREC, "3")
+  field(EGU, "kg")
+}
+
+#########################################################################################
+#        MAIN LOOP ON 1s SCAN -> PERIOD ACCUMULATION AND TOTAL CALCULATIONS
+#########################################################################################
+
+# Set the averaging period (in seconds) for the gas measurements
+record(longout, "$(P)$(R)AVGTIME") {
+  field(DESC, "Averaging Period")
+  field(DTYP, "Soft Channel")
+  field(VAL, "$(AVG_PERIOD=600)")
+  field(OUT, "$(P)$(R)AVGTIME_RBV PP")
+  field(LOPR, "10")
+  field(HOPR, "86400")
+  field(PINI, "YES")
+}
+
+# Get the averaging period (in seconds) for the gas measurements
+#% archiver 60 Monitor
+record(longout, "$(P)$(R)AVGTIME_RBV") {
+  field(DESC, "Averaging Period Readback")
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(P)$(R)COUNTER NPP")
+  field(EGU, "sec")
+}
+
+# Define a counter (counting down from the start value to enable averaging over the period)
+#% archiver 1 Monitor
+record(calc, "$(P)$(R)COUNTER") {
+  field(DESC, "Counter")
+  field(SCAN, "1 second")
+  field(INPA, "$(P)$(R)COUNTER NPP")
+  field(CALC, "A-1")
+  field(EGU, "sec")
+  field(FLNK, "$(P)$(R)CURRENT:TIMESTAMP_RBV")
+}
+
+# Record the timestamp associated with the current readings
+#% archiver 1 Monitor
+record(timestamp, "$(P)$(R)CURRENT:TIMESTAMP_RBV") {
+  field(DESC, "Current time")
+  field(SCAN, "Passive")
+  field(TST, "YY/MM/DD HH:MM:SS")
+  field(FLNK, "$(P)$(R)TICKLOOP:FANOUT")
+}
+
+# Trigger the period accumulation and the total calculations
+# Also check if measurements are valid, i.e. the Dewar must be in place at the beamline.
+record(fanout, "$(P)$(R)TICKLOOP:FANOUT") {
+  field(DESC, "Trigger accum and total")
+  field(SCAN, "Passive")
+  field(SELM, "All")
+  field(LNK1, "$(P)$(R)SUMDATA PP")
+  field(LNK2, "$(P)$(R)TOTAL:SEQ PP")
+  field(LNK3, "$(P)$(R)MEAS:VALID:CALC PP")
+}
+
+# Check the weight on the balance at the beamline; if very negative, then Dewar has been removed.
+record(calcout, "$(P)$(R)MEAS:VALID:CALC") {
+  field(DESC, "Check Dewar is present")
+  field(SCAN, "Passive")
+  field(INPA, "$(P)$(R)WEIGHT:CURRENT_RBV NPP")
+  field(CALC, "A>(-20)")
+  field(OOPT, "Transition To Zero")
+  field(DOPT, "Use CALC")
+  field(OUT, "$(P)$(R)MEAS:ENABLE PP")
+}
+
+#########################################################################################
+#        CURRENT MEASUREMENT CALCULATIONS
+#########################################################################################
+
+# Get the current gas weight recorded at the beamline (Dewar)
+record(ai, "$(P)$(R)WEIGHT:CURRENT_RBV") {
+  field(DESC, " Beamline gas amount")
+  field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(INP, "$(LIQUID_WEIGHT)")
+  field(PREC, "3")
+  field(EGU, "kg")
+  field(FLNK, "$(P)$(R)WEIGHT:LTR:CURRENT_RBV")
+}
+
+# Get the current gas weight in liters
+#% archiver 1 Monitor
+record(calc, "$(P)$(R)WEIGHT:LTR:CURRENT_RBV") {
+  field(DESC, " Beamline gas amount in L")
+  #field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(INPA, "$(P)$(R)WEIGHT:CURRENT_RBV NPP")
+  field(CALC, "A*$(KG_TO_LTR=8.0)")
+  field(PREC, "6")
+  field(EGU, "L")
+}
+
+# Accumulate beamline gas weight data throughout the specified period
+record(calc, "$(P)$(R)WEIGHT:ACCUMULATE") {
+  field(DESC, "Accumulate bl gas readings")
+  field(SCAN, "Passive")
+  field(INPA, "$(P)$(R)WEIGHT:ACCUMULATE NPP")
+  field(INPB, "$(P)$(R)WEIGHT:CURRENT_RBV PP")
+  field(VAL, "0")
+  field(CALC, "A+B")
+}
+
+# Get the current returned gas volume recorded at the service plant
+record(ai, "$(P)$(R)RETURNED:CURRENT_RBV") {
+  field(DESC, "Returned gas amount")
+  field(DTYP, "Soft Channel")
+  field(INP, "$(GAS_VOLUME) CA")
+  field(SCAN, "Passive")
+  field(PREC, "3")
+  field(EGU, "m3")
+  field(FLNK, "$(P)$(R)RETURNED:LTR:CURRENT_RBV")
+}
+
+# Get the current returned gas volume in liters
+#% archiver 1 Monitor
+record(calc, "$(P)$(R)RETURNED:LTR:CURRENT_RBV") {
+  field(DESC, "Returned gas amount")
+  #field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(INPA, "$(P)$(R)RETURNED:CURRENT_RBV NPP")
+  field(CALC, "A*$(M3_TO_LTR=1.3245)")
+  field(PREC, "6")
+  field(EGU, "L")
+}
+
+# Accumulate recovery gas volume data throughout the specified period
+record(calc, "$(P)$(R)RETURNED:ACCUMULATE") {
+  field(DESC, "Accumulate recovery readings")
+  field(INPA, "$(P)$(R)RETURNED:ACCUMULATE NPP")
+  field(INPB, "$(P)$(R)RETURNED:CURRENT_RBV PP")
+  field(VAL, "0")
+  field(CALC, "A+B")
+}
+
+# Trigger accumulation of the two gas datasets
+record(calcout, "$(P)$(R)SUMDATA") {
+  field(INPA, "$(P)$(R)COUNTER NPP")
+  field(INPB, "$(P)$(R)WEIGHT:ACCUMULATE PP")
+  field(INPC, "$(P)$(R)RETURNED:ACCUMULATE PP")
+  field(CALC, "A")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+  field(OUT, "$(P)$(R)CHECKCOUNTER.A PP")
+}
+
+# Check if countdown period has reached zero
+record(calcout, "$(P)$(R)CHECKCOUNTER") {
+  field(DESC, "Check Counter Completion")
+  field(SCAN, "Passive")
+  field(INPB, "$(P)$(R)AVGTIME_RBV NPP")
+  field(CALC, "A")
+  field(OOPT, "Transition To Zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "B")
+  field(OUT, "$(P)$(R)TIMESUPSEQ PP")
+}
+
+#########################################################################################
+#        TOTAL MEASUREMENT CALCULATIONS
+#########################################################################################
+
+# Sequence of events occuring at each counter tick
+record(sseq, "$(P)$(R)TOTAL:SEQ") {
+  field(DESC, "Total gas calc sequence")
+  field(SCAN, "Passive")
+  field(SELM, "All")
+  field(DOL1, "0")
+  field(LNK1, "$(P)$(R)TOTAL:TIME:CALC PP")
+  field(WAIT1, "Wait")
+  field(DOL2, "0")
+  field(LNK2, "$(P)$(R)WEIGHT:TOTAL:CSMPT_RBV PP")
+  field(WAIT2, "Wait")
+  field(DOL3, "0")
+  field(LNK3, "$(P)$(R)RETURNED:TOTAL:RECOV_RBV NPP")
+  field(WAIT3, "Wait")
+  field(DOL4, "0")
+  field(LNK4, "$(P)$(R)TOTAL:RECOVERY_RBV PP")
+  field(WAIT4, "Wait")
+}
+
+# Calculate the total measurement period which has elapsed since the latest 'Tare'
+record(calc, "$(P)$(R)TOTAL:TIME:CALC") {
+  field(DESC, "Calculate delta time")
+  field(SCAN, "Passive")
+  field(INPA, "$(P)$(R)TARE:TIMESTAMP_RBV.SEC NPP")
+  field(INPB, "$(P)$(R)CURRENT:TIMESTAMP_RBV.SEC NPP")
+  field(CALC, "B-A")
+  field(EGU, "seconds")
+  field(FLNK, "$(P)$(R)TOTAL:TSTRING:CALC")
+}
+
+# Extract the 'hours' component from the time difference value
+record(scalcout, "$(P)$(R)TOTAL:TIMESTAMP:HOUR") {
+  field(DESC, "Get hours component")
+  field(SCAN, "Passive")
+  field(INPA, "$(P)$(R)TOTAL:TIME:CALC NPP")
+  field(CALC, "PRINTF('%2d',A/3600)")
+  field(EGU, "hours")
+}
+
+# Extract the 'minutes' component from the time difference value
+record(scalcout, "$(P)$(R)TOTAL:TIMESTAMP:MINUTE") {
+  field(DESC, "Get minutes component")
+  field(SCAN, "Passive")
+  field(INPA, "$(P)$(R)TOTAL:TIME:CALC NPP")
+  field(CALC, "PRINTF('%2d',(A%3600)/60)")
+  field(EGU, "minutes")
+}
+
+# Extract the 'seconds' component from the time difference value
+record(scalcout, "$(P)$(R)TOTAL:TIMESTAMP:SECOND") {
+  field(DESC, "Get seconds component")
+  field(SCAN, "Passive")
+  field(INPA, "$(P)$(R)TOTAL:TIME:CALC NPP")
+  field(CALC, "PRINTF('%2d',(A%3600)%60)")
+  field(EGU, "seconds")
+}
+
+# Transform the time difference into a time format
+record(scalcout, "$(P)$(R)TOTAL:TSTRING:CALC") {
+  field(DESC, "Time format conversion")
+  field(SCAN, "Passive")
+  field(INPA, "$(P)$(R)TOTAL:TIMESTAMP:HOUR PP")
+  field(INPB, "$(P)$(R)TOTAL:TIMESTAMP:MINUTE PP")
+  field(INPC, "$(P)$(R)TOTAL:TIMESTAMP:SECOND PP")
+  field(CALC, "(PRINTF('H%3d',A)+PRINTF(':M%2d',B))+PRINTF(':S%2d',C)")
+  field(FLNK, "$(P)$(R)TOTAL:TIMESTAMP_RBV")
+}
+
+# Set the 'Total' timestamp value to n/a
+#%archiver 1 Monitor
+record(stringin, "$(P)$(R)TOTAL:TIMESTAMP_RBV") {
+  field(DESC, "Total Timestamp string")
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(INP, "$(P)$(R)TOTAL:TSTRING:CALC NPP")
+}
+
+# Get the total consumption of liquid gas in liters since the last 'tare'.
+#%archiver 1 Monitor
+record(calcout, "$(P)$(R)WEIGHT:TOTAL:CSMPT_RBV") {
+  field(DESC, "Total used Liquid Gas")
+  field(SCAN, "Passive")
+  field(INPA, "$(P)$(R)WEIGHT:LTR:INIT_RBV NPP")
+  field(INPB, "$(P)$(R)WEIGHT:LTR:CURRENT_RBV NPP")
+  field(CALC, "B-A")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+  field(OUT, "$(P)$(R)WEIGHT:TOTAL:RATE_RBV.B PP")
+  field(LOPR, "0")
+  field(HOPR, "200")
+  field(PREC, "6")
+  field(EGU, "L")
+}
+
+# Get the liquid gas consumption rate in L/hour from the overall measurement
+#% archiver 1 Monitor
+record(calc, "$(P)$(R)WEIGHT:TOTAL:RATE_RBV") {
+  field(DESC, "Total Liquid Gas csmpt rate")
+  field(SCAN, "Passive")
+  field(INPA, "$(P)$(R)TOTAL:TIME:CALC_RBV NPP")
+  field(CALC, "((B*3600)/A)")
+  field(VAL, "0")
+  field(PREC, "3")
+  field(EGU, "L/h")
+  field(LOLO, "-1.0")
+  field(LLSV, "MAJOR")
+}
+
+# Get the total recovery of gas in liters since the last 'tare'.
+#%archiver 1 Monitor
+record(calcout, "$(P)$(R)RETURNED:TOTAL:RECOV_RBV") {
+  field(DESC, "Total returned Gas")
+  field(SCAN, "Passive")
+  field(INPA, "$(P)$(R)RETURNED:LTR:INIT_RBV NPP")
+  field(INPB, "$(P)$(R)RETURNED:LTR:CURRENT_RBV NPP")
+  field(CALC, "B-A")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+  field(OUT, "$(P)$(R)RETURNED:TOTAL:RATE_RBV.B PP")
+  field(LOPR, "0")
+  field(HOPR, "200")
+  field(PREC, "6")
+  field(EGU, "L")
+}
+
+# Get the gas recovery rate in L/hour from the overall measurement
+#% archiver 1 Monitor
+record(calc, "$(P)$(R)RETURNED:TOTAL:RATE_RBV") {
+  field(DESC, "Total Gas recovery rate")
+  field(SCAN, "Passive")
+  field(INPA, "$(P)$(R)TOTAL:TIME:CALC_RBV NPP")
+  field(CALC, "((B*3600)/A)")
+  field(VAL, "0")
+  field(PREC, "3")
+  field(EGU, "L/h")
+  field(LOLO, "-1.0")
+  field(LLSV, "MAJOR")
+}
+
+#########################################################################################
+#        END OF PERIOD CALCULATIONS
+#########################################################################################
+
+# Sequence of events occuring at each period completion
+record(sseq, "$(P)$(R)TIMESUPSEQ") {
+  field(DESC, "Calculation,Reset sequence")
+  field(SCAN, "Passive")
+  field(SELM, "All")
+  field(DOL1, "1")
+  field(LNK1, "$(P)$(R)PERIOD:GETAVGS PP")
+  field(WAIT1, "Wait")
+  field(DOL2, "1")
+  field(LNK2, "$(P)$(R)PERIOD:RECOVERY_RBV PP")
+  field(WAIT2, "Wait")
+  field(DOL3, "$(P)$(R)AVGTIME_RBV NPP")
+  field(LNK3, "$(P)$(R)COUNTER NPP")
+  field(WAIT3, "Wait")
+  field(DOL4, "0")
+  field(LNK4, "$(P)$(R)PERIOD:AVGRESET PP")
+  field(WAIT4, "Wait")
+  field(DOL5, "0")
+  field(LNK5, "$(P)$(R)T0_VALUES PP")
+  field(WAIT5, "Wait")
+  field(DOL6, "0")
+  field(LNK6, "$(P)$(R)PERIOD:TIMESTAMP_RBV PP")
+  field(WAIT6, "Wait")
+}
+
+# Trigger the average calculations of individual gas datasets
+record(fanout, "$(P)$(R)PERIOD:GETAVGS") {
+  field(DESC, "Calculate gas consumptions")
+  field(SCAN, "Passive")
+  field(SELM, "All")
+  field(LNK1, "$(P)$(R)WEIGHT:PERIOD:CSMPT_RBV PP")
+  field(LNK2, "$(P)$(R)RETURNED:PERIOD:RECOV_RBV PP")
+}
+
+# Get the average consumption of liquid gas in liters over the last period
+#%archiver 30 Monitor
+record(calcout, "$(P)$(R)WEIGHT:PERIOD:CSMPT_RBV") {
+  field(DESC, "Used Liquid Gas (beamline)")
+  field(SCAN, "Passive")
+  field(INPA, "$(P)$(R)WEIGHT:AT_T0_RBV NPP")
+  field(INPB, "$(P)$(R)WEIGHT:ACCUMULATE NPP")
+  field(INPC, "$(P)$(R)AVGTIME_RBV NPP")
+  field(CALC, "((B/C)-A)*$(KG_TO_LTR=8.0)")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+  field(OUT, "$(P)$(R)WEIGHT:PERIOD:RATE_RBV.A PP")
+  field(LOPR, "0")
+  field(HOPR, "200")
+  field(PREC, "6")
+  field(EGU, "L")
+}
+
+# Get the liquid gas consumption rate in L/hour from the last period measurements
+#% archiver 30 Monitor
+record(calc, "$(P)$(R)WEIGHT:PERIOD:RATE_RBV") {
+  field(DESC, "Liquid Gas consumption rate")
+  field(SCAN, "Passive")
+  field(INPB, "$(P)$(R)AVGTIME_RBV NPP")
+  field(CALC, "((A/(B/3600))>0)?0:(A/(B/3600))")
+  field(PREC, "3")
+  field(EGU, "L/h")
+  field(LOLO, "-1.0")
+  field(LLSV, "MAJOR")
+}
+
+# Get the average return of gas in liters recorded over the last period
+#% archiver 30 Monitor
+record(calcout, "$(P)$(R)RETURNED:PERIOD:RECOV_RBV") {
+  field(DESC, "Returned Gas (DLS services)")
+  field(SCAN, "Passive")
+  field(INPA, "$(P)$(R)RETURNED:AT_T0_RBV NPP")
+  field(INPB, "$(P)$(R)RETURNED:ACCUMULATE NPP")
+  field(INPC, "$(P)$(R)AVGTIME_RBV NPP")
+  field(CALC, "((B/C)-A)*$(M3_TO_LTR=1.3245)")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+  field(OUT, "$(P)$(R)RETURNED:PERIOD:RATE_RBV.A PP")
+  field(PREC, "6")
+  field(EGU, "L")
+}
+
+# Get the gas return rate in L/hour from the last period measurements
+#% archiver 30 Monitor
+record(calc, "$(P)$(R)RETURNED:PERIOD:RATE_RBV") {
+  field(DESC, "Gas recovery rate")
+  field(SCAN, "Passive")
+  field(INPB, "$(P)$(R)AVGTIME_RBV NPP")
+  field(CALC, "(A/(B/3600))")
+  field(PREC, "3")
+  field(EGU, "L/h")
+}
+
+# Reset both accumulation datasets to zero
+record(dfanout, "$(P)$(R)PERIOD:AVGRESET") {
+  field(DESC, "Reset averages to Zero")
+  field(SCAN, "Passive")
+  field(OUTA, "$(P)$(R)WEIGHT:ACCUMULATE NPP")
+  field(OUTB, "$(P)$(R)RETURNED:ACCUMULATE NPP")
+  field(SELM, "All")
+}
+
+# Set new reference values for the next rate calculations 
+record(fanout, "$(P)$(R)T0_VALUES") {
+  field(DESC, "Set gas at period start")
+  field(SCAN, "Passive")
+  field(SELM, "All")
+  field(LNK1, "$(P)$(R)WEIGHT:AT_T0_RBV PP")
+  field(LNK2, "$(P)$(R)RETURNED:AT_T0_RBV PP")
+}
+
+# Record the timestamp associated with the period calculations
+#% archiver 30 Monitor
+record(timestamp, "$(P)$(R)PERIOD:TIMESTAMP_RBV") {
+  field(DESC, "Calculations timestamp")
+  field(SCAN, "Passive")
+  field(TST, "YY/MM/DD HH:MM:SS")
+}
+
+#########################################################################################
+#        RECOVERY CALCULATIONS
+#########################################################################################
+
+# Get the overall gas recovery percentage calculated over the last period
+#% archiver 30 Monitor
+record(calc, "$(P)$(R)PERIOD:RECOVERY_RBV") {
+  field(DESC, "Period Gas Recovery")
+  field(SCAN, "Passive")
+  field(INPA, "$(P)$(R)RETURNED:PERIOD:RECOV_RBV NPP")
+  field(INPB, "$(P)$(R)WEIGHT:PERIOD:CSMPT_RBV NPP")
+  field(CALC, "(ABS(100*(A/B))>100)?0:(100*(A/B))")
+  field(PREC, "3")
+  field(EGU, "%")
+}
+
+# Get the overall gas recovery percentage calculated over the last period
+#% archiver 1 Monitor
+record(calc, "$(P)$(R)TOTAL:RECOVERY_RBV") {
+  field(DESC, "Total Gas Recovery")
+  field(SCAN, "Passive")
+  field(INPA, "$(P)$(R)RETURNED:TOTAL:RECOV_RBV NPP")
+  field(INPB, "$(P)$(R)WEIGHT:TOTAL:CSMPT_RBV NPP")
+  field(CALC, "(ABS(100*(A/B))>100)?0:(100*(A/B))")
+  field(PREC, "3")
+  field(EGU, "%")
+}
+

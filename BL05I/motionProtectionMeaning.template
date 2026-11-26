@@ -1,0 +1,23 @@
+# File motionProtectionMeaning.template for BL05I module.
+#
+# To provide meaningful strings on the motion protection signals which are read as pmac variables.
+#
+# % macro P	Mandatory	Device record prefix of protection signal variable records.
+# % macro Q	Mandatory	Record prefix of the protection signal variable records.
+# % macro DESC	Optional	Description of the motion protection signal. 		Defaults to "Motion Protection Signal"
+# % macro ZNAM	Optional	String to apply to zero state of protection signal. 	Defaults to Off.
+# % macro ONAM	Optional	String to apply to one  state of protection signal. 	Defaults to On.
+# % macro ZSV	Optional	Alarm severity for the zero state.			Defaults to empty string.
+# % macro OSV	Optional	Alarm severity for the one state.			Defaults to empty string.
+# % macro COSV	Optional	Alarm severity for change of state.			Defaults to empty string.
+
+record(bi, "$(P)$(Q):MEANING") {
+  field(DESC, "$(DESC=Motion Protection Signal)")
+  field(DTYP, "Soft Channel")
+  field(INP, "$(P)$(Q):RBV CP")
+  field(ZNAM, "$(ZNAM)")
+  field(ONAM, "$(ONAM)")
+  field(ZSV, "$(ZSV=)")
+  field(OSV, "$(OSV=)")
+  field(COSV, "$(COSV=)")
+}

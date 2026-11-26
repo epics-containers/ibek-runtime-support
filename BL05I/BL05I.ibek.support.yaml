@@ -1,0 +1,755 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/4.10.0/ibek.support.schema.json
+
+# Imported from DLS production support module: BL05I 2-95
+# Source: controls/support/BL05I (DLS GitLab), tag 2-95, BL05IApp/Db
+# Pristine copies of the EPICS templates from that release.
+#
+# BL05I is the I05 beamline's support module; it also carries the templates of
+# the J (nano-ARPES) branch, BL05J. Its templates use only soft records: ai, ao,
+# bi, bo, calc, calcout, dfanout, fanout, longout, mbbi, mbbiDirect, mbbo, seq,
+# stringin, stringout and subArray from EPICS base; scalcout, sseq and
+# transform from calc; busy from busy; and timestamp from std, which only
+# BL05I_He_Recovery uses. So they run on a stock generic IOC image without
+# compiling the module; BL05I_He_Recovery needs an image that builds std.
+#
+# Entity model names are the builder class names, and the auto_* models are
+# builder's automatic classes for the templates that have no class of their
+# own: auto_<template> loads <template>.template. Parameter names are the
+# builder XML attribute names. The builder `name` parameter is not declared:
+# no template uses it in a record, and builder2ibek drops it. DESC of
+# BL05I_HR_manipulator is declared although only a GDA tag comment uses it,
+# because an i05 IOC sets it.
+#
+# Two templates override records that another module loads, so their entity
+# must come after that module's entity in ioc.yaml:
+# - auto_BL05I_mks937bGauge_pressureOverride redefines <GAUGE>:P of the
+#   mks937b gauge.
+# - auto_BL05I_slit_BPM_dummies sets fields of <SLITS>:POSCALC of the slits.
+#
+# Not in this pattern:
+# - BL05I_changeHexapodMirror and BL05I_changeHexapodMirror_withRef: they talk
+#   to a PMAC with StreamDevice and changeHexapod.proto, so they go to a
+#   pattern in ibek-runtime-streamdevice.
+# - BL05I_waterchiller: StreamDevice records with HostLink.proto (the HostLink
+#   module) and an asyn record, for the Keyence water chiller PLCs.
+# - auto_BL05I-digitelMpcIonpOverride: one StreamDevice record with
+#   digitelMpc.proto, and a hyphen in its name that is not a valid entity
+#   model name. No i05 IOC uses it.
+#
+# Only the templates and model entities an IOC actually needs may be vendored using:
+# 'ibek pattern add ibek-runtime-support:BL05I@<release> <service> --only <template> --model <entity_model>'
+#
+# To check for updates: diff this pattern's files against a newer tag of
+# controls/support/BL05I (BL05IApp/Db).
+
+module: BL05I
+
+entity_models:
+  - name: BL05I_waterchiller_interlock
+    description: |-
+      Shows the status of the MPS interlocks of one device of the water
+      chiller PLC: 16 interlock bits read from the device's interlock word.
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device record prefix of the subcomponent of the water chiller
+          system. Used to build record names.
+      DDESC:
+        type: str
+        description: |-
+          Sub device description. Keep it short: the template adds to it on
+          several records.
+      ilk0:
+        type: str
+        description: Name of interlock bit 0
+        default: unused
+      ilk1:
+        type: str
+        description: Name of interlock bit 1
+        default: unused
+      ilk2:
+        type: str
+        description: Name of interlock bit 2
+        default: unused
+      ilk3:
+        type: str
+        description: Name of interlock bit 3
+        default: unused
+      ilk4:
+        type: str
+        description: Name of interlock bit 4
+        default: unused
+      ilk5:
+        type: str
+        description: Name of interlock bit 5
+        default: unused
+      ilk6:
+        type: str
+        description: Name of interlock bit 6
+        default: unused
+      ilk7:
+        type: str
+        description: Name of interlock bit 7
+        default: unused
+      ilk8:
+        type: str
+        description: Name of interlock bit 8
+        default: unused
+      ilk9:
+        type: str
+        description: Name of interlock bit 9
+        default: unused
+      ilk10:
+        type: str
+        description: Name of interlock bit 10
+        default: unused
+      ilk11:
+        type: str
+        description: Name of interlock bit 11
+        default: unused
+      ilk12:
+        type: str
+        description: Name of interlock bit 12
+        default: unused
+      ilk13:
+        type: str
+        description: Name of interlock bit 13
+        default: unused
+      ilk14:
+        type: str
+        description: Name of interlock bit 14
+        default: unused
+      ilk15:
+        type: str
+        description: Name of interlock bit 15
+        default: unused
+    databases:
+      - file: BL05I_waterChiller_interlock.template
+        args:
+          .*:
+
+  - name: BL05I_pgmHomingSteps
+    description: |-
+      Provides GUI information about the status of the various steps
+      involved in the homing of the PGM (homing PLC10).
+    parameters:
+      P:
+        type: str
+        description: PV prefix
+      R:
+        type: str
+        description: PV suffix
+      HM:
+        type: str
+        description: |-
+          PV suffix of the homing status records from the homing template
+          definitions
+      HMC:
+        type: str
+        description: |-
+          PV suffix of the custom homing status records from the
+          pmacVariableWrite template definitions
+      STEP:
+        type: int
+        description: Step number of the PLC homing step
+      DESCNAME:
+        type: str
+        description: Descriptive name of the PLC homing step
+    databases:
+      - file: BL05I_PGM_homingPLC_steps.template
+        args:
+          .*:
+
+  - name: BL05I_FeedbackAutoPv
+    description: |-
+      Shutter-like AutoPV for BLfeedback.
+      Triggers feedback for a given period of time, but not when TopUp
+      is about to occur.
+    parameters:
+      prefix:
+        type: str
+        description: EPICS PV prefix
+      FEEDBACK_TIME:
+        type: float
+        description: Duration of feedback, in seconds
+      PULSE_DELAY:
+        type: float
+        description: Number of seconds between feedback pulses in Pulsed mode
+      DESC:
+        type: str
+        description: Description of this template in IOC
+    databases:
+      - file: BL05I_Feedback_AutoPV.template
+        args:
+          .*:
+
+  - name: BL05I_HR_manipulator
+    description: |-
+      HR branch end station sample manipulator: sequencer that moves all
+      axes to one of a set of stored positions.
+    parameters:
+      P:
+        type: str
+        description: Device PV prefix
+      DESC:
+        type: str
+        description: |-
+          GDA description of the positioner. Used only in a GDA tag, not in
+          a record.
+        default: ES Manipulator 1
+    databases:
+      - file: BL05I_HR_manipulator.template
+        args:
+          .*:
+
+  - name: BL05I_HR_manipulatorLimit
+    description: |-
+      Applies a motion limit dependent on switches and/or exclusion zones.
+    parameters:
+      P:
+        type: str
+        description: Device prefix
+      R:
+        type: str
+        description: Record name prefix
+      LIM1:
+        type: float
+        description: Limit value when switch 1 is active
+      LIM2:
+        type: float
+        description: Limit value when switch 2 is active
+      LIM3:
+        type: float
+        description: Limit value when switch 3 is active
+      LIM4:
+        type: float
+        description: Limit value when no switch is active
+      SW1:
+        type: str
+        description: Record name of switch 1 state signal
+      SW2:
+        type: str
+        description: Record name of switch 2 state signal
+      SW3:
+        type: str
+        description: Record name of switch 3 state signal
+      MTRLIM:
+        type: str
+        description: Name of motor record limit field to restrict
+      LIMTYPE:
+        type: int
+        description: |-
+          Type of motion limit, also whether the exclusion zones feature is
+          enabled: 0 for LO, 1 for Disabled or 2 for HI
+        default: 1
+      EGU:
+        type: str
+        description: Engineering units on the motion axis
+        default: ""
+    databases:
+      - file: BL05I_HR_manipulatorLimit.template
+        args:
+          .*:
+
+  - name: BL05I_HR_manipulatorSlit
+    description: |-
+      Calculates the analyser slit position string from an analogue input
+      voltage, for the HR branch end station.
+    parameters:
+      P:
+        type: str
+        description: Device PV prefix
+      R:
+        type: str
+        description: Record PV prefix
+      SLIT:
+        type: str
+        description: Analogue input voltage of slit position
+    databases:
+      - file: BL05I_HR_manipulatorSlit.template
+        args:
+          .*:
+
+  - name: BL05I_HR_manipulatorXZone
+    description: |-
+      Defines a manipulator exclusion zone: a motion limit dependent on the
+      position of a different axis. Works with the records of a
+      BL05I_HR_manipulatorLimit with the same P and R.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device name. Use the same as that of the manipulatorLimit to
+          override.
+      R:
+        type: str
+        description: |-
+          Record name. Use the same as that of the manipulatorLimit to
+          override.
+      XZ:
+        type: str
+        description: Name given to this exclusion trigger combination
+      XLIM:
+        type: float
+        description: Exclusion limit value to apply to the excluded motor
+      XTYPE:
+        type: int
+        description: |-
+          Type of exclusion: 0 for LO, 1 for Not Active or 2 for HI
+        default: 1
+      XEGU:
+        type: str
+        description: Engineering units on the excluded axis
+        default: ""
+      ZLIM:
+        type: float
+        description: |-
+          The limit value which defines the zone where the exclusion is
+          active; the motor triggers exclusion by moving past it
+      ZTYPE:
+        type: int
+        description: |-
+          The comparison against ZLIM that makes the zone active: 0 for LO,
+          1 for Not Active or 2 for HI
+        default: 1
+      ZMTR:
+        type: str
+        description: The motor whose position defines the exclusion zone
+    databases:
+      - file: BL05I_HR_manipulatorXZone.template
+        args:
+          .*:
+
+  - name: BL05I_HR_manipulatorXZoneSet
+    description: |-
+      Selects which exclusion zone to enforce: combines up to five
+      exclusion zones of one axis limit and applies the most restrictive.
+    parameters:
+      P:
+        type: str
+        description: Device prefix
+      R:
+        type: str
+        description: Record name prefix
+      XZS:
+        type: str
+        description: Name of the exclusion set
+      LIM:
+        type: str
+        description: |-
+          Prefix for the limit records defined by the manipulatorLimit
+          template
+      XTRLIM:
+        type: str
+        description: |-
+          Value of limit guaranteed to be outside the range of valid values
+      XSTATE1:
+        type: str
+        description: Name of the record holding the state of exclusion 1
+        default: "1"
+      XLIM1:
+        type: str
+        description: Name of the record holding the limit of exclusion 1
+        default: "{{XTRLIM}}"
+      XSTATE2:
+        type: str
+        description: Name of the record holding the state of exclusion 2
+        default: "1"
+      XLIM2:
+        type: str
+        description: Name of the record holding the limit of exclusion 2
+        default: "{{XTRLIM}}"
+      XSTATE3:
+        type: str
+        description: Name of the record holding the state of exclusion 3
+        default: "1"
+      XLIM3:
+        type: str
+        description: Name of the record holding the limit of exclusion 3
+        default: "{{XTRLIM}}"
+      XSTATE4:
+        type: str
+        description: Name of the record holding the state of exclusion 4
+        default: "1"
+      XLIM4:
+        type: str
+        description: Name of the record holding the limit of exclusion 4
+        default: "{{XTRLIM}}"
+      XSTATE5:
+        type: str
+        description: Name of the record holding the state of exclusion 5
+        default: "1"
+      XLIM5:
+        type: str
+        description: Name of the record holding the limit of exclusion 5
+        default: "{{XTRLIM}}"
+    databases:
+      - file: BL05I_HR_manipulatorXZoneSet.template
+        args:
+          .*:
+
+  - name: BL05I_He_Recovery
+    description: |-
+      Calculates the Helium gas recovery percentage and the liquid Helium
+      consumption rate, by comparing the liquid Helium weight in the
+      beamline Dewar with the gas returned to the recovery plant.
+    parameters:
+      P:
+        type: str
+        description: Device PV prefix
+      R:
+        type: str
+        description: Device PV suffix
+      GAS_VOLUME:
+        type: str
+        description: |-
+          The calc PV that provides the gas volume recorded at the recovery
+          plant
+      LIQUID_WEIGHT:
+        type: str
+        description: |-
+          The analogue input PV that provides the liquid gas weight in the
+          Dewar at the beamline
+      M3_TO_LTR:
+        type: float
+        description: |-
+          Coefficient to convert from cubic metres to litres, taking into
+          account the density of the gas phase (1 m3 = 1.3245 L for Helium)
+        default: 1.3245
+      KG_TO_LTR:
+        type: float
+        description: |-
+          Coefficient to convert from kilograms to litres, taking into
+          account the density of the liquid phase (1 kg = 8.0 L for Helium)
+        default: 8.0
+      AVG_PERIOD:
+        type: float
+        description: |-
+          The averaging period, in seconds, used to calculate each gas
+          recovery data point
+        default: 600
+    databases:
+      - file: BL05I_Helium_recovery.template
+        args:
+          .*:
+
+  - name: auto_BL05I_shared_beamStatus
+    description: |-
+      Beam status of the shared part of the beamline, for the synoptic,
+      combined with the beam status of the two branches.
+    parameters:
+      P:
+        type: str
+        description: Device PV prefix of the shared beam status
+      P1:
+        type: str
+        description: Device PV prefix for I-branch line propagation
+      P2:
+        type: str
+        description: Device PV prefix for J-branch line propagation
+    databases:
+      - file: BL05I_shared_beamStatus.template
+        args:
+          .*:
+
+  - name: auto_BL05I_HR_beamStatus
+    description: |-
+      Beam status of the HR branch end station for the synoptic, including
+      the readback of the manual valves.
+    parameters:
+      P:
+        type: str
+        description: Device PV prefix
+    databases:
+      - file: BL05I_HR_beamStatus.template
+        args:
+          .*:
+
+  - name: auto_BL05I_HR_vacuumOpenSequence
+    description: |-
+      Automates resetting and opening/arming a sequence of four
+      valve-style devices, resetting an interlock between the third and
+      the fourth.
+    parameters:
+      P:
+        type: str
+        description: Device prefix name for the sequence
+      R:
+        type: str
+        description: Device record name prefix for the sequence
+      device1:
+        type: str
+        description: Name of first valve/device to reset and open/arm
+      device2:
+        type: str
+        description: Name of second valve/device to reset and open/arm
+      device3:
+        type: str
+        description: Name of third valve/device to reset and open/arm
+      device4:
+        type: str
+        description: Name of fourth valve/device to reset and open/arm
+      ilkname:
+        type: str
+        description: |-
+          Name of interlock to reset after opening device3 before resetting
+          device4
+      DESC:
+        type: str
+        description: Description of the sequence
+        default: Open valves
+      dly_reset1:
+        type: float
+        description: Delay before resetting device 1
+        default: 0
+      dly_open1:
+        type: float
+        description: Delay before opening device 1 (after resetting device 1)
+        default: 7
+      dly_reset2:
+        type: float
+        description: Delay before resetting device 2 (after opening device 1)
+        default: 7
+      dly_open2:
+        type: float
+        description: Delay before opening device 2 (after resetting device 2)
+        default: 7
+      dly_reset3:
+        type: float
+        description: Delay before resetting device 3 (after opening device 2)
+        default: 7
+      dly_open3:
+        type: float
+        description: Delay before opening device 3 (after resetting device 3)
+        default: 7
+      dly_resetilk:
+        type: float
+        description: Delay before resetting interlock (after opening device 3)
+        default: 7
+      dly_reset4:
+        type: float
+        description: Delay before resetting device 4 (after resetting interlock)
+        default: 7
+      dly_open4:
+        type: float
+        description: Delay before opening device 4 (after resetting device 4)
+        default: 7
+      dly_final:
+        type: float
+        description: |-
+          Settling time delay before setting status complete (after opening
+          device 4)
+        default: 7
+      lvl_reset1:
+        type: int
+        description: Command value to reset device1
+        default: 2
+      lvl_reset2:
+        type: int
+        description: Command value to reset device2
+        default: 2
+      lvl_reset3:
+        type: int
+        description: Command value to reset device3
+        default: 2
+      lvl_reset4:
+        type: int
+        description: Command value to reset device4
+        default: 2
+      lvl_open1:
+        type: int
+        description: Command value to open/arm device1
+        default: 0
+      lvl_open2:
+        type: int
+        description: Command value to open/arm device2
+        default: 0
+      lvl_open3:
+        type: int
+        description: Command value to open/arm device3
+        default: 0
+      lvl_open4:
+        type: int
+        description: Command value to open/arm device4
+        default: 0
+    databases:
+      - file: BL05I_HR_vacuumOpenSequence.template
+        args:
+          .*:
+
+  - name: auto_BL05I_mks937bGauge_pressureOverride
+    description: |-
+      Overrides the pressure record <GAUGE>:P of an mks937b gauge, which has
+      no analogue :PLOG input, to take the pressure from the cold cathode
+      gauge when it is enabled and from the Pirani gauge otherwise. Must
+      come after the gauge's entity.
+    parameters:
+      GAUGE:
+        type: str
+        description: The gauge name
+      IMG:
+        type: str
+        description: The corresponding cold cathode gauge
+      PIRG:
+        type: str
+        description: The corresponding Pirani gauge
+    databases:
+      - file: BL05I_mks937bGauge_pressureOverride.template
+        args:
+          .*:
+
+  - name: auto_BL05I_slit_BPM_dummies
+    description: |-
+      Dummy current records for slits that have current monitoring on only
+      the X or the Y blades. Overrides the COPT field of the slits'
+      <SLITS>:POSCALC transform record, so it must come after the slits'
+      entity.
+    parameters:
+      SLITS:
+        type: str
+        description: Slit device name
+      BLADES:
+        type: str
+        description: Set of slit blades without current monitoring (X or Y)
+    databases:
+      - file: BL05I_slit_BPM_dummies.template
+        args:
+          .*:
+
+  - name: auto_BL05J_Nano_beamStatus
+    description: |-
+      Beam status of the J branch (nano) end station for the synoptic.
+    parameters:
+      P:
+        type: str
+        description: Device PV prefix
+    databases:
+      - file: BL05J_Nano_beamStatus.template
+        args:
+          .*:
+
+  - name: auto_BL05J_adamCPW_patch
+    description: |-
+      Replaces the string parsing of the gross, net and tare weights of an
+      adamCPW.adamCPWplus balance, for use with asynOctetSetInputEos and
+      asynOctetSetOutputEos. Must come after the balance's entity.
+    parameters:
+      P:
+        type: str
+        description: Device PV prefix of the balance
+    databases:
+      - file: BL05J_adamCPW_patch.template
+        args:
+          .*:
+
+  - name: auto_BL05JmanipulatorSlit
+    description: |-
+      Calculates the analyser slit position string from an analogue input
+      voltage, for the J branch end station.
+    parameters:
+      P:
+        type: str
+        description: Device PV prefix
+      R:
+        type: str
+        description: Record PV prefix
+      SLIT:
+        type: str
+        description: Analogue input voltage of slit position
+    databases:
+      - file: BL05JmanipulatorSlit.template
+        args:
+          .*:
+
+  - name: auto_BL05JpvRamp
+    description: |-
+      Ramps the voltage of a detector power supply, for the J branch end
+      station: drives an analogue output PV at a set ramp rate, where
+      output = EGU * SCALE + OFFSET.
+    parameters:
+      P:
+        type: str
+        description: Device PV prefix
+      OUTPV:
+        type: str
+        description: The analogue output PV that controls the PSU
+      EGU:
+        type: str
+        description: Engineering units
+        default: V
+      SCALE:
+        type: float
+        description: Conversion factor from EGU to the output PV value
+        default: 1
+      OFFSET:
+        type: float
+        description: Conversion offset from EGU to the output PV value
+        default: 0
+      MAXEGU:
+        type: float
+        description: Maximum EGU the PSU supports
+        default: 10000
+      MINRAMPEGU:
+        type: float
+        description: Minimum EGU that the user can ramp to
+        default: 0
+      MAXRAMPEGU:
+        type: float
+        description: Maximum EGU that the user can ramp to
+        default: 10000
+      RR:
+        type: float
+        description: Initial (first boot) ramp rate in EGU/s
+        default: 10
+      MINRR:
+        type: float
+        description: Minimum allowed ramp rate in EGU/s
+        default: 1
+      MAXRR:
+        type: float
+        description: Maximum allowed ramp rate in EGU/s
+        default: 10000
+    databases:
+      - file: BL05JpvRamp.template
+        args:
+          .*:
+
+  - name: auto_motionProtectionMeaning
+    description: |-
+      Gives a meaning (state names and alarm severities) to a motion
+      protection signal variable.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device record prefix of the protection signal variable records
+      Q:
+        type: str
+        description: Record prefix of the protection signal variable records
+      DESC:
+        type: str
+        description: Description of the motion protection signal
+        default: Motion Protection Signal
+      ZNAM:
+        type: str
+        description: String for the zero state of the protection signal
+      ONAM:
+        type: str
+        description: String for the one state of the protection signal
+      ZSV:
+        type: str
+        description: Alarm severity for the zero state
+        default: ""
+      OSV:
+        type: str
+        description: Alarm severity for the one state
+        default: ""
+      COSV:
+        type: str
+        description: Alarm severity for change of state
+        default: ""
+    databases:
+      - file: motionProtectionMeaning.template
+        args:
+          .*:
