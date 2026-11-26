@@ -1,0 +1,100 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/4.10.0/ibek.support.schema.json
+
+# Imported from DLS production support module: BLfeedback 2-26
+# Source: controls/support/BLfeedback (DLS GitLab), tag 2-26, BLfeedbackApp/Db
+# Pristine copy of feedback.template from that release.
+#
+# Only the feedback entity model is here: a PID loop on an epid record. Its
+# template uses only these records: ao, bo and calcout from EPICS base,
+# transform from calc, and epid from std. So it runs on a generic IOC image
+# that builds calc and std, with no compiling. The model and its parameters
+# are the same as BLfeedback.feedback in ibek-support-dls, so existing
+# ioc.yaml files validate unchanged; feedback.pvi.device.yaml comes from there
+# too.
+#
+# Not in this pattern:
+# - beamPositionCalc and characterise: asyn port drivers built into the
+#   module's library (drvBeamPositionCalc.cpp, drvCharacterise.c).
+# - fast_feedback, modulationFeedback and the other templates: no IOC that
+#   is being converted uses them yet.
+#
+# To check for updates: diff this pattern's files against a newer tag of
+# controls/support/BLfeedback (BLfeedbackApp/Db).
+
+module: BLfeedback
+
+entity_models:
+  - name: feedback
+    description: |-
+      BL feedback PID loop. Provides an EPID record with auto on/off control,
+      output rate of change limiting, and setpoint tweaking.
+    parameters:
+      P:
+        type: str
+        description: Device Prefix
+      PID:
+        type: str
+        description: Device suffix
+      INP:
+        type: str
+        description: Input PV for readback
+      OUT:
+        type: str
+        description: Output PV for demand
+      OROC:
+        type: float
+        description: Output rate of change (default=no ROC limit)
+        default: 0
+      SCAN:
+        type: str
+        description: Scan rate for updating values on screen
+      KP:
+        type: float
+        description: Proportional term for PID
+      KI:
+        type: float
+        description: Integral term for PID
+        default: 0
+      KD:
+        type: float
+        description: Differential term for PID
+        default: 0
+      LOPR:
+        type: float
+        description: Low operating range of setpoint
+      HOPR:
+        type: float
+        description: High operating range of setpoint
+      DRVL:
+        type: float
+        description: Low limit on Output
+      DRVH:
+        type: float
+        description: High limit on Output
+      PREC:
+        type: int
+        description: Precision of display
+      AUTOPV:
+        type: str
+        description: Shutter PV 1 to monitor to disable the PID
+        default: ""
+      AUTOPV2:
+        type: str
+        description: Shutter PV 2 to monitor to disable the PID
+        default: ""
+      TITLE:
+        type: str
+        description: Title of the EDM screen
+        default: Feedback
+
+    databases:
+      - file: feedback.template
+        args:
+          .*:
+
+    pvi:
+      yaml_path: feedback.pvi.device.yaml
+      ui_macros:
+        P:
+        PID:
+      pv_prefix: "$(P)$(PID)"
