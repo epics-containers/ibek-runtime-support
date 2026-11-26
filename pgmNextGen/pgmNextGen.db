@@ -1,0 +1,3478 @@
+##############################################################
+#
+# Template to write and read a variable on a PMAC/Geobrick.
+#
+##############################################################
+
+# Macros
+# % macro, __doc__, Simple template that reads and writes to a variable on a 
+# PMAC or geoBrick via dynamic parameters.
+# % macro, name, Object name and gui association name
+# % macro, P, Pv Prefix
+# % macro, Q, Pv Suffix
+# % macro, DTYP, asyn DTYP (e.g., asynFloat64, asynInt32)
+# % macro, PORT, Motor controller serial port
+# % macro, TYPE, PMAC variable type (D=double, I=integer, H=hex, S=string)
+# % macro, VAR, Variable on PMAC to write to, e.g. P700
+# % macro, EGU, Engineering units
+# % macro, VARIABLE_PREC, Variable Record precision
+# % macro, LABEL, Label for GUI
+
+# CSS GUI
+# % gui, , boyembed, pmacApp_opi/pmac_variable_write_embed_box.opi, P=$(P,recursive),Q=:LINES,LABEL=$(LABEL,undefined), name=
+# % gui, , boyembed, pmacApp_opi/pmac_variable_write_embed.opi, P=$(P,recursive),Q=:LINES,LABEL=$(LABEL,undefined), name=
+
+# EGM GUI
+# % gui, , edmembed, pmacVariableWrite.edl, P=$(P,recursive), Q=:LINES, LABEL=$(LABEL,undefined)
+
+##########################################
+# Records for writing to PMAC variables
+########################################## 
+
+record(ai, "$(P,recursive):LINES:RBV") {
+  field(SCAN, "I/O Intr")
+  field(PINI, "NO")
+  field(DTYP, "asynFloat64")
+  field(INP, "@asyn($(PITCH_PORT,undefined),0)PMAC_VDM_&$(COORD_NUM,undefined)Q21")
+  field(PREC, "$(VARIABLE_PREC,undefined)")
+  field(EGU, "")
+}
+
+record(calcout, "$(P,recursive):LINES:SYNC") {
+  field(DESC, "sync demand with readback")
+  field(CALC, "A")
+  field(OUT, "$(P,recursive):LINES PP")
+  field(INPA, "$(P,recursive):LINES:RBV")
+}
+
+# % archiver 1 monitor
+record(ao, "$(P,recursive):LINES") {
+  field(DESC, "demand")
+  field(EGU, "")
+  field(PREC, "$(VARIABLE_PREC,undefined)")
+  field(OUT, "$(P,recursive):LINES:SET PP")
+}
+
+record(ao, "$(P,recursive):LINES:SET") {
+  field(DESC, "Write value to pmac")
+  field(DTYP, "asynFloat64")
+  field(SDIS, "$(P,recursive):LINES:SYNC.PACT")
+  field(OUT, "@asyn($(PITCH_PORT,undefined),0)PMAC_WD_&$(COORD_NUM,undefined)Q21")
+}
+##############################################################
+#
+# Template to write and read a variable on a PMAC/Geobrick.
+#
+##############################################################
+
+# Macros
+# % macro, __doc__, Simple template that reads and writes to a variable on a 
+# PMAC or geoBrick via dynamic parameters.
+# % macro, name, Object name and gui association name
+# % macro, P, Pv Prefix
+# % macro, Q, Pv Suffix
+# % macro, DTYP, asyn DTYP (e.g., asynFloat64, asynInt32)
+# % macro, PORT, Motor controller serial port
+# % macro, TYPE, PMAC variable type (D=double, I=integer, H=hex, S=string)
+# % macro, VAR, Variable on PMAC to write to, e.g. P700
+# % macro, EGU, Engineering units
+# % macro, VARIABLE_PREC, Variable Record precision
+# % macro, LABEL, Label for GUI
+
+# CSS GUI
+# % gui, , boyembed, pmacApp_opi/pmac_variable_write_embed_box.opi, P=$(P,recursive),Q=:ORDER,LABEL=$(LABEL,undefined), name=
+# % gui, , boyembed, pmacApp_opi/pmac_variable_write_embed.opi, P=$(P,recursive),Q=:ORDER,LABEL=$(LABEL,undefined), name=
+
+# EGM GUI
+# % gui, , edmembed, pmacVariableWrite.edl, P=$(P,recursive), Q=:ORDER, LABEL=$(LABEL,undefined)
+
+##########################################
+# Records for writing to PMAC variables
+########################################## 
+
+record(ai, "$(P,recursive):ORDER:RBV") {
+  field(SCAN, "I/O Intr")
+  field(PINI, "NO")
+  field(DTYP, "asynFloat64")
+  field(INP, "@asyn($(PITCH_PORT,undefined),0)PMAC_VDM_&$(COORD_NUM,undefined)Q22")
+  field(PREC, "$(VARIABLE_PREC,undefined)")
+  field(EGU, "")
+}
+
+record(calcout, "$(P,recursive):ORDER:SYNC") {
+  field(DESC, "sync demand with readback")
+  field(CALC, "A")
+  field(OUT, "$(P,recursive):ORDER PP")
+  field(INPA, "$(P,recursive):ORDER:RBV")
+}
+
+# % archiver 1 monitor
+record(ao, "$(P,recursive):ORDER") {
+  field(DESC, "demand")
+  field(EGU, "")
+  field(PREC, "$(VARIABLE_PREC,undefined)")
+  field(OUT, "$(P,recursive):ORDER:SET PP")
+}
+
+record(ao, "$(P,recursive):ORDER:SET") {
+  field(DESC, "Write value to pmac")
+  field(DTYP, "asynFloat64")
+  field(SDIS, "$(P,recursive):ORDER:SYNC.PACT")
+  field(OUT, "@asyn($(PITCH_PORT,undefined),0)PMAC_WD_&$(COORD_NUM,undefined)Q22")
+}
+##############################################################
+#
+# Template to write and read a variable on a PMAC/Geobrick.
+#
+##############################################################
+
+# Macros
+# % macro, __doc__, Simple template that reads and writes to a variable on a 
+# PMAC or geoBrick via dynamic parameters.
+# % macro, name, Object name and gui association name
+# % macro, P, Pv Prefix
+# % macro, Q, Pv Suffix
+# % macro, DTYP, asyn DTYP (e.g., asynFloat64, asynInt32)
+# % macro, PORT, Motor controller serial port
+# % macro, TYPE, PMAC variable type (D=double, I=integer, H=hex, S=string)
+# % macro, VAR, Variable on PMAC to write to, e.g. P700
+# % macro, EGU, Engineering units
+# % macro, VARIABLE_PREC, Variable Record precision
+# % macro, LABEL, Label for GUI
+
+# CSS GUI
+# % gui, , boyembed, pmacApp_opi/pmac_variable_write_embed_box.opi, P=$(P,recursive),Q=:ENERGYDEMAND,LABEL=$(LABEL,undefined), name=
+# % gui, , boyembed, pmacApp_opi/pmac_variable_write_embed.opi, P=$(P,recursive),Q=:ENERGYDEMAND,LABEL=$(LABEL,undefined), name=
+
+# EGM GUI
+# % gui, , edmembed, pmacVariableWrite.edl, P=$(P,recursive), Q=:ENERGYDEMAND, LABEL=$(LABEL,undefined)
+
+##########################################
+# Records for writing to PMAC variables
+########################################## 
+
+record(ai, "$(P,recursive):ENERGYDEMAND:RBV") {
+  field(SCAN, "I/O Intr")
+  field(PINI, "NO")
+  field(DTYP, "asynFloat64")
+  field(INP, "@asyn($(PITCH_PORT,undefined),0)PMAC_VDM_&$(COORD_NUM,undefined)Q77")
+  field(PREC, "$(VARIABLE_PREC,undefined)")
+  field(EGU, "eV")
+}
+
+record(calcout, "$(P,recursive):ENERGYDEMAND:SYNC") {
+  field(DESC, "sync demand with readback")
+  field(CALC, "A")
+  field(OUT, "$(P,recursive):ENERGYDEMAND PP")
+  field(INPA, "$(P,recursive):ENERGYDEMAND:RBV")
+}
+
+# % archiver 1 monitor
+record(ao, "$(P,recursive):ENERGYDEMAND") {
+  field(DESC, "demand")
+  field(EGU, "eV")
+  field(PREC, "$(VARIABLE_PREC,undefined)")
+  field(OUT, "$(P,recursive):ENERGYDEMAND:SET PP")
+}
+
+record(ao, "$(P,recursive):ENERGYDEMAND:SET") {
+  field(DESC, "Write value to pmac")
+  field(DTYP, "asynFloat64")
+  field(SDIS, "$(P,recursive):ENERGYDEMAND:SYNC.PACT")
+  field(OUT, "@asyn($(PITCH_PORT,undefined),0)PMAC_WD_&$(COORD_NUM,undefined)Q77")
+}
+##############################################################
+#
+# Template to write and read a variable on a PMAC/Geobrick.
+#
+##############################################################
+
+# Macros
+# % macro, __doc__, Simple template that reads and writes to a variable on a 
+# PMAC or geoBrick via dynamic parameters.
+# % macro, name, Object name and gui association name
+# % macro, P, Pv Prefix
+# % macro, Q, Pv Suffix
+# % macro, DTYP, asyn DTYP (e.g., asynFloat64, asynInt32)
+# % macro, PORT, Motor controller serial port
+# % macro, TYPE, PMAC variable type (D=double, I=integer, H=hex, S=string)
+# % macro, VAR, Variable on PMAC to write to, e.g. P700
+# % macro, EGU, Engineering units
+# % macro, VARIABLE_PREC, Variable Record precision
+# % macro, LABEL, Label for GUI
+
+# CSS GUI
+# % gui, , boyembed, pmacApp_opi/pmac_variable_write_embed_box.opi, P=$(P,recursive),Q=:CFFDEMAND,LABEL=$(LABEL,undefined), name=
+# % gui, , boyembed, pmacApp_opi/pmac_variable_write_embed.opi, P=$(P,recursive),Q=:CFFDEMAND,LABEL=$(LABEL,undefined), name=
+
+# EGM GUI
+# % gui, , edmembed, pmacVariableWrite.edl, P=$(P,recursive), Q=:CFFDEMAND, LABEL=$(LABEL,undefined)
+
+##########################################
+# Records for writing to PMAC variables
+########################################## 
+
+record(ai, "$(P,recursive):CFFDEMAND:RBV") {
+  field(SCAN, "I/O Intr")
+  field(PINI, "NO")
+  field(DTYP, "asynFloat64")
+  field(INP, "@asyn($(PITCH_PORT,undefined),0)PMAC_VDM_&$(COORD_NUM,undefined)Q78")
+  field(PREC, "$(VARIABLE_PREC,undefined)")
+  field(EGU, "")
+}
+
+record(calcout, "$(P,recursive):CFFDEMAND:SYNC") {
+  field(DESC, "sync demand with readback")
+  field(CALC, "A")
+  field(OUT, "$(P,recursive):CFFDEMAND PP")
+  field(INPA, "$(P,recursive):CFFDEMAND:RBV")
+}
+
+# % archiver 1 monitor
+record(ao, "$(P,recursive):CFFDEMAND") {
+  field(DESC, "demand")
+  field(EGU, "")
+  field(PREC, "$(VARIABLE_PREC,undefined)")
+  field(OUT, "$(P,recursive):CFFDEMAND:SET PP")
+}
+
+record(ao, "$(P,recursive):CFFDEMAND:SET") {
+  field(DESC, "Write value to pmac")
+  field(DTYP, "asynFloat64")
+  field(SDIS, "$(P,recursive):CFFDEMAND:SYNC.PACT")
+  field(OUT, "@asyn($(PITCH_PORT,undefined),0)PMAC_WD_&$(COORD_NUM,undefined)Q78")
+}
+##############################################################
+#
+# Template to write and read a variable on a PMAC/Geobrick.
+#
+##############################################################
+
+# Macros
+# % macro, __doc__, Simple template that reads and writes to a variable on a 
+# PMAC or geoBrick via dynamic parameters.
+# % macro, name, Object name and gui association name
+# % macro, P, Pv Prefix
+# % macro, Q, Pv Suffix
+# % macro, DTYP, asyn DTYP (e.g., asynFloat64, asynInt32)
+# % macro, PORT, Motor controller serial port
+# % macro, TYPE, PMAC variable type (D=double, I=integer, H=hex, S=string)
+# % macro, VAR, Variable on PMAC to write to, e.g. P700
+# % macro, EGU, Engineering units
+# % macro, VARIABLE_PREC, Variable Record precision
+# % macro, LABEL, Label for GUI
+
+# CSS GUI
+# % gui, , boyembed, pmacApp_opi/pmac_variable_write_embed_box.opi, P=$(P,recursive),Q=:BETA,LABEL=$(LABEL,undefined), name=
+# % gui, , boyembed, pmacApp_opi/pmac_variable_write_embed.opi, P=$(P,recursive),Q=:BETA,LABEL=$(LABEL,undefined), name=
+
+# EGM GUI
+# % gui, , edmembed, pmacVariableWrite.edl, P=$(P,recursive), Q=:BETA, LABEL=$(LABEL,undefined)
+
+##########################################
+# Records for writing to PMAC variables
+########################################## 
+
+record(ai, "$(P,recursive):BETA:RBV") {
+  field(SCAN, "I/O Intr")
+  field(PINI, "NO")
+  field(DTYP, "asynFloat64")
+  field(INP, "@asyn($(PITCH_PORT,undefined),0)PMAC_VDM_P$(GRATING_AXIS,undefined)")
+  field(PREC, "$(VARIABLE_PREC,undefined)")
+  field(EGU, "deg")
+}
+
+record(calcout, "$(P,recursive):BETA:SYNC") {
+  field(DESC, "sync demand with readback")
+  field(CALC, "A")
+  field(OUT, "$(P,recursive):BETA PP")
+  field(INPA, "$(P,recursive):BETA:RBV")
+}
+
+# % archiver 1 monitor
+record(ao, "$(P,recursive):BETA") {
+  field(DESC, "demand")
+  field(EGU, "deg")
+  field(PREC, "$(VARIABLE_PREC,undefined)")
+  field(OUT, "$(P,recursive):BETA:SET PP")
+}
+
+record(ao, "$(P,recursive):BETA:SET") {
+  field(DESC, "Write value to pmac")
+  field(DTYP, "asynFloat64")
+  field(SDIS, "$(P,recursive):BETA:SYNC.PACT")
+  field(OUT, "@asyn($(PITCH_PORT,undefined),0)PMAC_WD_P$(GRATING_AXIS,undefined)")
+}
+##############################################################
+#
+# Template to write and read a variable on a PMAC/Geobrick.
+#
+##############################################################
+
+# Macros
+# % macro, __doc__, Simple template that reads and writes to a variable on a 
+# PMAC or geoBrick via dynamic parameters.
+# % macro, name, Object name and gui association name
+# % macro, P, Pv Prefix
+# % macro, Q, Pv Suffix
+# % macro, DTYP, asyn DTYP (e.g., asynFloat64, asynInt32)
+# % macro, PORT, Motor controller serial port
+# % macro, TYPE, PMAC variable type (D=double, I=integer, H=hex, S=string)
+# % macro, VAR, Variable on PMAC to write to, e.g. P700
+# % macro, EGU, Engineering units
+# % macro, VARIABLE_PREC, Variable Record precision
+# % macro, LABEL, Label for GUI
+
+# CSS GUI
+# % gui, , boyembed, pmacApp_opi/pmac_variable_write_embed_box.opi, P=$(P,recursive),Q=:THETA,LABEL=$(LABEL,undefined), name=
+# % gui, , boyembed, pmacApp_opi/pmac_variable_write_embed.opi, P=$(P,recursive),Q=:THETA,LABEL=$(LABEL,undefined), name=
+
+# EGM GUI
+# % gui, , edmembed, pmacVariableWrite.edl, P=$(P,recursive), Q=:THETA, LABEL=$(LABEL,undefined)
+
+##########################################
+# Records for writing to PMAC variables
+########################################## 
+
+record(ai, "$(P,recursive):THETA:RBV") {
+  field(SCAN, "I/O Intr")
+  field(PINI, "NO")
+  field(DTYP, "asynFloat64")
+  field(INP, "@asyn($(PITCH_PORT,undefined),0)PMAC_VDM_P$(MIRROR_AXIS,undefined)")
+  field(PREC, "$(VARIABLE_PREC,undefined)")
+  field(EGU, "deg")
+}
+
+record(calcout, "$(P,recursive):THETA:SYNC") {
+  field(DESC, "sync demand with readback")
+  field(CALC, "A")
+  field(OUT, "$(P,recursive):THETA PP")
+  field(INPA, "$(P,recursive):THETA:RBV")
+}
+
+# % archiver 1 monitor
+record(ao, "$(P,recursive):THETA") {
+  field(DESC, "demand")
+  field(EGU, "deg")
+  field(PREC, "$(VARIABLE_PREC,undefined)")
+  field(OUT, "$(P,recursive):THETA:SET PP")
+}
+
+record(ao, "$(P,recursive):THETA:SET") {
+  field(DESC, "Write value to pmac")
+  field(DTYP, "asynFloat64")
+  field(SDIS, "$(P,recursive):THETA:SYNC.PACT")
+  field(OUT, "@asyn($(PITCH_PORT,undefined),0)PMAC_WD_P$(MIRROR_AXIS,undefined)")
+}
+##############################################################
+#
+# Template to write and read a variable on a PMAC/Geobrick.
+#
+##############################################################
+
+# Macros
+# % macro, __doc__, Simple template that reads and writes to a variable on a 
+# PMAC or geoBrick via dynamic parameters.
+# % macro, name, Object name and gui association name
+# % macro, P, Pv Prefix
+# % macro, Q, Pv Suffix
+# % macro, DTYP, asyn DTYP (e.g., asynFloat64, asynInt32)
+# % macro, PORT, Motor controller serial port
+# % macro, TYPE, PMAC variable type (D=double, I=integer, H=hex, S=string)
+# % macro, VAR, Variable on PMAC to write to, e.g. P700
+# % macro, EGU, Engineering units
+# % macro, VARIABLE_PREC, Variable Record precision
+# % macro, LABEL, Label for GUI
+
+# CSS GUI
+# % gui, , boyembed, pmacApp_opi/pmac_variable_write_embed_box.opi, P=$(P,recursive),Q=:CURRENTENERGY,LABEL=$(LABEL,undefined), name=
+# % gui, , boyembed, pmacApp_opi/pmac_variable_write_embed.opi, P=$(P,recursive),Q=:CURRENTENERGY,LABEL=$(LABEL,undefined), name=
+
+# EGM GUI
+# % gui, , edmembed, pmacVariableWrite.edl, P=$(P,recursive), Q=:CURRENTENERGY, LABEL=$(LABEL,undefined)
+
+##########################################
+# Records for writing to PMAC variables
+########################################## 
+
+record(ai, "$(P,recursive):CURRENTENERGY:RBV") {
+  field(SCAN, "I/O Intr")
+  field(PINI, "NO")
+  field(DTYP, "asynFloat64")
+  field(INP, "@asyn($(PITCH_PORT,undefined),0)PMAC_VDM_&$(COORD_NUM,undefined)Q7")
+  field(PREC, "$(VARIABLE_PREC,undefined)")
+  field(EGU, "eV")
+}
+
+record(calcout, "$(P,recursive):CURRENTENERGY:SYNC") {
+  field(DESC, "sync demand with readback")
+  field(CALC, "A")
+  field(OUT, "$(P,recursive):CURRENTENERGY PP")
+  field(INPA, "$(P,recursive):CURRENTENERGY:RBV")
+}
+
+# % archiver 1 monitor
+record(ao, "$(P,recursive):CURRENTENERGY") {
+  field(DESC, "demand")
+  field(EGU, "eV")
+  field(PREC, "$(VARIABLE_PREC,undefined)")
+  field(OUT, "$(P,recursive):CURRENTENERGY:SET PP")
+}
+
+record(ao, "$(P,recursive):CURRENTENERGY:SET") {
+  field(DESC, "Write value to pmac")
+  field(DTYP, "asynFloat64")
+  field(SDIS, "$(P,recursive):CURRENTENERGY:SYNC.PACT")
+  field(OUT, "@asyn($(PITCH_PORT,undefined),0)PMAC_WD_&$(COORD_NUM,undefined)Q7")
+}
+# File PGM.template
+#
+# % macro, __doc__, PGM template from the pgmNextGen module, supporting Plane Grating Monochromators (PGMs) running on Delta Tau Motion Control systems.
+# % macro, P,            Mandatory. Device prefix for the PGM.
+# % macro, COORD_NUM,    Mandatory. Delta Tau co-ordinate system number used for the PGM Energy.
+# % macro, PORT,         Mandatory. Port name for the PMAC the Energy co-ordinate system is on.
+# % macro, GRATINGPITCH, Mandatory. Name of grating pitch motor excl device prefix.
+# % macro, MIRRORPITCH,  Mandatory. Name of mirror pitch motor excl device prefix.
+#
+
+## Ensure that the co-ordinate system is aborted
+## before a move is attempted by following a sequence
+record(seq, "$(P,recursive):MOVE_SEQ")
+{
+  field(DLY1, "0.0")
+  field(DOL1, "1")
+  field(LNK1, "$(P,recursive):ABORT_COORD.PROC PP")
+  field(DLY2, "1.0")
+  field(DOL2, "1")
+  field(LNK2, "$(P,recursive):RUN_COORD.PROC PP")
+}
+
+## Send an abort command to the co-ordinate system
+record(asyn, "$(P,recursive):ABORT_COORD")
+{
+  field(DESC, "Abort coord system")
+  field(PORT, "$(PITCH_PORT,undefined)")
+  field(AOUT, "&$(COORD_NUM,recursive)a")
+  field(OEOS, "\r")
+  field(IEOS, "\006")
+}
+
+## Send a run command to the co-ordinate system
+record(asyn, "$(P,recursive):RUN_COORD")
+{
+  field(DESC, "Run coord system")
+  field(PORT, "$(PITCH_PORT,undefined)")
+  field(AOUT, "&$(COORD_NUM,recursive)b10r")
+  field(OEOS, "\r")
+  field(IEOS, "\006")
+}
+
+# When the stop button is pressed, send
+# the stop command to both virtual motors
+# and both physical motors
+record(seq, "$(P,recursive):STOP")
+{
+  field(DESC, "Stop all pitch and energy motors")
+  field(DLY1, "0.0")
+  field(DOL1, "1")
+  field(LNK1, "$(P,recursive):ENERGY.STOP PP")
+  field(DLY2, "0.0")
+  field(DOL2, "1")
+  field(LNK2, "$(P,recursive):CFF.STOP PP")
+  field(DLY3, "0.0")
+  field(DOL3, "1")
+  field(LNK3, "$(P,recursive):$(GRATINGPITCH,undefined).STOP PP")
+  field(DLY4, "0.0")
+  field(DOL4, "1")
+  field(LNK4, "$(P,recursive):$(MIRRORPITCH,undefined).STOP PP")
+}
+
+# This is not used for control of the PGM co-ordinate system.
+# However loathe to remove it because believe GDA use it, at least during
+# development and commissioning and there might still be beamlines doing
+# things the prehistoric way.
+# Forward kinematic calculations of 
+# pitch positions from demand energy
+record(transform, "$(P,recursive):PGMFORWARDS") 
+{
+  field(DESC, "From soft to real")
+  field(CLCG, "E/(F*F-1)+SQR((E*F/(F*F-1))^2+1)")
+  field(CLCJ, "(ASIN(G+E)*R2D)+H")
+  field(INPF, "$(P,recursive):CFFDEMAND CP")
+  field(CMTA, "Soft energy request")
+  field(CMTB, "Constant")
+  field(CMTD, "No. lines")
+  field(CMTE, "SASB calculation")
+  field(CMTF, "CFF")
+  field(CMTG, "SA calculation")
+  field(CMTJ, "Beta calculation")
+  field(CMTL, "Theta calculation")
+  field(CLCE, "B*C*D/A")
+  field(CLCL, "((J-H+ASIN(G)*R2D)/2)+K")
+  field(INPA, "$(P,recursive):ENERGYDEMAND CP")
+  field(INPB, "1.239842E-3")
+  field(INPC, "$(P,recursive):ORDER CP")
+  field(INPD, "$(P,recursive):GRATLINE:SEL1 CP")
+  field(INPH, "0")
+  field(INPK, "0")
+  field(CMTC, "Diffraction order")
+  field(CMTH, "Grating offset")
+  field(CMTK, "Mirror offset")
+  field(OUTJ, "")
+  field(OUTL, "")
+}
+
+# This does not seem to be doing what the description says.
+record(seq, "$(P,recursive):MOVE")
+{
+  field(DESC, "Move both translations")
+  field(DLY1, "0.0")
+  field(DLY1, "0.1")
+  field(DOL1, "$(P,recursive):PGMFORWARDS.J")
+  field(LNK1, "$(P,recursive):$(GRATINGPITCH,undefined).VAL PP")
+  field(DLY2, "0.0")
+  field(DOL2, "$(P,recursive):PGMFORWARDS.L")
+  field(LNK2, "$(P,recursive):$(MIRRORPITCH,undefined).VAL PP")
+}
+
+# Calculate the difference between 
+# the two pitch motor angles
+# This is displayed on GUI screens to help users.
+record(calc, "$(P,recursive):DIFFERENCE")
+{
+  field(DESC, "Difference between angles")
+  field(INPA, "$(P,recursive):$(MIRRORPITCH,undefined).RBV CPP")
+  field(INPB, "$(P,recursive):$(GRATINGPITCH,undefined).RBV CPP")
+  field(CALC, "A-B")
+  field(SCAN, "Passive")
+}
+
+#! Generated by VisualDCT v2.7.1-SNAPSHOT
+#! DBDSTART
+#! DBD("../../dbd/pgmNextGen.dbd")
+#! DBDEND
+
+
+# File AutoDecouple.template
+#
+# % macro, __doc__, AutoDecouple template from the pgmNextGen module, supporting Plane Grating Monochromators (PGMs).  They have cross-dependency between the translation and pitch motors and require extra reverse move for both mirror and grating after translation motion to free the pitch motion called decoupling (or unlatching).
+# % macro, P,                   Mandatory. Device prefix for the PGM.
+# % macro, DECOUPLING_DISTANCE, Mandatory. Size of extra move to achieve decoupling/unlatching.
+# % macro, REAL_MOTOR,          Mandatory. Name of the real translation motor.
+# % macro, SOFT_MOTOR,          Mandatory. Name of soft motor presented to user to demand translation.
+# % macro, DESC,                Mandatory. Description for the DESC field on the soft motor record.
+# % macro, POST_DECOUPLE_DELAY  Optional.  Defaults to zero.  Delay in seconds to allow for disengaged couple (latch) switch signal to cause pitch motor record status to get updated.
+#
+# Work out which direction the motor has been commanded in
+record(calcout, "$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION") {
+  field(DESC, "Find Direction")
+  field(CALC, "A>B?1:-1")
+  field(INPA, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined)")
+  field(INPB, "$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined).RBV")
+}
+
+# Initial move with extra move in same direction
+# Additional distance is decoupling distance
+record(calcout, "$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):INITIALMOVE") {
+  field(DESC, "Initial Move")
+  field(CALC, "(B+(A*C))")
+  field(INPA, "$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION")
+  field(INPB, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined)")
+  field(INPC, "$(GRAT_DECOUPLE_DIST,undefined)")
+}
+
+# Final move back to the demanded position
+# to complete the decouple move
+record(calcout, "$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):FINALMOVE") {
+  field(DESC, "Final Move")
+  field(CALC, "(A-(B*C))")
+  field(INPA, "$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):INITIALMOVE")
+  field(INPB, "$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION")
+  field(INPC, "$(GRAT_DECOUPLE_DIST,undefined)")
+}
+
+# Busy record for soft motor done moving
+record(busy, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):DONE") {
+}
+
+# Sequence of moves to be carried out
+# Waits for each move to finish before continuing
+# 
+# Sets soft motor done move to Moving
+# Moves to position decoupling distance further than demand
+# Moves to demanded position to cause decouple
+# Waits for POST_DECOUPLE_DELAY (while pitch motor status updates)
+# Sets soft motor done move to Done
+record(sseq, "$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ") {
+  field(WAIT1, "NoWait")
+  field(DOL1, "0")
+  field(LNK1, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):DONE CA")
+  field(WAIT2, "Wait")
+  field(DOL2, "1")
+  field(LNK2, "$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION.PROC CA")
+  field(WAIT3, "Wait")
+  field(DOL3, "1")
+  field(LNK3, "$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):INITIALMOVE.PROC CA")
+  field(WAIT4, "Wait")
+  field(DOL4, "1")
+  field(LNK4, "$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):FINALMOVE.PROC CA")
+  field(WAIT5, "Wait")
+  field(DOL5, "$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):INITIALMOVE")
+  field(LNK5, "$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined) CA")
+  field(WAIT6, "Wait")
+  field(DOL6, "$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):FINALMOVE")
+  field(LNK6, "$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined) CA")
+  field(DOL7, "1")
+  field(LNK7, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):DONE CA")
+  field(SELM, "Mask")
+  field(SELL, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):IFMOVE")
+  field(DLY8, "$(POST_DECOUPLE_DELAY=0)")
+  field(DOL8, "1")
+  field(LNK8, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):DONE CA")
+}
+
+# Soft motor presented to the user
+# When demand position entered it triggers
+# sseq record to run through a series of moves
+# % autosave 0 RDBD
+record(motor, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined)") {
+  field(DTYP, "Soft Channel")
+  field(DIR, "Pos")
+  field(VELO, "1")
+  field(VBAS, "0")
+  field(VMAX, "1")
+  field(BDST, "0")
+  field(BVEL, "0")
+  field(BACC, "0")
+  field(MRES, "0.001")
+  field(RDBD, "0.001")
+  field(RRES, "1")
+  field(URIP, "Yes")
+  field(PREC, "4")
+  field(EGU, "mm")
+  field(HHSV, "MINOR")
+  field(LLSV, "MINOR")
+  field(DESC, "Grating Translation")
+  field(RDBL, "$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined).RBV")
+  field(RTRY, "0")
+  field(DINP, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):DONE")
+  field(NTM, "NO")
+  field(OUT, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):IFMOVE.PROC PP")
+}
+
+record(calcout, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):IFMOVE") {
+  field(DESC, "decide if move required")
+  field(CALC, "((ABS(A-B)>=C)||(C=0.001))?191:79")
+  field(INPA, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined)")
+  field(INPB, "$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined).RBV")
+  field(INPC, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).RDBD")
+  field(FLNK, "$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ")
+}
+
+record(ao, "$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):GET:DHLM") {
+  field(DESC, "Get motor dial high limit")
+  field(PINI, "YES")
+  field(DTYP, "Soft Channel")
+  field(DOL, "$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined).DHLM CPP")
+  field(OMSL, "closed_loop")
+  field(OUT, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).DHLM")
+  field(SCAN, "Passive")
+}
+
+record(ao, "$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):GET:DLLM") {
+  field(DESC, "Get motor dial low limit")
+  field(PINI, "YES")
+  field(DTYP, "Soft Channel")
+  field(DOL, "$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined).DLLM CPP")
+  field(OMSL, "closed_loop")
+  field(OUT, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).DLLM")
+  field(SCAN, "Passive")
+}
+
+#! Further lines contain data used by VisualDCT
+#! View(241,2,1.0)
+#! Record("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION",1160,468,0,0,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION")
+#! Field("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION.INPA",16777215,0,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION.INPA")
+#! Link("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION.INPA","$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).VAL")
+#! Field("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION.INPB",16777215,1,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION.INPB")
+#! Field("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION.VAL",16777215,1,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION.VAL")
+#! Field("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION.PROC",16777215,1,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION.PROC")
+#! Record("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):INITIALMOVE",1540,554,0,0,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):INITIALMOVE")
+#! Field("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):INITIALMOVE.INPA",16777215,0,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):INITIALMOVE.INPA")
+#! Link("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):INITIALMOVE.INPA","$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION.VAL")
+#! Field("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):INITIALMOVE.INPB",16777215,0,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):INITIALMOVE.INPB")
+#! Link("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):INITIALMOVE.INPB","$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).VAL")
+#! Field("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):INITIALMOVE.INPC",16777215,1,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):INITIALMOVE.INPC")
+#! Field("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):INITIALMOVE.VAL",16777215,1,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):INITIALMOVE.VAL")
+#! Field("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):INITIALMOVE.PROC",16777215,1,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):INITIALMOVE.PROC")
+#! Record("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):FINALMOVE",1820,314,0,0,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):FINALMOVE")
+#! Field("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):FINALMOVE.INPA",16777215,0,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):FINALMOVE.INPA")
+#! Link("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):FINALMOVE.INPA","$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):INITIALMOVE.VAL")
+#! Field("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):FINALMOVE.INPB",16777215,0,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):FINALMOVE.INPB")
+#! Link("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):FINALMOVE.INPB","$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION.VAL")
+#! Field("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):FINALMOVE.INPC",16777215,1,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):FINALMOVE.INPC")
+#! Field("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):FINALMOVE.PROC",16777215,1,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):FINALMOVE.PROC")
+#! Field("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):FINALMOVE.VAL",16777215,1,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):FINALMOVE.VAL")
+#! Record("$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):DONE",400,683,0,0,"$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):DONE")
+#! Field("$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):DONE.VAL",16777215,1,"$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):DONE.VAL")
+#! Record("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ",2160,437,0,0,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ")
+#! Field("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK1",16777215,0,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK1")
+#! Link("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK1","$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):DONE.VAL")
+#! Field("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK2",16777215,0,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK2")
+#! Link("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK2","$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION.PROC")
+#! Field("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK3",16777215,0,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK3")
+#! Link("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK3","$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):INITIALMOVE.PROC")
+#! Field("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK4",16777215,0,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK4")
+#! Link("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK4","$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):FINALMOVE.PROC")
+#! Field("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.DOL5",16777215,0,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.DOL5")
+#! Link("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.DOL5","$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):INITIALMOVE.VAL")
+#! Field("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK5",16777215,1,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK5")
+#! Field("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.DOL6",16777215,0,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.DOL6")
+#! Link("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.DOL6","$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):FINALMOVE.VAL")
+#! Field("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK6",16777215,1,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK6")
+#! Field("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK7",16777215,0,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK7")
+#! Link("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK7","$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):DONE.VAL")
+#! Field("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.SELL",16777215,0,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.SELL")
+#! Link("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.SELL","$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):IFMOVE.VAL")
+#! Field("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK8",16777215,0,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK8")
+#! Link("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK8","$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):DONE.VAL")
+#! Record("$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined)",780,338,0,0,"$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined)")
+#! Field("$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).VAL",16777215,1,"$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).VAL")
+#! Field("$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).RDBL",16777215,1,"$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).RDBL")
+#! Field("$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).DINP",16777215,0,"$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).DINP")
+#! Link("$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).DINP","$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):DONE.VAL")
+#! Field("$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).RDBD",16777215,1,"$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).RDBD")
+#! Field("$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).OUT",16777215,1,"$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).OUT")
+#! Link("$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).OUT","$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):IFMOVE.PROC")
+#! Field("$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).DHLM",16777215,0,"$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).DHLM")
+#! Field("$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).DLLM",16777215,0,"$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).DLLM")
+#! Record("$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):IFMOVE",1160,80,0,1,"$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):IFMOVE")
+#! Field("$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):IFMOVE.INPA",16777215,0,"$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):IFMOVE.INPA")
+#! Link("$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):IFMOVE.INPA","$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).VAL")
+#! Field("$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):IFMOVE.INPB",16777215,1,"$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):IFMOVE.INPB")
+#! Field("$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):IFMOVE.INPC",16777215,0,"$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):IFMOVE.INPC")
+#! Link("$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):IFMOVE.INPC","$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).RDBD")
+#! Field("$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):IFMOVE.FLNK",16777215,1,"$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):IFMOVE.FLNK")
+#! Link("$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):IFMOVE.FLNK","$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):MOVE_SEQ")
+#! Field("$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):IFMOVE.PROC",16777215,0,"$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):IFMOVE.PROC")
+#! Field("$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):IFMOVE.VAL",16777215,1,"$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined):IFMOVE.VAL")
+#! Record("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):GET:DHLM",480,206,0,1,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):GET:DHLM")
+#! Field("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):GET:DHLM.DOL",16777215,1,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):GET:DHLM.DOL")
+#! Field("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):GET:DHLM.OUT",16777215,1,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):GET:DHLM.OUT")
+#! Link("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):GET:DHLM.OUT","$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).DHLM")
+#! Record("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):GET:DLLM",480,406,0,1,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):GET:DLLM")
+#! Field("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):GET:DLLM.DOL",16777215,1,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):GET:DLLM.DOL")
+#! Field("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):GET:DLLM.OUT",16777215,1,"$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):GET:DLLM.OUT")
+#! Link("$(P,recursive):$(GRATING_TRANS_REAL_MOTOR,undefined):GET:DLLM.OUT","$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).DLLM")
+#! Generated by VisualDCT v2.7.1-SNAPSHOT
+#! DBDSTART
+#! DBD("../../dbd/pgmNextGen.dbd")
+#! DBDEND
+
+
+# File AutoDecouple.template
+#
+# % macro, __doc__, AutoDecouple template from the pgmNextGen module, supporting Plane Grating Monochromators (PGMs).  They have cross-dependency between the translation and pitch motors and require extra reverse move for both mirror and grating after translation motion to free the pitch motion called decoupling (or unlatching).
+# % macro, P,                   Mandatory. Device prefix for the PGM.
+# % macro, DECOUPLING_DISTANCE, Mandatory. Size of extra move to achieve decoupling/unlatching.
+# % macro, REAL_MOTOR,          Mandatory. Name of the real translation motor.
+# % macro, SOFT_MOTOR,          Mandatory. Name of soft motor presented to user to demand translation.
+# % macro, DESC,                Mandatory. Description for the DESC field on the soft motor record.
+# % macro, POST_DECOUPLE_DELAY  Optional.  Defaults to zero.  Delay in seconds to allow for disengaged couple (latch) switch signal to cause pitch motor record status to get updated.
+#
+# Work out which direction the motor has been commanded in
+record(calcout, "$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION") {
+  field(DESC, "Find Direction")
+  field(CALC, "A>B?1:-1")
+  field(INPA, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined)")
+  field(INPB, "$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined).RBV")
+}
+
+# Initial move with extra move in same direction
+# Additional distance is decoupling distance
+record(calcout, "$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):INITIALMOVE") {
+  field(DESC, "Initial Move")
+  field(CALC, "(B+(A*C))")
+  field(INPA, "$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION")
+  field(INPB, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined)")
+  field(INPC, "$(MIRR_DECOUPLE_DIST,undefined)")
+}
+
+# Final move back to the demanded position
+# to complete the decouple move
+record(calcout, "$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):FINALMOVE") {
+  field(DESC, "Final Move")
+  field(CALC, "(A-(B*C))")
+  field(INPA, "$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):INITIALMOVE")
+  field(INPB, "$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION")
+  field(INPC, "$(MIRR_DECOUPLE_DIST,undefined)")
+}
+
+# Busy record for soft motor done moving
+record(busy, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):DONE") {
+}
+
+# Sequence of moves to be carried out
+# Waits for each move to finish before continuing
+# 
+# Sets soft motor done move to Moving
+# Moves to position decoupling distance further than demand
+# Moves to demanded position to cause decouple
+# Waits for POST_DECOUPLE_DELAY (while pitch motor status updates)
+# Sets soft motor done move to Done
+record(sseq, "$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ") {
+  field(WAIT1, "NoWait")
+  field(DOL1, "0")
+  field(LNK1, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):DONE CA")
+  field(WAIT2, "Wait")
+  field(DOL2, "1")
+  field(LNK2, "$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION.PROC CA")
+  field(WAIT3, "Wait")
+  field(DOL3, "1")
+  field(LNK3, "$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):INITIALMOVE.PROC CA")
+  field(WAIT4, "Wait")
+  field(DOL4, "1")
+  field(LNK4, "$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):FINALMOVE.PROC CA")
+  field(WAIT5, "Wait")
+  field(DOL5, "$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):INITIALMOVE")
+  field(LNK5, "$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined) CA")
+  field(WAIT6, "Wait")
+  field(DOL6, "$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):FINALMOVE")
+  field(LNK6, "$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined) CA")
+  field(DOL7, "1")
+  field(LNK7, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):DONE CA")
+  field(SELM, "Mask")
+  field(SELL, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):IFMOVE")
+  field(DLY8, "$(POST_DECOUPLE_DELAY=0)")
+  field(DOL8, "1")
+  field(LNK8, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):DONE CA")
+}
+
+# Soft motor presented to the user
+# When demand position entered it triggers
+# sseq record to run through a series of moves
+# % autosave 0 RDBD
+record(motor, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined)") {
+  field(DTYP, "Soft Channel")
+  field(DIR, "Pos")
+  field(VELO, "1")
+  field(VBAS, "0")
+  field(VMAX, "1")
+  field(BDST, "0")
+  field(BVEL, "0")
+  field(BACC, "0")
+  field(MRES, "0.001")
+  field(RDBD, "0.001")
+  field(RRES, "1")
+  field(URIP, "Yes")
+  field(PREC, "4")
+  field(EGU, "mm")
+  field(HHSV, "MINOR")
+  field(LLSV, "MINOR")
+  field(DESC, "Mirror Translation")
+  field(RDBL, "$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined).RBV")
+  field(RTRY, "0")
+  field(DINP, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):DONE")
+  field(NTM, "NO")
+  field(OUT, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):IFMOVE.PROC PP")
+}
+
+record(calcout, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):IFMOVE") {
+  field(DESC, "decide if move required")
+  field(CALC, "((ABS(A-B)>=C)||(C=0.001))?191:79")
+  field(INPA, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined)")
+  field(INPB, "$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined).RBV")
+  field(INPC, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).RDBD")
+  field(FLNK, "$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ")
+}
+
+record(ao, "$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):GET:DHLM") {
+  field(DESC, "Get motor dial high limit")
+  field(PINI, "YES")
+  field(DTYP, "Soft Channel")
+  field(DOL, "$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined).DHLM CPP")
+  field(OMSL, "closed_loop")
+  field(OUT, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).DHLM")
+  field(SCAN, "Passive")
+}
+
+record(ao, "$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):GET:DLLM") {
+  field(DESC, "Get motor dial low limit")
+  field(PINI, "YES")
+  field(DTYP, "Soft Channel")
+  field(DOL, "$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined).DLLM CPP")
+  field(OMSL, "closed_loop")
+  field(OUT, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).DLLM")
+  field(SCAN, "Passive")
+}
+
+#! Further lines contain data used by VisualDCT
+#! View(241,2,1.0)
+#! Record("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION",1160,468,0,0,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION")
+#! Field("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION.INPA",16777215,0,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION.INPA")
+#! Link("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION.INPA","$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).VAL")
+#! Field("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION.INPB",16777215,1,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION.INPB")
+#! Field("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION.VAL",16777215,1,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION.VAL")
+#! Field("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION.PROC",16777215,1,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION.PROC")
+#! Record("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):INITIALMOVE",1540,554,0,0,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):INITIALMOVE")
+#! Field("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):INITIALMOVE.INPA",16777215,0,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):INITIALMOVE.INPA")
+#! Link("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):INITIALMOVE.INPA","$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION.VAL")
+#! Field("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):INITIALMOVE.INPB",16777215,0,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):INITIALMOVE.INPB")
+#! Link("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):INITIALMOVE.INPB","$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).VAL")
+#! Field("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):INITIALMOVE.INPC",16777215,1,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):INITIALMOVE.INPC")
+#! Field("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):INITIALMOVE.VAL",16777215,1,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):INITIALMOVE.VAL")
+#! Field("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):INITIALMOVE.PROC",16777215,1,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):INITIALMOVE.PROC")
+#! Record("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):FINALMOVE",1820,314,0,0,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):FINALMOVE")
+#! Field("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):FINALMOVE.INPA",16777215,0,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):FINALMOVE.INPA")
+#! Link("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):FINALMOVE.INPA","$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):INITIALMOVE.VAL")
+#! Field("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):FINALMOVE.INPB",16777215,0,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):FINALMOVE.INPB")
+#! Link("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):FINALMOVE.INPB","$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION.VAL")
+#! Field("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):FINALMOVE.INPC",16777215,1,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):FINALMOVE.INPC")
+#! Field("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):FINALMOVE.PROC",16777215,1,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):FINALMOVE.PROC")
+#! Field("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):FINALMOVE.VAL",16777215,1,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):FINALMOVE.VAL")
+#! Record("$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):DONE",400,683,0,0,"$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):DONE")
+#! Field("$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):DONE.VAL",16777215,1,"$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):DONE.VAL")
+#! Record("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ",2160,437,0,0,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ")
+#! Field("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK1",16777215,0,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK1")
+#! Link("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK1","$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):DONE.VAL")
+#! Field("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK2",16777215,0,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK2")
+#! Link("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK2","$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):CHECK_DIRECTION.PROC")
+#! Field("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK3",16777215,0,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK3")
+#! Link("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK3","$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):INITIALMOVE.PROC")
+#! Field("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK4",16777215,0,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK4")
+#! Link("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK4","$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):FINALMOVE.PROC")
+#! Field("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.DOL5",16777215,0,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.DOL5")
+#! Link("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.DOL5","$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):INITIALMOVE.VAL")
+#! Field("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK5",16777215,1,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK5")
+#! Field("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.DOL6",16777215,0,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.DOL6")
+#! Link("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.DOL6","$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):FINALMOVE.VAL")
+#! Field("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK6",16777215,1,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK6")
+#! Field("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK7",16777215,0,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK7")
+#! Link("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK7","$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):DONE.VAL")
+#! Field("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.SELL",16777215,0,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.SELL")
+#! Link("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.SELL","$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):IFMOVE.VAL")
+#! Field("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK8",16777215,0,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK8")
+#! Link("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ.LNK8","$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):DONE.VAL")
+#! Record("$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined)",780,338,0,0,"$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined)")
+#! Field("$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).VAL",16777215,1,"$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).VAL")
+#! Field("$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).RDBL",16777215,1,"$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).RDBL")
+#! Field("$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).DINP",16777215,0,"$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).DINP")
+#! Link("$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).DINP","$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):DONE.VAL")
+#! Field("$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).RDBD",16777215,1,"$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).RDBD")
+#! Field("$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).OUT",16777215,1,"$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).OUT")
+#! Link("$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).OUT","$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):IFMOVE.PROC")
+#! Field("$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).DHLM",16777215,0,"$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).DHLM")
+#! Field("$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).DLLM",16777215,0,"$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).DLLM")
+#! Record("$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):IFMOVE",1160,80,0,1,"$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):IFMOVE")
+#! Field("$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):IFMOVE.INPA",16777215,0,"$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):IFMOVE.INPA")
+#! Link("$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):IFMOVE.INPA","$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).VAL")
+#! Field("$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):IFMOVE.INPB",16777215,1,"$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):IFMOVE.INPB")
+#! Field("$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):IFMOVE.INPC",16777215,0,"$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):IFMOVE.INPC")
+#! Link("$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):IFMOVE.INPC","$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).RDBD")
+#! Field("$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):IFMOVE.FLNK",16777215,1,"$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):IFMOVE.FLNK")
+#! Link("$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):IFMOVE.FLNK","$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):MOVE_SEQ")
+#! Field("$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):IFMOVE.PROC",16777215,0,"$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):IFMOVE.PROC")
+#! Field("$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):IFMOVE.VAL",16777215,1,"$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined):IFMOVE.VAL")
+#! Record("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):GET:DHLM",480,206,0,1,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):GET:DHLM")
+#! Field("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):GET:DHLM.DOL",16777215,1,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):GET:DHLM.DOL")
+#! Field("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):GET:DHLM.OUT",16777215,1,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):GET:DHLM.OUT")
+#! Link("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):GET:DHLM.OUT","$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).DHLM")
+#! Record("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):GET:DLLM",480,406,0,1,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):GET:DLLM")
+#! Field("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):GET:DLLM.DOL",16777215,1,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):GET:DLLM.DOL")
+#! Field("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):GET:DLLM.OUT",16777215,1,"$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):GET:DLLM.OUT")
+#! Link("$(P,recursive):$(MIRROR_TRANS_REAL_MOTOR,undefined):GET:DLLM.OUT","$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).DLLM")
+#! Generated by VisualDCT v2.7.1-SNAPSHOT
+
+# % macro, __doc__, Template for controlling many positioner or
+# it to be controlled by a multipositioner, mapping a list of names onto a
+# list of motor positions
+# % macro, P, Device prefix
+# % macro, MP, Device suffix
+# % macro, DESC, Multipositioner description
+# % macro, STRA, String description for position 1
+# % macro, STRB, String description for position 2
+# % macro, STRC, String description for position 3
+# % macro, STRD, String description for position 4
+# % macro, STRE, String description for position 5
+# % macro, STRF, String description for position 6
+# % macro, STRG, String description for position 7
+# % macro, STRH, String description for position 8
+# % macro, STRI, String description for position 9
+# % macro, STRJ, String description for position 10
+# % macro, STRK, String description for position 11
+# % macro, STRL, String description for position 12
+# % macro, STRM, String description for position 13
+# % macro, STRN, String description for position 14
+# % macro, STRO, String description for position 15
+# % macro, STRP, String description for position 16
+# % macro, name, Object name and gui association name
+# % macro, gda_name, If set, export to GDA with this name
+# % macro, gda_desc, Description for GDA
+# % macro, NPOS, Number of positioners, used to work out which screen to use.
+# Only specify if not using the builder object.
+# % macro, P1, Positioner 1 suffix for screen.
+# Only specify if not using the builder object.
+# % macro, P2, Positioner 2 suffix for screen.
+# Only specify if not using the builder object.
+# % macro, P3, Positioner 3 suffix for screen.
+# Only specify if not using the builder object.
+# % macro, P4, Positioner 4 suffix for screen.
+# Only specify if not using the builder object.
+# % macro, P5, Positioner 5 suffix for screen.
+# Only specify if not using the builder object.
+# % macro, P6, Positioner 6 suffix for screen.
+# Only specify if not using the builder object.
+# % macro, P7, Positioner 7 suffix for screen.
+# Only specify if not using the builder object.
+# % macro, P8, Positioner 8 suffix for screen.
+# Only specify if not using the builder object.
+# % macro, P1_VALS, Optional.  Defaults to P1 Val.  Short label for values button <= 6 characters
+# % macro, P2_VALS, Optional.  Defaults to P2 Val.  Short label for values button <= 6 characters
+# % macro, P3_VALS, Optional.  Defaults to P3 Val.  Short label for values button <= 6 characters
+# % macro, P4_VALS, Optional.  Defaults to P4 Val.  Short label for values button <= 6 characters
+# % macro, P5_VALS, Optional.  Defaults to P5 Val.  Short label for values button <= 6 characters
+# % macro, P6_VALS, Optional.  Defaults to P6 Val.  Short label for values button <= 6 characters
+# This associates an edm screen with the template
+# % gui, , edmembed, pos-$(NPOS,undefined)pos.edl, P=$(P,recursive),MP=:GRATINGSELECT,filename=motor.edl,P1=$(P1,undefined),P2=$(P2,undefined),P3=$(P3,undefined),P4=$(P4,undefined),P5=$(P5,undefined),P6=$(P6,undefined),P7=$(P7,undefined),P8=$(P8,undefined)
+# This associates a BOY screen with the template
+# % gui, , boydetail, positionerApp_opi/positioner_detail.opi, P=$(P,recursive),MP=:GRATINGSELECT,DESC=Grating Positioner,desc=Grating Positioner,name=,P1=$(P1,undefined),P2=$(P2,undefined),P3=$(P3,undefined),P4=$(P4,undefined),P5=$(P5,undefined),P6=$(P6,undefined),P7=$(P7,undefined),P8=$(P8,undefined),NPOS=$(NPOS,undefined)
+# % gui, , boyembed, positionerApp_opi/positioner_embed_box.opi, P=$(P,recursive),MP=:GRATINGSELECT,DESC=Grating Positioner,desc=Grating Positioner,name=,P1=$(P1,undefined),P2=$(P2,undefined),P3=$(P3,undefined),P4=$(P4,undefined),P5=$(P5,undefined),P6=$(P6,undefined),P7=$(P7,undefined),P8=$(P8,undefined),NPOS=$(NPOS,undefined)
+# % gui, , boyembed, positionerApp_opi/positioner_embed.opi, P=$(P,recursive),MP=:GRATINGSELECT,DESC=Grating Positioner,desc=Grating Positioner,name=,P1=$(P1,undefined),P2=$(P2,undefined),P3=$(P3,undefined),P4=$(P4,undefined),P5=$(P5,undefined),P6=$(P6,undefined),P7=$(P7,undefined),P8=$(P8,undefined),NPOS=$(NPOS,undefined)
+# This provides the list of PVs to show on the details pane
+# % gui, , demand, Name 1, <pv>.ZRST
+# % gui, , demand, Name 2, <pv>.ONST
+# % gui, , demand, Name 3, <pv>.TWST
+# % gui, , demand, Name 4, <pv>.THST
+# % gui, , demand, Name 5, <pv>.FRST
+# % gui, , demand, Name 6, <pv>.FVST
+# % gui, , demand, Name 7, <pv>.SXST
+# % gui, , demand, Name 8, <pv>.SVST
+# % gui, , demand, Name 9, <pv>.EIST
+# % gui, , demand, Name 10, <pv>.NIST
+# % gui, , demand, Name 11, <pv>.TEST
+# % gui, , demand, Name 12, <pv>.ELST
+# % gui, , demand, Name 13, <pv>.TVST
+# % gui, , demand, Name 14, <pv>.TTST
+# % gui, , demand, Name 15, <pv>.FTST
+# % gui, , demand, Name 16, <pv>.FFST
+# Positioner 1 values
+# % gui, , demand, Pos 1 Value 1, $(P,recursive)$(P1,undefined):VALA
+# % gui, , demand, Pos 1 Value 2, $(P,recursive)$(P1,undefined):VALB
+# % gui, , demand, Pos 1 Value 3, $(P,recursive)$(P1,undefined):VALC
+# % gui, , demand, Pos 1 Value 4, $(P,recursive)$(P1,undefined):VALD
+# % gui, , demand, Pos 1 Value 5, $(P,recursive)$(P1,undefined):VALE
+# % gui, , demand, Pos 1 Value 6, $(P,recursive)$(P1,undefined):VALF
+# % gui, , demand, Pos 1 Value 7, $(P,recursive)$(P1,undefined):VALG
+# % gui, , demand, Pos 1 Value 8, $(P,recursive)$(P1,undefined):VALH
+# % gui, , demand, Pos 1 Value 9, $(P,recursive)$(P1,undefined):VALI
+# % gui, , demand, Pos 1 Value 10, $(P,recursive)$(P1,undefined):VALJ
+# % gui, , demand, Pos 1 Value 11, $(P,recursive)$(P1,undefined):VALK
+# % gui, , demand, Pos 1 Value 12, $(P,recursive)$(P1,undefined):VALL
+# % gui, , demand, Pos 1 Value 13, $(P,recursive)$(P1,undefined):VALM
+# % gui, , demand, Pos 1 Value 14, $(P,recursive)$(P1,undefined):VALN
+# % gui, , demand, Pos 1 Value 15, $(P,recursive)$(P1,undefined):VALO
+# % gui, , demand, Pos 1 Value 16, $(P,recursive)$(P1,undefined):VALP
+# Positioner 2 values
+# % gui, , demand, Pos 2 Value 1, $(P,recursive)$(P2,undefined):VALA
+# % gui, , demand, Pos 2 Value 2, $(P,recursive)$(P2,undefined):VALB
+# % gui, , demand, Pos 2 Value 3, $(P,recursive)$(P2,undefined):VALC
+# % gui, , demand, Pos 2 Value 4, $(P,recursive)$(P2,undefined):VALD
+# % gui, , demand, Pos 2 Value 5, $(P,recursive)$(P2,undefined):VALE
+# % gui, , demand, Pos 2 Value 6, $(P,recursive)$(P2,undefined):VALF
+# % gui, , demand, Pos 2 Value 7, $(P,recursive)$(P2,undefined):VALG
+# % gui, , demand, Pos 2 Value 8, $(P,recursive)$(P2,undefined):VALH
+# % gui, , demand, Pos 2 Value 9, $(P,recursive)$(P2,undefined):VALI
+# % gui, , demand, Pos 2 Value 10, $(P,recursive)$(P2,undefined):VALJ
+# % gui, , demand, Pos 2 Value 11, $(P,recursive)$(P2,undefined):VALK
+# % gui, , demand, Pos 2 Value 12, $(P,recursive)$(P2,undefined):VALL
+# % gui, , demand, Pos 2 Value 13, $(P,recursive)$(P2,undefined):VALM
+# % gui, , demand, Pos 2 Value 14, $(P,recursive)$(P2,undefined):VALN
+# % gui, , demand, Pos 2 Value 15, $(P,recursive)$(P2,undefined):VALO
+# % gui, , demand, Pos 2 Value 16, $(P,recursive)$(P2,undefined):VALP
+# Positioner 3 values
+# % gui, , demand, Pos 3 Value 1, $(P,recursive)$(P3,undefined):VALA
+# % gui, , demand, Pos 3 Value 2, $(P,recursive)$(P3,undefined):VALB
+# % gui, , demand, Pos 3 Value 3, $(P,recursive)$(P3,undefined):VALC
+# % gui, , demand, Pos 3 Value 4, $(P,recursive)$(P3,undefined):VALD
+# % gui, , demand, Pos 3 Value 5, $(P,recursive)$(P3,undefined):VALE
+# % gui, , demand, Pos 3 Value 6, $(P,recursive)$(P3,undefined):VALF
+# % gui, , demand, Pos 3 Value 7, $(P,recursive)$(P3,undefined):VALG
+# % gui, , demand, Pos 3 Value 8, $(P,recursive)$(P3,undefined):VALH
+# % gui, , demand, Pos 3 Value 9, $(P,recursive)$(P3,undefined):VALI
+# % gui, , demand, Pos 3 Value 10, $(P,recursive)$(P3,undefined):VALJ
+# % gui, , demand, Pos 3 Value 11, $(P,recursive)$(P3,undefined):VALK
+# % gui, , demand, Pos 3 Value 12, $(P,recursive)$(P3,undefined):VALL
+# % gui, , demand, Pos 3 Value 13, $(P,recursive)$(P3,undefined):VALM
+# % gui, , demand, Pos 3 Value 14, $(P,recursive)$(P3,undefined):VALN
+# % gui, , demand, Pos 3 Value 15, $(P,recursive)$(P3,undefined):VALO
+# % gui, , demand, Pos 3 Value 16, $(P,recursive)$(P3,undefined):VALP
+# Positioner 4 values
+# % gui, , demand, Pos 4 Value 1, $(P,recursive)$(P4,undefined):VALA
+# % gui, , demand, Pos 4 Value 2, $(P,recursive)$(P4,undefined):VALB
+# % gui, , demand, Pos 4 Value 3, $(P,recursive)$(P4,undefined):VALC
+# % gui, , demand, Pos 4 Value 4, $(P,recursive)$(P4,undefined):VALD
+# % gui, , demand, Pos 4 Value 5, $(P,recursive)$(P4,undefined):VALE
+# % gui, , demand, Pos 4 Value 6, $(P,recursive)$(P4,undefined):VALF
+# % gui, , demand, Pos 4 Value 7, $(P,recursive)$(P4,undefined):VALG
+# % gui, , demand, Pos 4 Value 8, $(P,recursive)$(P4,undefined):VALH
+# % gui, , demand, Pos 4 Value 9, $(P,recursive)$(P4,undefined):VALI
+# % gui, , demand, Pos 4 Value 10, $(P,recursive)$(P4,undefined):VALJ
+# % gui, , demand, Pos 4 Value 11, $(P,recursive)$(P4,undefined):VALK
+# % gui, , demand, Pos 4 Value 12, $(P,recursive)$(P4,undefined):VALL
+# % gui, , demand, Pos 4 Value 13, $(P,recursive)$(P4,undefined):VALM
+# % gui, , demand, Pos 4 Value 14, $(P,recursive)$(P4,undefined):VALN
+# % gui, , demand, Pos 4 Value 15, $(P,recursive)$(P4,undefined):VALO
+# % gui, , demand, Pos 4 Value 16, $(P,recursive)$(P4,undefined):VALP
+# Positioner 5 values
+# % gui, , demand, Pos 5 Value 1, $(P,recursive)$(P5,undefined):VALA
+# % gui, , demand, Pos 5 Value 2, $(P,recursive)$(P5,undefined):VALB
+# % gui, , demand, Pos 5 Value 3, $(P,recursive)$(P5,undefined):VALC
+# % gui, , demand, Pos 5 Value 4, $(P,recursive)$(P5,undefined):VALD
+# % gui, , demand, Pos 5 Value 5, $(P,recursive)$(P5,undefined):VALE
+# % gui, , demand, Pos 5 Value 6, $(P,recursive)$(P5,undefined):VALF
+# % gui, , demand, Pos 5 Value 7, $(P,recursive)$(P5,undefined):VALG
+# % gui, , demand, Pos 5 Value 8, $(P,recursive)$(P5,undefined):VALH
+# % gui, , demand, Pos 5 Value 9, $(P,recursive)$(P5,undefined):VALI
+# % gui, , demand, Pos 5 Value 10, $(P,recursive)$(P5,undefined):VALJ
+# % gui, , demand, Pos 5 Value 11, $(P,recursive)$(P5,undefined):VALK
+# % gui, , demand, Pos 5 Value 12, $(P,recursive)$(P5,undefined):VALL
+# % gui, , demand, Pos 5 Value 13, $(P,recursive)$(P5,undefined):VALM
+# % gui, , demand, Pos 5 Value 14, $(P,recursive)$(P5,undefined):VALN
+# % gui, , demand, Pos 5 Value 15, $(P,recursive)$(P5,undefined):VALO
+# % gui, , demand, Pos 5 Value 16, $(P,recursive)$(P5,undefined):VALP
+# Positioner 6 values
+# % gui, , demand, Pos 6 Value 1, $(P,recursive)$(P6,undefined):VALA
+# % gui, , demand, Pos 6 Value 2, $(P,recursive)$(P6,undefined):VALB
+# % gui, , demand, Pos 6 Value 3, $(P,recursive)$(P6,undefined):VALC
+# % gui, , demand, Pos 6 Value 4, $(P,recursive)$(P6,undefined):VALD
+# % gui, , demand, Pos 6 Value 5, $(P,recursive)$(P6,undefined):VALE
+# % gui, , demand, Pos 6 Value 6, $(P,recursive)$(P6,undefined):VALF
+# % gui, , demand, Pos 6 Value 7, $(P,recursive)$(P6,undefined):VALG
+# % gui, , demand, Pos 6 Value 8, $(P,recursive)$(P6,undefined):VALH
+# % gui, , demand, Pos 6 Value 9, $(P,recursive)$(P6,undefined):VALI
+# % gui, , demand, Pos 6 Value 10, $(P,recursive)$(P6,undefined):VALJ
+# % gui, , demand, Pos 6 Value 11, $(P,recursive)$(P6,undefined):VALK
+# % gui, , demand, Pos 6 Value 12, $(P,recursive)$(P6,undefined):VALL
+# % gui, , demand, Pos 6 Value 13, $(P,recursive)$(P6,undefined):VALM
+# % gui, , demand, Pos 6 Value 14, $(P,recursive)$(P6,undefined):VALN
+# % gui, , demand, Pos 6 Value 15, $(P,recursive)$(P6,undefined):VALO
+# % gui, , demand, Pos 6 Value 16, $(P,recursive)$(P6,undefined):VALP
+# This makes the component icon reflect the status and severity
+# % gui, , sevr
+# List of names for selection by user.
+# Severity is returned via DISA.
+# DISV set to 2 to stop disabling.
+# % autosave 0 VAL
+# % autosave 2 ZRST ONST TWST THST FRST FVST SXST SVST EIST NIST TEST ELST TVST TTST FTST FFST
+# % gdatag,template,positioner,PGM.GRATINGSELECT,Grating Selection
+# % gdatag,mbbinary,rw,PGM.GRATINGSELECT,SELECT,Position Selection
+record(mbbo, "$(P,recursive):GRATINGSELECT:SELECT") {
+  field(DESC, "Grating Positioner")
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(ZRST, "$(GLABA=$(GSTRA,undefined) lines/mm)")
+  field(ONST, "$(GLABB=$(GSTRB,undefined) lines/mm)")
+  field(TWST, "$(GLABC=$(GSTRC,undefined) lines/mm)")
+  field(THST, "$(GLABD=$(GSTRD,undefined) lines/mm)")
+  field(FRST, "$(GLABE=$(GSTRE,undefined) lines/mm)")
+  field(FVST, "")
+  field(SXST, "")
+  field(FLNK, "$(P,recursive):GRATINGSELECT:START PP MS")
+  field(SVST, "")
+  field(EIST, "")
+  field(NIST, "")
+  field(TEST, "")
+  field(ELST, "")
+  field(PINI, "YES")
+  field(DISV, "2")
+  field(VAL, "0")
+  field(TVST, "")
+  field(TTST, "")
+  field(FTST, "")
+  field(FFST, "")
+}
+
+# Open a gate on each positioner.
+# The outlinks are filled by the positioners.
+record(dfanout, "$(P,recursive):GRATINGSELECT:SFANOUT") {
+  field(DESC, "Fanout start motion")
+  field(SELM, "All")
+  field(VAL, "0")
+}
+
+# On selection make sure all gates are open before motion
+record(fanout, "$(P,recursive):GRATINGSELECT:FANOUT") {
+  field(LNK1, "$(P,recursive):GRATINGSELECT:SFANOUT PP MS")
+  field(LNK2, "$(P,recursive):GRATINGSELECT:DFANOUTA PP MS")
+  field(DESC, "Fanout of processing")
+}
+
+# This PV is a good indication of severity
+# % gui, , sevr
+# Combined done moving indicator.
+# Value from AND of all 8 possible inputs.
+# The fixed values of 1 are overwritten by each positioner.
+# % gdatag,pv,ro,PGM.GRATINGSELECT,DMOV,Done Moving Indicator
+record(calcout, "$(P,recursive):GRATINGSELECT:DMOV") {
+  field(CALC, "A&B&C&D&E&F&G&H")
+  field(A, "1")
+  field(B, "1")
+  field(C, "1")
+  field(D, "1")
+  field(E, "1")
+  field(F, "1")
+  field(G, "1")
+  field(H, "1")
+  field(DESC, "Positioner done moving")
+  field(OUT, "$(P,recursive):GRATINGSELECT:BUSY CA")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "(A&B&C&D&E&F&G&H)?0:1")
+}
+
+# Test opening of gates by waiting between open gate and move commands
+# To use this change the FLNK of VALUE to point to this.
+record(seq, "$(P,recursive):GRATINGSELECT:FANOUT2") {
+  field(DESC, "Wait before sending val")
+  field(SCAN, "Passive")
+  field(SELM, "All")
+  field(DOL1, "0")
+  field(LNK1, "$(P,recursive):GRATINGSELECT:SFANOUT.PROC PP MS")
+  field(DLY2, "5")
+  field(LNK2, "$(P,recursive):GRATINGSELECT:DFANOUTA.PROC PP MS")
+}
+
+#% gdatag,pv,ro,PGM.GRATINGSELECT,ERROR,Error Indicator,<pv>.K
+record(transform, "$(P,recursive):GRATINGSELECT:ERROR") {
+  field(DESC, "Errors from positioners")
+  field(FLNK, "$(P,recursive):GRATINGSELECT:SETERROR1 PP MS")
+  field(CLCI, "MAX(MAX(A,B),MAX(C,D))")
+  field(CLCJ, "MAX(MAX(E,F),MAX(G,H))")
+  field(CLCK, "MAX(I,J)")
+  field(INPA, "0")
+  field(INPB, "0")
+  field(INPC, "0")
+  field(INPD, "0")
+  field(INPE, "0")
+  field(INPF, "0")
+  field(INPG, "0")
+  field(INPH, "0")
+}
+
+# Check if value has changed from previous call.
+# This stops infinite loops when passing MS back
+record(calcout, "$(P,recursive):GRATINGSELECT:GATE") {
+  field(DESC, "Stop repeated output")
+  field(DTYP, "Soft Channel")
+  field(CALC, "(A#B)||((~C)&D)")
+  field(INPA, "$(P,recursive):GRATINGSELECT:SELECT NPP MS")
+  field(INPB, "$(P,recursive):GRATINGSELECT:VALUE")
+  field(OUT, "$(P,recursive):GRATINGSELECT:VALUE PP MS")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "A")
+  field(INPC, "$(P,recursive):GRATINGSELECT:INPOS")
+  field(INPD, "$(P,recursive):GRATINGSELECT:DMOV")
+}
+
+# Stores last selected value. This enables the gate record to check if the value has changed.
+# Initially set to -1 to ensure first value is selected correctly.
+record(longout, "$(P,recursive):GRATINGSELECT:VALUE") {
+  field(DESC, "Value selected")
+  field(DTYP, "Soft Channel")
+  field(FLNK, "$(P,recursive):GRATINGSELECT:FANOUT")
+  field(VAL, "-1")
+}
+
+# Add 1 to selection to allow 1st seq to work
+record(calc, "$(P,recursive):GRATINGSELECT:SELECT1") {
+  field(DESC, "Selection+1")
+  field(CALC, "A+1")
+  field(INPA, "$(P,recursive):GRATINGSELECT:SELECT.VAL")
+}
+
+# Sets error severities for 2nd 6 positions
+record(seq, "$(P,recursive):GRATINGSELECT:SETERROR2") {
+  field(DESC, "Sets errors in SELECT")
+  field(SELM, "Specified")
+  field(SELL, "$(P,recursive):GRATINGSELECT:SELECT2.VAL PP")
+  field(DOL1, "$(P,recursive):GRATINGSELECT:ERROR.K NPP MS")
+  field(LNK1, "$(P,recursive):GRATINGSELECT:SELECT.EISV PP MS")
+  field(DOL2, "$(P,recursive):GRATINGSELECT:ERROR.K NPP MS")
+  field(LNK2, "$(P,recursive):GRATINGSELECT:SELECT.NISV PP MS")
+  field(DOL3, "$(P,recursive):GRATINGSELECT:ERROR.K NPP MS")
+  field(LNK3, "$(P,recursive):GRATINGSELECT:SELECT.TESV PP MS")
+  field(DOL4, "$(P,recursive):GRATINGSELECT:ERROR.K NPP MS")
+  field(LNK4, "$(P,recursive):GRATINGSELECT:SELECT.ELSV PP MS")
+  field(DOL5, "$(P,recursive):GRATINGSELECT:ERROR.K NPP MS")
+  field(LNK5, "$(P,recursive):GRATINGSELECT:SELECT.TVSV PP MS")
+  field(DOL6, "$(P,recursive):GRATINGSELECT:ERROR.K NPP MS")
+  field(LNK6, "$(P,recursive):GRATINGSELECT:SELECT.TTSV PP MS")
+  field(DOL7, "$(P,recursive):GRATINGSELECT:ERROR.K NPP MS")
+  field(LNK7, "$(P,recursive):GRATINGSELECT:SELECT.FTSV PP MS")
+  field(DOL8, "$(P,recursive):GRATINGSELECT:ERROR.K NPP MS")
+  field(LNK8, "$(P,recursive):GRATINGSELECT:SELECT.FFSV PP MS")
+}
+
+# Select the correct link from the second sequence
+record(calc, "$(P,recursive):GRATINGSELECT:SELECT2") {
+  field(DESC, "Selection-7")
+  field(CALC, "A-7")
+  field(INPA, "$(P,recursive):GRATINGSELECT:SELECT.VAL")
+}
+
+# Sets error severities for 1st 6 positions
+record(seq, "$(P,recursive):GRATINGSELECT:SETERROR1") {
+  field(DESC, "Sets errors in SELECT")
+  field(FLNK, "$(P,recursive):GRATINGSELECT:SETERROR2")
+  field(SELM, "Specified")
+  field(SELL, "$(P,recursive):GRATINGSELECT:SELECT1 PP")
+  field(DOL1, "$(P,recursive):GRATINGSELECT:ERROR.K NPP MS")
+  field(LNK1, "$(P,recursive):GRATINGSELECT:SELECT.ZRSV PP MS")
+  field(DOL2, "$(P,recursive):GRATINGSELECT:ERROR.K NPP MS")
+  field(LNK2, "$(P,recursive):GRATINGSELECT:SELECT.ONSV PP MS")
+  field(DOL3, "$(P,recursive):GRATINGSELECT:ERROR.K NPP MS")
+  field(LNK3, "$(P,recursive):GRATINGSELECT:SELECT.TWSV PP MS")
+  field(DOL4, "$(P,recursive):GRATINGSELECT:ERROR.K NPP MS")
+  field(LNK4, "$(P,recursive):GRATINGSELECT:SELECT.THSV PP MS")
+  field(DOL5, "$(P,recursive):GRATINGSELECT:ERROR.K NPP MS")
+  field(LNK5, "$(P,recursive):GRATINGSELECT:SELECT.FRSV PP MS")
+  field(DOL6, "$(P,recursive):GRATINGSELECT:ERROR.K NPP MS")
+  field(LNK6, "$(P,recursive):GRATINGSELECT:SELECT.FVSV PP MS")
+  field(DOL7, "$(P,recursive):GRATINGSELECT:ERROR.K NPP MS")
+  field(LNK7, "$(P,recursive):GRATINGSELECT:SELECT.SXSV PP MS")
+  field(DOL8, "$(P,recursive):GRATINGSELECT:ERROR.K NPP MS")
+  field(LNK8, "$(P,recursive):GRATINGSELECT:SELECT.SVSV PP MS")
+}
+
+# Stores types of underlying positioners
+# 0 = Undefined
+# 1 = Normal
+# 2 = Motor
+record(calcout, "$(P,recursive):GRATINGSELECT:TYPE") {
+  field(CALC, "A&B&C&D&E&F&G&H")
+  field(A, "0")
+  field(B, "0")
+  field(C, "0")
+  field(D, "0")
+  field(E, "0")
+  field(F, "0")
+  field(G, "0")
+  field(H, "0")
+  field(DESC, "Types of positioner")
+}
+
+# Record to allow EDM to process changes of strings.
+record(bo, "$(P,recursive):GRATINGSELECT:UPDATE") {
+  field(DESC, "Dummy for EDM")
+  field(PINI, "YES")
+  field(DTYP, "Soft Channel")
+  field(VAL, "1")
+  field(ZNAM, "Updating")
+  field(ONAM, "Normal")
+}
+
+# Combined in position indicator.
+# Value from AND of all 8 possible inputs.
+# The fixed values of 1 are overwritten by each positioner.
+#% gdatag,pv,ro,PGM.GRATINGSELECT,INPOS,In Position Indicator
+record(calcout, "$(P,recursive):GRATINGSELECT:INPOS") {
+  field(CALC, "A&B&C&D&E&F&G&H")
+  field(A, "1")
+  field(B, "1")
+  field(C, "1")
+  field(D, "1")
+  field(E, "1")
+  field(F, "1")
+  field(G, "1")
+  field(H, "1")
+  field(DESC, "Combined in position monitor")
+}
+
+#% gdatag,pv,rw,PGM.GRATINGSELECT,STOP,Stop Button,<pv>.PROC
+record(dfanout, "$(P,recursive):GRATINGSELECT:STOP") {
+  field(DESC, "Stop all motors")
+  field(VAL, "1")
+  field(SELM, "All")
+}
+
+# This makes the component icon reflect the status
+# % gui, , status
+record(busy, "$(P,recursive):GRATINGSELECT:BUSY") {
+}
+
+record(fanout, "$(P,recursive):GRATINGSELECT:START") {
+  field(LNK1, "$(P,recursive):GRATINGSELECT:GATE PP MS")
+  field(LNK2, "$(P,recursive):GRATINGSELECT:BUSY")
+  field(SDIS, "$(P,recursive):GRATINGSELECT:ERRPROC PP")
+}
+
+# Fans selected position number to each separate controller
+# The outlinks are filled by the positioners.
+record(dfanout, "$(P,recursive):GRATINGSELECT:DFANOUTA") {
+  field(DESC, "Fanout selection")
+  field(SELM, "All")
+  field(DOL, "$(P,recursive):GRATINGSELECT:VALUE.VAL")
+  field(OMSL, "closed_loop")
+}
+
+record(calc, "$(P,recursive):GRATINGSELECT:ERRPROC") {
+  field(CALC, "A||B")
+  field(INPA, "$(P,recursive):GRATINGSELECT:SETERROR1.PACT")
+  field(INPB, "$(P,recursive):GRATINGSELECT:SETERROR2.PACT")
+}
+
+# short strings to display on positioner value buttons
+# on -2pos, -3pos and -6pos embedded screens
+record(stringout, "$(P,recursive):GRATINGSELECT:P1VALS") {
+  field(DESC, "short label for P1 VALS")
+  field(VAL, "P1 Val")
+}
+
+record(stringout, "$(P,recursive):GRATINGSELECT:P2VALS") {
+  field(DESC, "short label for P2 VALS")
+  field(VAL, "P2 Val")
+}
+
+record(stringout, "$(P,recursive):GRATINGSELECT:P3VALS") {
+  field(DESC, "short label for P3 VALS")
+  field(VAL, "P3 Val")
+}
+
+record(stringout, "$(P,recursive):GRATINGSELECT:P4VALS") {
+  field(DESC, "short label for P4 VALS")
+  field(VAL, "P4 Val")
+}
+
+record(stringout, "$(P,recursive):GRATINGSELECT:P5VALS") {
+  field(DESC, "short label for P5 VALS")
+  field(VAL, "P5 Val")
+}
+
+record(stringout, "$(P,recursive):GRATINGSELECT:P6VALS") {
+  field(DESC, "short label for P6 VALS")
+  field(VAL, "P6 Val")
+}
+#! Generated by VisualDCT v2.7.1-SNAPSHOT
+
+# % macro, __doc__, Template for controlling many positioner or
+# it to be controlled by a multipositioner, mapping a list of names onto a
+# list of motor positions
+# % macro, P, Device prefix
+# % macro, MP, Device suffix
+# % macro, DESC, Multipositioner description
+# % macro, STRA, String description for position 1
+# % macro, STRB, String description for position 2
+# % macro, STRC, String description for position 3
+# % macro, STRD, String description for position 4
+# % macro, STRE, String description for position 5
+# % macro, STRF, String description for position 6
+# % macro, STRG, String description for position 7
+# % macro, STRH, String description for position 8
+# % macro, STRI, String description for position 9
+# % macro, STRJ, String description for position 10
+# % macro, STRK, String description for position 11
+# % macro, STRL, String description for position 12
+# % macro, STRM, String description for position 13
+# % macro, STRN, String description for position 14
+# % macro, STRO, String description for position 15
+# % macro, STRP, String description for position 16
+# % macro, name, Object name and gui association name
+# % macro, gda_name, If set, export to GDA with this name
+# % macro, gda_desc, Description for GDA
+# % macro, NPOS, Number of positioners, used to work out which screen to use.
+# Only specify if not using the builder object.
+# % macro, P1, Positioner 1 suffix for screen.
+# Only specify if not using the builder object.
+# % macro, P2, Positioner 2 suffix for screen.
+# Only specify if not using the builder object.
+# % macro, P3, Positioner 3 suffix for screen.
+# Only specify if not using the builder object.
+# % macro, P4, Positioner 4 suffix for screen.
+# Only specify if not using the builder object.
+# % macro, P5, Positioner 5 suffix for screen.
+# Only specify if not using the builder object.
+# % macro, P6, Positioner 6 suffix for screen.
+# Only specify if not using the builder object.
+# % macro, P7, Positioner 7 suffix for screen.
+# Only specify if not using the builder object.
+# % macro, P8, Positioner 8 suffix for screen.
+# Only specify if not using the builder object.
+# % macro, P1_VALS, Optional.  Defaults to P1 Val.  Short label for values button <= 6 characters
+# % macro, P2_VALS, Optional.  Defaults to P2 Val.  Short label for values button <= 6 characters
+# % macro, P3_VALS, Optional.  Defaults to P3 Val.  Short label for values button <= 6 characters
+# % macro, P4_VALS, Optional.  Defaults to P4 Val.  Short label for values button <= 6 characters
+# % macro, P5_VALS, Optional.  Defaults to P5 Val.  Short label for values button <= 6 characters
+# % macro, P6_VALS, Optional.  Defaults to P6 Val.  Short label for values button <= 6 characters
+# This associates an edm screen with the template
+# % gui, , edmembed, pos-$(NPOS,undefined)pos.edl, P=$(P,recursive),MP=:MIRRORSELECT,filename=motor.edl,P1=$(P1,undefined),P2=$(P2,undefined),P3=$(P3,undefined),P4=$(P4,undefined),P5=$(P5,undefined),P6=$(P6,undefined),P7=$(P7,undefined),P8=$(P8,undefined)
+# This associates a BOY screen with the template
+# % gui, , boydetail, positionerApp_opi/positioner_detail.opi, P=$(P,recursive),MP=:MIRRORSELECT,DESC=Mirror Positioner,desc=Mirror Positioner,name=,P1=$(P1,undefined),P2=$(P2,undefined),P3=$(P3,undefined),P4=$(P4,undefined),P5=$(P5,undefined),P6=$(P6,undefined),P7=$(P7,undefined),P8=$(P8,undefined),NPOS=$(NPOS,undefined)
+# % gui, , boyembed, positionerApp_opi/positioner_embed_box.opi, P=$(P,recursive),MP=:MIRRORSELECT,DESC=Mirror Positioner,desc=Mirror Positioner,name=,P1=$(P1,undefined),P2=$(P2,undefined),P3=$(P3,undefined),P4=$(P4,undefined),P5=$(P5,undefined),P6=$(P6,undefined),P7=$(P7,undefined),P8=$(P8,undefined),NPOS=$(NPOS,undefined)
+# % gui, , boyembed, positionerApp_opi/positioner_embed.opi, P=$(P,recursive),MP=:MIRRORSELECT,DESC=Mirror Positioner,desc=Mirror Positioner,name=,P1=$(P1,undefined),P2=$(P2,undefined),P3=$(P3,undefined),P4=$(P4,undefined),P5=$(P5,undefined),P6=$(P6,undefined),P7=$(P7,undefined),P8=$(P8,undefined),NPOS=$(NPOS,undefined)
+# This provides the list of PVs to show on the details pane
+# % gui, , demand, Name 1, <pv>.ZRST
+# % gui, , demand, Name 2, <pv>.ONST
+# % gui, , demand, Name 3, <pv>.TWST
+# % gui, , demand, Name 4, <pv>.THST
+# % gui, , demand, Name 5, <pv>.FRST
+# % gui, , demand, Name 6, <pv>.FVST
+# % gui, , demand, Name 7, <pv>.SXST
+# % gui, , demand, Name 8, <pv>.SVST
+# % gui, , demand, Name 9, <pv>.EIST
+# % gui, , demand, Name 10, <pv>.NIST
+# % gui, , demand, Name 11, <pv>.TEST
+# % gui, , demand, Name 12, <pv>.ELST
+# % gui, , demand, Name 13, <pv>.TVST
+# % gui, , demand, Name 14, <pv>.TTST
+# % gui, , demand, Name 15, <pv>.FTST
+# % gui, , demand, Name 16, <pv>.FFST
+# Positioner 1 values
+# % gui, , demand, Pos 1 Value 1, $(P,recursive)$(P1,undefined):VALA
+# % gui, , demand, Pos 1 Value 2, $(P,recursive)$(P1,undefined):VALB
+# % gui, , demand, Pos 1 Value 3, $(P,recursive)$(P1,undefined):VALC
+# % gui, , demand, Pos 1 Value 4, $(P,recursive)$(P1,undefined):VALD
+# % gui, , demand, Pos 1 Value 5, $(P,recursive)$(P1,undefined):VALE
+# % gui, , demand, Pos 1 Value 6, $(P,recursive)$(P1,undefined):VALF
+# % gui, , demand, Pos 1 Value 7, $(P,recursive)$(P1,undefined):VALG
+# % gui, , demand, Pos 1 Value 8, $(P,recursive)$(P1,undefined):VALH
+# % gui, , demand, Pos 1 Value 9, $(P,recursive)$(P1,undefined):VALI
+# % gui, , demand, Pos 1 Value 10, $(P,recursive)$(P1,undefined):VALJ
+# % gui, , demand, Pos 1 Value 11, $(P,recursive)$(P1,undefined):VALK
+# % gui, , demand, Pos 1 Value 12, $(P,recursive)$(P1,undefined):VALL
+# % gui, , demand, Pos 1 Value 13, $(P,recursive)$(P1,undefined):VALM
+# % gui, , demand, Pos 1 Value 14, $(P,recursive)$(P1,undefined):VALN
+# % gui, , demand, Pos 1 Value 15, $(P,recursive)$(P1,undefined):VALO
+# % gui, , demand, Pos 1 Value 16, $(P,recursive)$(P1,undefined):VALP
+# Positioner 2 values
+# % gui, , demand, Pos 2 Value 1, $(P,recursive)$(P2,undefined):VALA
+# % gui, , demand, Pos 2 Value 2, $(P,recursive)$(P2,undefined):VALB
+# % gui, , demand, Pos 2 Value 3, $(P,recursive)$(P2,undefined):VALC
+# % gui, , demand, Pos 2 Value 4, $(P,recursive)$(P2,undefined):VALD
+# % gui, , demand, Pos 2 Value 5, $(P,recursive)$(P2,undefined):VALE
+# % gui, , demand, Pos 2 Value 6, $(P,recursive)$(P2,undefined):VALF
+# % gui, , demand, Pos 2 Value 7, $(P,recursive)$(P2,undefined):VALG
+# % gui, , demand, Pos 2 Value 8, $(P,recursive)$(P2,undefined):VALH
+# % gui, , demand, Pos 2 Value 9, $(P,recursive)$(P2,undefined):VALI
+# % gui, , demand, Pos 2 Value 10, $(P,recursive)$(P2,undefined):VALJ
+# % gui, , demand, Pos 2 Value 11, $(P,recursive)$(P2,undefined):VALK
+# % gui, , demand, Pos 2 Value 12, $(P,recursive)$(P2,undefined):VALL
+# % gui, , demand, Pos 2 Value 13, $(P,recursive)$(P2,undefined):VALM
+# % gui, , demand, Pos 2 Value 14, $(P,recursive)$(P2,undefined):VALN
+# % gui, , demand, Pos 2 Value 15, $(P,recursive)$(P2,undefined):VALO
+# % gui, , demand, Pos 2 Value 16, $(P,recursive)$(P2,undefined):VALP
+# Positioner 3 values
+# % gui, , demand, Pos 3 Value 1, $(P,recursive)$(P3,undefined):VALA
+# % gui, , demand, Pos 3 Value 2, $(P,recursive)$(P3,undefined):VALB
+# % gui, , demand, Pos 3 Value 3, $(P,recursive)$(P3,undefined):VALC
+# % gui, , demand, Pos 3 Value 4, $(P,recursive)$(P3,undefined):VALD
+# % gui, , demand, Pos 3 Value 5, $(P,recursive)$(P3,undefined):VALE
+# % gui, , demand, Pos 3 Value 6, $(P,recursive)$(P3,undefined):VALF
+# % gui, , demand, Pos 3 Value 7, $(P,recursive)$(P3,undefined):VALG
+# % gui, , demand, Pos 3 Value 8, $(P,recursive)$(P3,undefined):VALH
+# % gui, , demand, Pos 3 Value 9, $(P,recursive)$(P3,undefined):VALI
+# % gui, , demand, Pos 3 Value 10, $(P,recursive)$(P3,undefined):VALJ
+# % gui, , demand, Pos 3 Value 11, $(P,recursive)$(P3,undefined):VALK
+# % gui, , demand, Pos 3 Value 12, $(P,recursive)$(P3,undefined):VALL
+# % gui, , demand, Pos 3 Value 13, $(P,recursive)$(P3,undefined):VALM
+# % gui, , demand, Pos 3 Value 14, $(P,recursive)$(P3,undefined):VALN
+# % gui, , demand, Pos 3 Value 15, $(P,recursive)$(P3,undefined):VALO
+# % gui, , demand, Pos 3 Value 16, $(P,recursive)$(P3,undefined):VALP
+# Positioner 4 values
+# % gui, , demand, Pos 4 Value 1, $(P,recursive)$(P4,undefined):VALA
+# % gui, , demand, Pos 4 Value 2, $(P,recursive)$(P4,undefined):VALB
+# % gui, , demand, Pos 4 Value 3, $(P,recursive)$(P4,undefined):VALC
+# % gui, , demand, Pos 4 Value 4, $(P,recursive)$(P4,undefined):VALD
+# % gui, , demand, Pos 4 Value 5, $(P,recursive)$(P4,undefined):VALE
+# % gui, , demand, Pos 4 Value 6, $(P,recursive)$(P4,undefined):VALF
+# % gui, , demand, Pos 4 Value 7, $(P,recursive)$(P4,undefined):VALG
+# % gui, , demand, Pos 4 Value 8, $(P,recursive)$(P4,undefined):VALH
+# % gui, , demand, Pos 4 Value 9, $(P,recursive)$(P4,undefined):VALI
+# % gui, , demand, Pos 4 Value 10, $(P,recursive)$(P4,undefined):VALJ
+# % gui, , demand, Pos 4 Value 11, $(P,recursive)$(P4,undefined):VALK
+# % gui, , demand, Pos 4 Value 12, $(P,recursive)$(P4,undefined):VALL
+# % gui, , demand, Pos 4 Value 13, $(P,recursive)$(P4,undefined):VALM
+# % gui, , demand, Pos 4 Value 14, $(P,recursive)$(P4,undefined):VALN
+# % gui, , demand, Pos 4 Value 15, $(P,recursive)$(P4,undefined):VALO
+# % gui, , demand, Pos 4 Value 16, $(P,recursive)$(P4,undefined):VALP
+# Positioner 5 values
+# % gui, , demand, Pos 5 Value 1, $(P,recursive)$(P5,undefined):VALA
+# % gui, , demand, Pos 5 Value 2, $(P,recursive)$(P5,undefined):VALB
+# % gui, , demand, Pos 5 Value 3, $(P,recursive)$(P5,undefined):VALC
+# % gui, , demand, Pos 5 Value 4, $(P,recursive)$(P5,undefined):VALD
+# % gui, , demand, Pos 5 Value 5, $(P,recursive)$(P5,undefined):VALE
+# % gui, , demand, Pos 5 Value 6, $(P,recursive)$(P5,undefined):VALF
+# % gui, , demand, Pos 5 Value 7, $(P,recursive)$(P5,undefined):VALG
+# % gui, , demand, Pos 5 Value 8, $(P,recursive)$(P5,undefined):VALH
+# % gui, , demand, Pos 5 Value 9, $(P,recursive)$(P5,undefined):VALI
+# % gui, , demand, Pos 5 Value 10, $(P,recursive)$(P5,undefined):VALJ
+# % gui, , demand, Pos 5 Value 11, $(P,recursive)$(P5,undefined):VALK
+# % gui, , demand, Pos 5 Value 12, $(P,recursive)$(P5,undefined):VALL
+# % gui, , demand, Pos 5 Value 13, $(P,recursive)$(P5,undefined):VALM
+# % gui, , demand, Pos 5 Value 14, $(P,recursive)$(P5,undefined):VALN
+# % gui, , demand, Pos 5 Value 15, $(P,recursive)$(P5,undefined):VALO
+# % gui, , demand, Pos 5 Value 16, $(P,recursive)$(P5,undefined):VALP
+# Positioner 6 values
+# % gui, , demand, Pos 6 Value 1, $(P,recursive)$(P6,undefined):VALA
+# % gui, , demand, Pos 6 Value 2, $(P,recursive)$(P6,undefined):VALB
+# % gui, , demand, Pos 6 Value 3, $(P,recursive)$(P6,undefined):VALC
+# % gui, , demand, Pos 6 Value 4, $(P,recursive)$(P6,undefined):VALD
+# % gui, , demand, Pos 6 Value 5, $(P,recursive)$(P6,undefined):VALE
+# % gui, , demand, Pos 6 Value 6, $(P,recursive)$(P6,undefined):VALF
+# % gui, , demand, Pos 6 Value 7, $(P,recursive)$(P6,undefined):VALG
+# % gui, , demand, Pos 6 Value 8, $(P,recursive)$(P6,undefined):VALH
+# % gui, , demand, Pos 6 Value 9, $(P,recursive)$(P6,undefined):VALI
+# % gui, , demand, Pos 6 Value 10, $(P,recursive)$(P6,undefined):VALJ
+# % gui, , demand, Pos 6 Value 11, $(P,recursive)$(P6,undefined):VALK
+# % gui, , demand, Pos 6 Value 12, $(P,recursive)$(P6,undefined):VALL
+# % gui, , demand, Pos 6 Value 13, $(P,recursive)$(P6,undefined):VALM
+# % gui, , demand, Pos 6 Value 14, $(P,recursive)$(P6,undefined):VALN
+# % gui, , demand, Pos 6 Value 15, $(P,recursive)$(P6,undefined):VALO
+# % gui, , demand, Pos 6 Value 16, $(P,recursive)$(P6,undefined):VALP
+# This makes the component icon reflect the status and severity
+# % gui, , sevr
+# List of names for selection by user.
+# Severity is returned via DISA.
+# DISV set to 2 to stop disabling.
+# % autosave 0 VAL
+# % autosave 2 ZRST ONST TWST THST FRST FVST SXST SVST EIST NIST TEST ELST TVST TTST FTST FFST
+# % gdatag,template,positioner,PGM.MIRRORSELECT,Mirror Selection
+# % gdatag,mbbinary,rw,PGM.MIRRORSELECT,SELECT,Position Selection
+record(mbbo, "$(P,recursive):MIRRORSELECT:SELECT") {
+  field(DESC, "Mirror Positioner")
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(ZRST, "$(MSTRA,undefined)")
+  field(ONST, "$(MSTRB,undefined)")
+  field(TWST, "$(MSTRC,undefined)")
+  field(THST, "$(MSTRD,undefined)")
+  field(FRST, "$(MSTRE,undefined)")
+  field(FVST, "")
+  field(SXST, "")
+  field(FLNK, "$(P,recursive):MIRRORSELECT:START PP MS")
+  field(SVST, "")
+  field(EIST, "")
+  field(NIST, "")
+  field(TEST, "")
+  field(ELST, "")
+  field(PINI, "YES")
+  field(DISV, "2")
+  field(VAL, "0")
+  field(TVST, "")
+  field(TTST, "")
+  field(FTST, "")
+  field(FFST, "")
+}
+
+# Open a gate on each positioner.
+# The outlinks are filled by the positioners.
+record(dfanout, "$(P,recursive):MIRRORSELECT:SFANOUT") {
+  field(DESC, "Fanout start motion")
+  field(SELM, "All")
+  field(VAL, "0")
+}
+
+# On selection make sure all gates are open before motion
+record(fanout, "$(P,recursive):MIRRORSELECT:FANOUT") {
+  field(LNK1, "$(P,recursive):MIRRORSELECT:SFANOUT PP MS")
+  field(LNK2, "$(P,recursive):MIRRORSELECT:DFANOUTA PP MS")
+  field(DESC, "Fanout of processing")
+}
+
+# This PV is a good indication of severity
+# % gui, , sevr
+# Combined done moving indicator.
+# Value from AND of all 8 possible inputs.
+# The fixed values of 1 are overwritten by each positioner.
+# % gdatag,pv,ro,PGM.MIRRORSELECT,DMOV,Done Moving Indicator
+record(calcout, "$(P,recursive):MIRRORSELECT:DMOV") {
+  field(CALC, "A&B&C&D&E&F&G&H")
+  field(A, "1")
+  field(B, "1")
+  field(C, "1")
+  field(D, "1")
+  field(E, "1")
+  field(F, "1")
+  field(G, "1")
+  field(H, "1")
+  field(DESC, "Positioner done moving")
+  field(OUT, "$(P,recursive):MIRRORSELECT:BUSY CA")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "(A&B&C&D&E&F&G&H)?0:1")
+}
+
+# Test opening of gates by waiting between open gate and move commands
+# To use this change the FLNK of VALUE to point to this.
+record(seq, "$(P,recursive):MIRRORSELECT:FANOUT2") {
+  field(DESC, "Wait before sending val")
+  field(SCAN, "Passive")
+  field(SELM, "All")
+  field(DOL1, "0")
+  field(LNK1, "$(P,recursive):MIRRORSELECT:SFANOUT.PROC PP MS")
+  field(DLY2, "5")
+  field(LNK2, "$(P,recursive):MIRRORSELECT:DFANOUTA.PROC PP MS")
+}
+
+#% gdatag,pv,ro,PGM.MIRRORSELECT,ERROR,Error Indicator,<pv>.K
+record(transform, "$(P,recursive):MIRRORSELECT:ERROR") {
+  field(DESC, "Errors from positioners")
+  field(FLNK, "$(P,recursive):MIRRORSELECT:SETERROR1 PP MS")
+  field(CLCI, "MAX(MAX(A,B),MAX(C,D))")
+  field(CLCJ, "MAX(MAX(E,F),MAX(G,H))")
+  field(CLCK, "MAX(I,J)")
+  field(INPA, "0")
+  field(INPB, "0")
+  field(INPC, "0")
+  field(INPD, "0")
+  field(INPE, "0")
+  field(INPF, "0")
+  field(INPG, "0")
+  field(INPH, "0")
+}
+
+# Check if value has changed from previous call.
+# This stops infinite loops when passing MS back
+record(calcout, "$(P,recursive):MIRRORSELECT:GATE") {
+  field(DESC, "Stop repeated output")
+  field(DTYP, "Soft Channel")
+  field(CALC, "(A#B)||((~C)&D)")
+  field(INPA, "$(P,recursive):MIRRORSELECT:SELECT NPP MS")
+  field(INPB, "$(P,recursive):MIRRORSELECT:VALUE")
+  field(OUT, "$(P,recursive):MIRRORSELECT:VALUE PP MS")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "A")
+  field(INPC, "$(P,recursive):MIRRORSELECT:INPOS")
+  field(INPD, "$(P,recursive):MIRRORSELECT:DMOV")
+}
+
+# Stores last selected value. This enables the gate record to check if the value has changed.
+# Initially set to -1 to ensure first value is selected correctly.
+record(longout, "$(P,recursive):MIRRORSELECT:VALUE") {
+  field(DESC, "Value selected")
+  field(DTYP, "Soft Channel")
+  field(FLNK, "$(P,recursive):MIRRORSELECT:FANOUT")
+  field(VAL, "-1")
+}
+
+# Add 1 to selection to allow 1st seq to work
+record(calc, "$(P,recursive):MIRRORSELECT:SELECT1") {
+  field(DESC, "Selection+1")
+  field(CALC, "A+1")
+  field(INPA, "$(P,recursive):MIRRORSELECT:SELECT.VAL")
+}
+
+# Sets error severities for 2nd 6 positions
+record(seq, "$(P,recursive):MIRRORSELECT:SETERROR2") {
+  field(DESC, "Sets errors in SELECT")
+  field(SELM, "Specified")
+  field(SELL, "$(P,recursive):MIRRORSELECT:SELECT2.VAL PP")
+  field(DOL1, "$(P,recursive):MIRRORSELECT:ERROR.K NPP MS")
+  field(LNK1, "$(P,recursive):MIRRORSELECT:SELECT.EISV PP MS")
+  field(DOL2, "$(P,recursive):MIRRORSELECT:ERROR.K NPP MS")
+  field(LNK2, "$(P,recursive):MIRRORSELECT:SELECT.NISV PP MS")
+  field(DOL3, "$(P,recursive):MIRRORSELECT:ERROR.K NPP MS")
+  field(LNK3, "$(P,recursive):MIRRORSELECT:SELECT.TESV PP MS")
+  field(DOL4, "$(P,recursive):MIRRORSELECT:ERROR.K NPP MS")
+  field(LNK4, "$(P,recursive):MIRRORSELECT:SELECT.ELSV PP MS")
+  field(DOL5, "$(P,recursive):MIRRORSELECT:ERROR.K NPP MS")
+  field(LNK5, "$(P,recursive):MIRRORSELECT:SELECT.TVSV PP MS")
+  field(DOL6, "$(P,recursive):MIRRORSELECT:ERROR.K NPP MS")
+  field(LNK6, "$(P,recursive):MIRRORSELECT:SELECT.TTSV PP MS")
+  field(DOL7, "$(P,recursive):MIRRORSELECT:ERROR.K NPP MS")
+  field(LNK7, "$(P,recursive):MIRRORSELECT:SELECT.FTSV PP MS")
+  field(DOL8, "$(P,recursive):MIRRORSELECT:ERROR.K NPP MS")
+  field(LNK8, "$(P,recursive):MIRRORSELECT:SELECT.FFSV PP MS")
+}
+
+# Select the correct link from the second sequence
+record(calc, "$(P,recursive):MIRRORSELECT:SELECT2") {
+  field(DESC, "Selection-7")
+  field(CALC, "A-7")
+  field(INPA, "$(P,recursive):MIRRORSELECT:SELECT.VAL")
+}
+
+# Sets error severities for 1st 6 positions
+record(seq, "$(P,recursive):MIRRORSELECT:SETERROR1") {
+  field(DESC, "Sets errors in SELECT")
+  field(FLNK, "$(P,recursive):MIRRORSELECT:SETERROR2")
+  field(SELM, "Specified")
+  field(SELL, "$(P,recursive):MIRRORSELECT:SELECT1 PP")
+  field(DOL1, "$(P,recursive):MIRRORSELECT:ERROR.K NPP MS")
+  field(LNK1, "$(P,recursive):MIRRORSELECT:SELECT.ZRSV PP MS")
+  field(DOL2, "$(P,recursive):MIRRORSELECT:ERROR.K NPP MS")
+  field(LNK2, "$(P,recursive):MIRRORSELECT:SELECT.ONSV PP MS")
+  field(DOL3, "$(P,recursive):MIRRORSELECT:ERROR.K NPP MS")
+  field(LNK3, "$(P,recursive):MIRRORSELECT:SELECT.TWSV PP MS")
+  field(DOL4, "$(P,recursive):MIRRORSELECT:ERROR.K NPP MS")
+  field(LNK4, "$(P,recursive):MIRRORSELECT:SELECT.THSV PP MS")
+  field(DOL5, "$(P,recursive):MIRRORSELECT:ERROR.K NPP MS")
+  field(LNK5, "$(P,recursive):MIRRORSELECT:SELECT.FRSV PP MS")
+  field(DOL6, "$(P,recursive):MIRRORSELECT:ERROR.K NPP MS")
+  field(LNK6, "$(P,recursive):MIRRORSELECT:SELECT.FVSV PP MS")
+  field(DOL7, "$(P,recursive):MIRRORSELECT:ERROR.K NPP MS")
+  field(LNK7, "$(P,recursive):MIRRORSELECT:SELECT.SXSV PP MS")
+  field(DOL8, "$(P,recursive):MIRRORSELECT:ERROR.K NPP MS")
+  field(LNK8, "$(P,recursive):MIRRORSELECT:SELECT.SVSV PP MS")
+}
+
+# Stores types of underlying positioners
+# 0 = Undefined
+# 1 = Normal
+# 2 = Motor
+record(calcout, "$(P,recursive):MIRRORSELECT:TYPE") {
+  field(CALC, "A&B&C&D&E&F&G&H")
+  field(A, "0")
+  field(B, "0")
+  field(C, "0")
+  field(D, "0")
+  field(E, "0")
+  field(F, "0")
+  field(G, "0")
+  field(H, "0")
+  field(DESC, "Types of positioner")
+}
+
+# Record to allow EDM to process changes of strings.
+record(bo, "$(P,recursive):MIRRORSELECT:UPDATE") {
+  field(DESC, "Dummy for EDM")
+  field(PINI, "YES")
+  field(DTYP, "Soft Channel")
+  field(VAL, "1")
+  field(ZNAM, "Updating")
+  field(ONAM, "Normal")
+}
+
+# Combined in position indicator.
+# Value from AND of all 8 possible inputs.
+# The fixed values of 1 are overwritten by each positioner.
+#% gdatag,pv,ro,PGM.MIRRORSELECT,INPOS,In Position Indicator
+record(calcout, "$(P,recursive):MIRRORSELECT:INPOS") {
+  field(CALC, "A&B&C&D&E&F&G&H")
+  field(A, "1")
+  field(B, "1")
+  field(C, "1")
+  field(D, "1")
+  field(E, "1")
+  field(F, "1")
+  field(G, "1")
+  field(H, "1")
+  field(DESC, "Combined in position monitor")
+}
+
+#% gdatag,pv,rw,PGM.MIRRORSELECT,STOP,Stop Button,<pv>.PROC
+record(dfanout, "$(P,recursive):MIRRORSELECT:STOP") {
+  field(DESC, "Stop all motors")
+  field(VAL, "1")
+  field(SELM, "All")
+}
+
+# This makes the component icon reflect the status
+# % gui, , status
+record(busy, "$(P,recursive):MIRRORSELECT:BUSY") {
+}
+
+record(fanout, "$(P,recursive):MIRRORSELECT:START") {
+  field(LNK1, "$(P,recursive):MIRRORSELECT:GATE PP MS")
+  field(LNK2, "$(P,recursive):MIRRORSELECT:BUSY")
+  field(SDIS, "$(P,recursive):MIRRORSELECT:ERRPROC PP")
+}
+
+# Fans selected position number to each separate controller
+# The outlinks are filled by the positioners.
+record(dfanout, "$(P,recursive):MIRRORSELECT:DFANOUTA") {
+  field(DESC, "Fanout selection")
+  field(SELM, "All")
+  field(DOL, "$(P,recursive):MIRRORSELECT:VALUE.VAL")
+  field(OMSL, "closed_loop")
+}
+
+record(calc, "$(P,recursive):MIRRORSELECT:ERRPROC") {
+  field(CALC, "A||B")
+  field(INPA, "$(P,recursive):MIRRORSELECT:SETERROR1.PACT")
+  field(INPB, "$(P,recursive):MIRRORSELECT:SETERROR2.PACT")
+}
+
+# short strings to display on positioner value buttons
+# on -2pos, -3pos and -6pos embedded screens
+record(stringout, "$(P,recursive):MIRRORSELECT:P1VALS") {
+  field(DESC, "short label for P1 VALS")
+  field(VAL, "P1 Val")
+}
+
+record(stringout, "$(P,recursive):MIRRORSELECT:P2VALS") {
+  field(DESC, "short label for P2 VALS")
+  field(VAL, "P2 Val")
+}
+
+record(stringout, "$(P,recursive):MIRRORSELECT:P3VALS") {
+  field(DESC, "short label for P3 VALS")
+  field(VAL, "P3 Val")
+}
+
+record(stringout, "$(P,recursive):MIRRORSELECT:P4VALS") {
+  field(DESC, "short label for P4 VALS")
+  field(VAL, "P4 Val")
+}
+
+record(stringout, "$(P,recursive):MIRRORSELECT:P5VALS") {
+  field(DESC, "short label for P5 VALS")
+  field(VAL, "P5 Val")
+}
+
+record(stringout, "$(P,recursive):MIRRORSELECT:P6VALS") {
+  field(DESC, "short label for P6 VALS")
+  field(VAL, "P6 Val")
+}
+#! Generated by VisualDCT v2.7.1-SNAPSHOT
+
+record(stringout, "$(P,recursive):GRATLINE:SETINPUT2") {
+  field(DESC, "Create open gate link")
+  field(DTYP, "Soft Channel")
+  field(FLNK, "$(P,recursive):GRATLINE:SETINPUT3")
+  field(VAL, "$(P,recursive):GRATLINE:OPENGATE PP")
+  field(OUT, "$(P,recursive):GRATINGSELECT:SFANOUT.OUTA CA")
+}
+
+# This record stops the setting of the input after 1 cycle
+# It also causes the multipositioner's fanout record to be processed.
+# This pushes the current value to the motor.
+record(bo, "$(P,recursive):GRATLINE:SETUPDISABLE") {
+  field(DESC, "Disable proc once done")
+  field(DTYP, "Soft Channel")
+  field(FLNK, "$(P,recursive):GRATLINE:CALCSEL")
+  field(VAL, "1")
+  field(OUT, "$(P,recursive):GRATLINE:SETINPUT1.DISA")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):GRATLINE:VALA") {
+  field(DESC, "First position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "$(GSTRA,undefined)")
+  field(OUT, "$(P,recursive):GRATLINE:SEL1.A")
+  field(PINI, "YES")
+  field(PREC, "1")
+  field(EGU, "lines/mm")
+  field(FLNK, "$(P,recursive):GRATLINE:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):GRATLINE:VALB") {
+  field(DESC, "Second position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "$(GSTRB,undefined)")
+  field(OUT, "$(P,recursive):GRATLINE:SEL1.B")
+  field(PINI, "YES")
+  field(PREC, "1")
+  field(EGU, "lines/mm")
+  field(FLNK, "$(P,recursive):GRATLINE:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):GRATLINE:VALC") {
+  field(DESC, "Third position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "$(GSTRC,undefined)")
+  field(OUT, "$(P,recursive):GRATLINE:SEL1.C")
+  field(PINI, "YES")
+  field(PREC, "1")
+  field(EGU, "lines/mm")
+  field(FLNK, "$(P,recursive):GRATLINE:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):GRATLINE:VALD") {
+  field(DESC, "Fourth position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "$(GSTRD,undefined)")
+  field(OUT, "$(P,recursive):GRATLINE:SEL1.D")
+  field(PINI, "YES")
+  field(PREC, "1")
+  field(EGU, "lines/mm")
+  field(FLNK, "$(P,recursive):GRATLINE:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):GRATLINE:VALE") {
+  field(DESC, "Fifth position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "$(GSTRE,undefined)")
+  field(OUT, "$(P,recursive):GRATLINE:SEL1.E")
+  field(PINI, "YES")
+  field(PREC, "1")
+  field(EGU, "lines/mm")
+  field(FLNK, "$(P,recursive):GRATLINE:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):GRATLINE:VALF") {
+  field(DESC, "Sixth position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "")
+  field(OUT, "$(P,recursive):GRATLINE:SEL1.F")
+  field(PINI, "YES")
+  field(PREC, "1")
+  field(EGU, "lines/mm")
+  field(FLNK, "$(P,recursive):GRATLINE:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):GRATLINE:VALG") {
+  field(DESC, "Seventh position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "0")
+  field(OUT, "$(P,recursive):GRATLINE:SEL1.G")
+  field(PINI, "YES")
+  field(PREC, "1")
+  field(EGU, "lines/mm")
+  field(FLNK, "$(P,recursive):GRATLINE:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):GRATLINE:VALH") {
+  field(DESC, "Eigth position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "")
+  field(OUT, "$(P,recursive):GRATLINE:SEL1.H")
+  field(PINI, "YES")
+  field(PREC, "1")
+  field(EGU, "lines/mm")
+  field(FLNK, "$(P,recursive):GRATLINE:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):GRATLINE:VALI") {
+  field(DESC, "Ninth position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "")
+  field(OUT, "$(P,recursive):GRATLINE:SEL1.I")
+  field(PINI, "YES")
+  field(PREC, "1")
+  field(EGU, "lines/mm")
+  field(FLNK, "$(P,recursive):GRATLINE:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):GRATLINE:VALJ") {
+  field(DESC, "Tenth position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "")
+  field(OUT, "$(P,recursive):GRATLINE:SEL1.J")
+  field(PINI, "YES")
+  field(PREC, "1")
+  field(EGU, "lines/mm")
+  field(FLNK, "$(P,recursive):GRATLINE:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):GRATLINE:VALK") {
+  field(DESC, "Eleventh position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "")
+  field(OUT, "$(P,recursive):GRATLINE:SEL1.K")
+  field(PINI, "YES")
+  field(PREC, "1")
+  field(EGU, "lines/mm")
+  field(FLNK, "$(P,recursive):GRATLINE:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):GRATLINE:VALL") {
+  field(DESC, "Twelth position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "")
+  field(OUT, "$(P,recursive):GRATLINE:SEL1.L")
+  field(PINI, "YES")
+  field(PREC, "1")
+  field(EGU, "lines/mm")
+  field(FLNK, "$(P,recursive):GRATLINE:CALCSEL")
+}
+
+record(ao, "$(P,recursive):GRATLINE:SETVALUE") {
+  field(OMSL, "closed_loop")
+  field(PREC, "1")
+  field(OUT, "$(P,recursive):GRATLINE:SETVALUE2 PP")
+  field(EGU, "lines/mm")
+  field(FLNK, "$(P,recursive):GRATLINE:UPD")
+}
+
+# Takes readback and sets value field
+record(ao, "$(P,recursive):GRATLINE:SETA") {
+  field(DESC, "Set VALA")
+  field(OUT, "$(P,recursive):GRATLINE:VALA PP")
+  field(DOL, "$(P,recursive):LINES")
+  field(OMSL, "closed_loop")
+}
+
+record(bo, "$(P,recursive):GRATLINE:DMOV") {
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(P,recursive):GRATINGSELECT:DMOV.A PP MS")
+  field(ZNAM, "Opened")
+  field(ONAM, "Closed")
+}
+
+record(bo, "$(P,recursive):GRATLINE:INPOS") {
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(P,recursive):GRATINGSELECT:INPOS.A PP MS")
+  field(ZNAM, "Opened")
+  field(ONAM, "Closed")
+}
+
+record(dfanout, "$(P,recursive):GRATLINE:OPENGATE") {
+  field(DESC, "Fanout open gate command")
+  field(OUTA, "$(P,recursive):GRATLINE:DMOV PP")
+  field(OUTB, "$(P,recursive):GRATLINE:INPOS PP")
+}
+
+record(ao, "$(P,recursive):GRATLINE:SETB") {
+  field(DESC, "Set VALA")
+  field(OUT, "$(P,recursive):GRATLINE:VALB PP")
+  field(DOL, "$(P,recursive):LINES")
+  field(OMSL, "closed_loop")
+}
+
+record(ao, "$(P,recursive):GRATLINE:SETC") {
+  field(DESC, "Set VALA")
+  field(OUT, "$(P,recursive):GRATLINE:VALC PP")
+  field(DOL, "$(P,recursive):LINES")
+  field(OMSL, "closed_loop")
+}
+
+record(ao, "$(P,recursive):GRATLINE:SETD") {
+  field(DESC, "Set VALA")
+  field(OUT, "$(P,recursive):GRATLINE:VALD PP")
+  field(DOL, "$(P,recursive):LINES")
+  field(OMSL, "closed_loop")
+}
+
+record(ao, "$(P,recursive):GRATLINE:SETE") {
+  field(DESC, "Set VALA")
+  field(OUT, "$(P,recursive):GRATLINE:VALE PP")
+  field(DOL, "$(P,recursive):LINES")
+  field(OMSL, "closed_loop")
+}
+
+record(ao, "$(P,recursive):GRATLINE:SETF") {
+  field(DESC, "Set VALA")
+  field(OUT, "$(P,recursive):GRATLINE:VALF PP")
+  field(DOL, "$(P,recursive):LINES")
+  field(OMSL, "closed_loop")
+}
+
+record(ao, "$(P,recursive):GRATLINE:SETL") {
+  field(DESC, "Set VALA")
+  field(OUT, "$(P,recursive):GRATLINE:VALL PP")
+  field(DOL, "$(P,recursive):LINES")
+  field(OMSL, "closed_loop")
+}
+
+record(ao, "$(P,recursive):GRATLINE:SETK") {
+  field(DESC, "Set VALA")
+  field(OUT, "$(P,recursive):GRATLINE:VALK PP")
+  field(DOL, "$(P,recursive):LINES")
+  field(OMSL, "closed_loop")
+}
+
+record(ao, "$(P,recursive):GRATLINE:SETJ") {
+  field(DESC, "Set VALA")
+  field(OUT, "$(P,recursive):GRATLINE:VALJ PP")
+  field(DOL, "$(P,recursive):LINES")
+  field(OMSL, "closed_loop")
+}
+
+record(ao, "$(P,recursive):GRATLINE:SETG") {
+  field(DESC, "Set VALA")
+  field(OUT, "$(P,recursive):GRATLINE:VALG PP")
+  field(DOL, "$(P,recursive):LINES")
+  field(OMSL, "closed_loop")
+}
+
+record(ao, "$(P,recursive):GRATLINE:SETH") {
+  field(DESC, "Set VALA")
+  field(OUT, "$(P,recursive):GRATLINE:VALH PP")
+  field(DOL, "$(P,recursive):LINES")
+  field(OMSL, "closed_loop")
+}
+
+record(ao, "$(P,recursive):GRATLINE:SETI") {
+  field(DESC, "Set VALA")
+  field(OUT, "$(P,recursive):GRATLINE:VALI PP")
+  field(DOL, "$(P,recursive):LINES")
+  field(OMSL, "closed_loop")
+}
+
+record(stringout, "$(P,recursive):GRATLINE:SETINPUT3") {
+  field(DESC, "Create severity link")
+  field(DTYP, "Soft Channel")
+  field(FLNK, "$(P,recursive):GRATLINE:SETINPUT4")
+  field(VAL, "$(P,recursive):GRATLINE:UPD.SEVR CP")
+  field(OUT, "$(P,recursive):GRATINGSELECT:ERROR.INPA CA")
+}
+
+record(ao, "$(P,recursive):GRATLINE:SETVALUE2") {
+  field(PREC, "1")
+  field(OUT, "$(P,recursive):LINES PP")
+  field(EGU, "lines/mm")
+  field(SDIS, "$(P,recursive):GRATLINE:CALCSEL.PACT")
+}
+
+record(stringout, "$(P,recursive):GRATLINE:SETINPUT4") {
+  field(DESC, "Store Type")
+  field(DTYP, "Soft Channel")
+  field(FLNK, "$(P,recursive):GRATLINE:SETINPUT5")
+  field(VAL, "1")
+  field(OUT, "$(P,recursive):GRATINGSELECT:TYPE.A CA")
+}
+
+record(stringout, "$(P,recursive):GRATLINE:DEVNAME") {
+  field(DESC, "Placeholder for name")
+  field(VAL, "$(P,recursive):LINES")
+}
+
+record(transform, "$(P,recursive):GRATLINE:UPD") {
+  field(CLCE, "ABS(D-A)<=C")
+  field(CLCF, "ABS(D-B)<=C")
+  field(INPA, "$(P,recursive):LINES")
+  field(INPB, "$(P,recursive):GRATLINE:SETVALUE.VAL")
+  field(INPC, "0")
+  field(INPD, "$(P,recursive):LINES CP MS")
+  field(OUTE, "$(P,recursive):GRATLINE:DMOV PP MS")
+  field(OUTF, "$(P,recursive):GRATLINE:INPOS PP MS")
+  field(EGU, "lines/mm")
+  field(PREC, "1")
+}
+
+record(stringout, "$(P,recursive):GRATLINE:SETINPUT5") {
+  field(DESC, "Set stop link")
+  field(DTYP, "Soft Channel")
+  field(FLNK, "$(P,recursive):GRATLINE:SETUPDISABLE")
+  field(VAL, "$(P,recursive):GRATLINE:STOP PP")
+  field(OUT, "$(P,recursive):GRATINGSELECT:STOP.OUTA CA")
+}
+
+record(ao, "$(P,recursive):GRATLINE:STOP") {
+  field(DESC, "Stop the motion")
+  field(OUT, "$(P,recursive)0 PP")
+  field(DOL, "0")
+  field(OMSL, "closed_loop")
+}
+
+record(sel, "$(P,recursive):GRATLINE:SEL1") {
+  field(DESC, "Grating Selection")
+  field(FLNK, "$(P,recursive):GRATLINE:SEL1COPY PP")
+  field(SELM, "Specified")
+  field(PREC, "1")
+  field(EGU, "lines/mm")
+}
+
+# This record contains the list of positions for motor.
+# The multipositioner writes to the VAL field to select one.
+record(longout, "$(P,recursive):GRATLINE:SEL") {
+  field(DESC, "Grating Selection")
+  field(FLNK, "$(P,recursive):GRATLINE:SELCALC1")
+}
+
+record(calcout, "$(P,recursive):GRATLINE:SELCALC1") {
+  field(FLNK, "$(P,recursive):GRATLINE:SELCALC2")
+  field(CALC, "A<12?1:0")
+  field(INPA, "$(P,recursive):GRATLINE:SEL.VAL")
+  field(OUT, "$(P,recursive):GRATLINE:SEL1.SELN PP")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "A")
+}
+
+record(ao, "$(P,recursive):GRATLINE:SEL1COPY") {
+  field(DOL, "$(P,recursive):GRATLINE:SEL1.VAL")
+  field(OMSL, "closed_loop")
+  field(PREC, "1")
+  field(OUT, "$(P,recursive):GRATLINE:SETVALUE PP")
+  field(EGU, "lines/mm")
+}
+
+record(sel, "$(P,recursive):GRATLINE:SEL2") {
+  field(DESC, "Grating Selection")
+  field(FLNK, "$(P,recursive):GRATLINE:SEL2COPY")
+  field(SELM, "Specified")
+  field(PREC, "1")
+  field(EGU, "lines/mm")
+}
+
+record(ao, "$(P,recursive):GRATLINE:SEL2COPY") {
+  field(DOL, "$(P,recursive):GRATLINE:SEL2.VAL")
+  field(OMSL, "closed_loop")
+  field(PREC, "1")
+  field(OUT, "$(P,recursive):GRATLINE:SETVALUE PP")
+  field(EGU, "lines/mm")
+}
+
+record(calcout, "$(P,recursive):GRATLINE:SELCALC2") {
+  field(CALC, "A>=12?1:0")
+  field(INPA, "$(P,recursive):GRATLINE:SEL")
+  field(OUT, "$(P,recursive):GRATLINE:SEL2.SELN PP")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "A-12")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):GRATLINE:VALM") {
+  field(DESC, "First position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "0")
+  field(OUT, "$(P,recursive):GRATLINE:SEL2.A")
+  field(PINI, "YES")
+  field(PREC, "1")
+  field(EGU, "lines/mm")
+  field(FLNK, "$(P,recursive):GRATLINE:CALCSEL")
+}
+
+record(ao, "$(P,recursive):GRATLINE:SETM") {
+  field(DESC, "Set VALA")
+  field(OUT, "$(P,recursive):GRATLINE:VALM.VAL PP")
+  field(DOL, "$(P,recursive):LINES")
+  field(OMSL, "closed_loop")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):GRATLINE:VALN") {
+  field(DESC, "Second position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "0")
+  field(OUT, "$(P,recursive):GRATLINE:SEL2.B")
+  field(PINI, "YES")
+  field(PREC, "1")
+  field(EGU, "lines/mm")
+  field(FLNK, "$(P,recursive):GRATLINE:CALCSEL")
+}
+
+record(ao, "$(P,recursive):GRATLINE:SETN") {
+  field(DESC, "Set VALA")
+  field(OUT, "$(P,recursive):GRATLINE:VALN.VAL PP")
+  field(DOL, "$(P,recursive):LINES")
+  field(OMSL, "closed_loop")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):GRATLINE:VALO") {
+  field(DESC, "Third position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "0")
+  field(OUT, "$(P,recursive):GRATLINE:SEL2.C")
+  field(PINI, "YES")
+  field(PREC, "1")
+  field(EGU, "lines/mm")
+  field(FLNK, "$(P,recursive):GRATLINE:CALCSEL")
+}
+
+record(ao, "$(P,recursive):GRATLINE:SETO") {
+  field(DESC, "Set VALA")
+  field(OUT, "$(P,recursive):GRATLINE:VALO.VAL PP")
+  field(DOL, "$(P,recursive):LINES")
+  field(OMSL, "closed_loop")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):GRATLINE:VALP") {
+  field(DESC, "Fourth position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "0")
+  field(OUT, "$(P,recursive):GRATLINE:SEL2.D")
+  field(PINI, "YES")
+  field(PREC, "1")
+  field(EGU, "lines/mm")
+  field(FLNK, "$(P,recursive):GRATLINE:CALCSEL")
+}
+
+record(ao, "$(P,recursive):GRATLINE:SETP") {
+  field(DESC, "Set VALA")
+  field(OUT, "$(P,recursive):GRATLINE:VALP.VAL PP")
+  field(DOL, "$(P,recursive):LINES")
+  field(OMSL, "closed_loop")
+}
+
+# % macro, __doc__, Template for wrapping any pv as a positioner. This allows 
+# it to be controlled by a multipositioner, mapping a list of names onto a 
+# list of values for this pv
+# % macro, P, Device prefix, must match P of multipositioner
+# % macro, Q, Device suffix
+# % macro, MP, Multipositioner suffix, must match MP of multipositioner
+# % macro, DESC, Positioner description
+# % macro, SET, Pv used to set the value
+# % macro, EGU, Engineering units
+# % macro, PREC, Precision to display to
+# % macro, READBACK, Pv used to readback the value
+# % macro, STOP, STOPVAL written to this Pv to stop movement
+# % macro, STOPVAL, The value written to STOP to stop movement
+# % macro, DEADBAND, In position if abs(demand - readback) < DEADBAND
+# % macro, VALA, Positioner value for position 1
+# % macro, VALB, Positioner value for position 2
+# % macro, VALC, Positioner value for position 3
+# % macro, VALD, Positioner value for position 4
+# % macro, VALE, Positioner value for position 5
+# % macro, VALF, Positioner value for position 6
+# % macro, VALG, Positioner value for position 7
+# % macro, VALH, Positioner value for position 8
+# % macro, VALI, Positioner value for position 9
+# % macro, VALJ, Positioner value for position 10
+# % macro, VALK, Positioner value for position 11
+# % macro, VALL, Positioner value for position 12
+# % macro, VALM, Positioner value for position 13
+# % macro, VALN, Positioner value for position 14
+# % macro, VALO, Positioner value for position 15
+# % macro, VALP, Positioner value for position 16
+# % macro, pos, Positioner letter (A..H)
+# This record sets the first input link from the multipositioner.
+# This decouples the two templates.
+# The output can only be set after initialisation. Hence this runs on a scan.
+# After running once it is disabled.
+record(stringout, "$(P,recursive):GRATLINE:SETINPUT1") {
+  field(DESC, "Set output link from above")
+  field(DTYP, "Soft Channel")
+  field(FLNK, "$(P,recursive):GRATLINE:SETINPUT2")
+  field(VAL, "$(P,recursive):GRATLINE:SEL PP")
+  field(OUT, "$(P,recursive):GRATINGSELECT:DFANOUTA.OUTA CA")
+  field(SCAN, "1 second")
+}
+
+record(calcout, "$(P,recursive):GRATLINE:CALCSEL") {
+  field(CALC, "A")
+  field(INPA, "$(P,recursive):GRATINGSELECT:SELECT")
+  field(OUT, "$(P,recursive):GRATLINE:SEL PP")
+  field(DISV, "0")
+  field(SDIS, "$(P,recursive):GRATLINE:SETINPUT1.DISA")
+}
+#! Generated by VisualDCT v2.7.1-SNAPSHOT
+
+record(stringout, "$(P,recursive):GRATINGPOS:SETINPUT2") {
+  field(DESC, "Create open gate link")
+  field(DTYP, "Soft Channel")
+  field(FLNK, "$(P,recursive):GRATINGPOS:SETINPUT3")
+  field(VAL, "$(P,recursive):GRATINGPOS:OPENGATE PP")
+  field(OUT, "$(P,recursive):GRATINGSELECT:SFANOUT.OUTB CA")
+}
+
+# This record stops the setting of the input after 1 cycle
+# It also causes the multipositioner's fanout record to be processed.
+# This pushes the current value to the motor.
+record(bo, "$(P,recursive):GRATINGPOS:SETUPDISABLE") {
+  field(DESC, "Disable proc once done")
+  field(DTYP, "Soft Channel")
+  field(FLNK, "$(P,recursive):GRATINGPOS:CALCSEL")
+  field(VAL, "1")
+  field(OUT, "$(P,recursive):GRATINGPOS:SETINPUT1.DISA")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):GRATINGPOS:VALA") {
+  field(DESC, "First position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "$(GPOSA,undefined)")
+  field(OUT, "$(P,recursive):GRATINGPOS:SEL1.A")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):GRATINGPOS:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):GRATINGPOS:VALB") {
+  field(DESC, "Second position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "$(GPOSB,undefined)")
+  field(OUT, "$(P,recursive):GRATINGPOS:SEL1.B")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):GRATINGPOS:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):GRATINGPOS:VALC") {
+  field(DESC, "Third position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "$(GPOSC,undefined)")
+  field(OUT, "$(P,recursive):GRATINGPOS:SEL1.C")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):GRATINGPOS:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):GRATINGPOS:VALD") {
+  field(DESC, "Fourth position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "$(GPOSD,undefined)")
+  field(OUT, "$(P,recursive):GRATINGPOS:SEL1.D")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):GRATINGPOS:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):GRATINGPOS:VALE") {
+  field(DESC, "Fifth position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "$(GPOSE,undefined)")
+  field(OUT, "$(P,recursive):GRATINGPOS:SEL1.E")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):GRATINGPOS:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):GRATINGPOS:VALF") {
+  field(DESC, "Sixth position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "0")
+  field(OUT, "$(P,recursive):GRATINGPOS:SEL1.F")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):GRATINGPOS:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):GRATINGPOS:VALG") {
+  field(DESC, "Seventh position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "0")
+  field(OUT, "$(P,recursive):GRATINGPOS:SEL1.G")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):GRATINGPOS:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):GRATINGPOS:VALH") {
+  field(DESC, "Eigthth position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "0")
+  field(OUT, "$(P,recursive):GRATINGPOS:SEL1.H")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):GRATINGPOS:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):GRATINGPOS:VALI") {
+  field(DESC, "Nineth position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "0")
+  field(OUT, "$(P,recursive):GRATINGPOS:SEL1.I")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):GRATINGPOS:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):GRATINGPOS:VALJ") {
+  field(DESC, "Tenth position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "0")
+  field(OUT, "$(P,recursive):GRATINGPOS:SEL1.J")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):GRATINGPOS:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):GRATINGPOS:VALK") {
+  field(DESC, "Eleventh position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "0")
+  field(OUT, "$(P,recursive):GRATINGPOS:SEL1.K")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):GRATINGPOS:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):GRATINGPOS:VALL") {
+  field(DESC, "Twelveth position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "0")
+  field(OUT, "$(P,recursive):GRATINGPOS:SEL1.L")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):GRATINGPOS:CALCSEL")
+}
+
+record(ao, "$(P,recursive):GRATINGPOS:SETVALUE") {
+  field(OMSL, "supervisory")
+  field(PREC, "5")
+  field(OUT, "$(P,recursive):GRATINGPOS:SETVALUE2 PP")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):GRATINGPOS:UPD")
+}
+
+# Takes readback and sets value field
+record(ao, "$(P,recursive):GRATINGPOS:SETA") {
+  field(DESC, "Set VALA")
+  field(OUT, "$(P,recursive):GRATINGPOS:VALA PP")
+  field(DOL, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).RBV")
+  field(OMSL, "closed_loop")
+}
+
+record(bo, "$(P,recursive):GRATINGPOS:DMOV") {
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(P,recursive):GRATINGSELECT:DMOV.B PP")
+  field(ZNAM, "Opened")
+  field(ONAM, "Closed")
+}
+
+record(bo, "$(P,recursive):GRATINGPOS:INPOS") {
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(P,recursive):GRATINGSELECT:INPOS.B PP")
+  field(ZNAM, "Opened")
+  field(ONAM, "Closed")
+}
+
+record(dfanout, "$(P,recursive):GRATINGPOS:OPENGATE") {
+  field(DESC, "Fanout open gate command")
+  field(OUTA, "$(P,recursive):GRATINGPOS:DMOV PP")
+  field(OUTB, "$(P,recursive):GRATINGPOS:INPOS PP")
+}
+
+record(ao, "$(P,recursive):GRATINGPOS:SETB") {
+  field(DESC, "Set VALB")
+  field(OUT, "$(P,recursive):GRATINGPOS:VALB PP")
+  field(DOL, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).RBV")
+  field(OMSL, "closed_loop")
+}
+
+record(ao, "$(P,recursive):GRATINGPOS:SETC") {
+  field(DESC, "Set VALC")
+  field(OUT, "$(P,recursive):GRATINGPOS:VALC PP")
+  field(DOL, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).RBV")
+  field(OMSL, "closed_loop")
+}
+
+record(ao, "$(P,recursive):GRATINGPOS:SETD") {
+  field(DESC, "Set VALD")
+  field(OUT, "$(P,recursive):GRATINGPOS:VALD PP")
+  field(DOL, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).RBV")
+  field(OMSL, "closed_loop")
+}
+
+record(ao, "$(P,recursive):GRATINGPOS:SETE") {
+  field(DESC, "Set VALE")
+  field(OUT, "$(P,recursive):GRATINGPOS:VALE PP")
+  field(DOL, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).RBV")
+  field(OMSL, "closed_loop")
+}
+
+record(ao, "$(P,recursive):GRATINGPOS:SETF") {
+  field(DESC, "Set VALF")
+  field(OUT, "$(P,recursive):GRATINGPOS:VALF PP")
+  field(DOL, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).RBV")
+  field(OMSL, "closed_loop")
+}
+
+record(ao, "$(P,recursive):GRATINGPOS:SETL") {
+  field(DESC, "Set VALL")
+  field(OUT, "$(P,recursive):GRATINGPOS:VALL PP")
+  field(DOL, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).RBV")
+  field(OMSL, "closed_loop")
+}
+
+record(ao, "$(P,recursive):GRATINGPOS:SETK") {
+  field(DESC, "Set VALK")
+  field(OUT, "$(P,recursive):GRATINGPOS:VALK PP")
+  field(DOL, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).RBV")
+  field(OMSL, "closed_loop")
+}
+
+record(ao, "$(P,recursive):GRATINGPOS:SETJ") {
+  field(DESC, "Set VALJ")
+  field(OUT, "$(P,recursive):GRATINGPOS:VALJ PP")
+  field(DOL, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).RBV")
+  field(OMSL, "closed_loop")
+}
+
+record(ao, "$(P,recursive):GRATINGPOS:SETG") {
+  field(DESC, "Set VALG")
+  field(OUT, "$(P,recursive):GRATINGPOS:VALG PP")
+  field(DOL, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).RBV")
+  field(OMSL, "closed_loop")
+}
+
+record(ao, "$(P,recursive):GRATINGPOS:SETH") {
+  field(DESC, "Set VALH")
+  field(OUT, "$(P,recursive):GRATINGPOS:VALH PP")
+  field(DOL, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).RBV")
+  field(OMSL, "closed_loop")
+}
+
+record(ao, "$(P,recursive):GRATINGPOS:SETI") {
+  field(DESC, "Set VALI")
+  field(OUT, "$(P,recursive):GRATINGPOS:VALI PP")
+  field(DOL, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).RBV")
+  field(OMSL, "closed_loop")
+}
+
+record(stringout, "$(P,recursive):GRATINGPOS:SETINPUT3") {
+  field(DESC, "Create severity link")
+  field(DTYP, "Soft Channel")
+  field(FLNK, "$(P,recursive):GRATINGPOS:SETINPUT4")
+  field(VAL, "$(P,recursive):GRATINGPOS:UPD.SEVR CP")
+  field(OUT, "$(P,recursive):GRATINGSELECT:ERROR.INPB CA")
+}
+
+record(ao, "$(P,recursive):GRATINGPOS:SETVALUE2") {
+  field(PREC, "5")
+  field(OUT, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined) PP")
+  field(EGU, "mm")
+  field(SDIS, "$(P,recursive):GRATINGPOS:CALCSEL.PACT")
+}
+
+record(stringout, "$(P,recursive):GRATINGPOS:SETINPUT4") {
+  field(DESC, "Store Type")
+  field(DTYP, "Soft Channel")
+  field(FLNK, "$(P,recursive):GRATINGPOS:SETINPUT5")
+  field(VAL, "2")
+  field(OUT, "$(P,recursive):GRATINGSELECT:TYPE.B CA")
+}
+
+record(stringout, "$(P,recursive):GRATINGPOS:DEVNAME") {
+  field(DESC, "Placeholder for name")
+  field(VAL, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined)")
+}
+
+record(transform, "$(P,recursive):GRATINGPOS:UPD") {
+  field(CLCE, "A")
+  field(CLCF, "ABS(D-B)<=C")
+  field(INPA, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).DMOV CP")
+  field(INPB, "$(P,recursive):GRATINGPOS:SETVALUE")
+  field(INPC, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).RDBD")
+  field(INPD, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).RBV CP MS")
+  field(OUTE, "$(P,recursive):GRATINGPOS:DMOV PP")
+  field(OUTF, "$(P,recursive):GRATINGPOS:INPOS PP")
+  field(EGU, "mm")
+  field(PREC, "5")
+}
+
+record(stringout, "$(P,recursive):GRATINGPOS:SETINPUT5") {
+  field(DESC, "Set stop link")
+  field(DTYP, "Soft Channel")
+  field(FLNK, "$(P,recursive):GRATINGPOS:SETUPDISABLE")
+  field(VAL, "$(P,recursive):GRATINGPOS:STOP PP")
+  field(OUT, "$(P,recursive):GRATINGSELECT:STOP.OUTB CA")
+}
+
+# Send stop to motor
+record(bo, "$(P,recursive):GRATINGPOS:STOP") {
+  field(DESC, "Stop motor")
+  field(OMSL, "closed_loop")
+  field(DOL, "1")
+  field(OUT, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).STOP PP")
+}
+
+record(sel, "$(P,recursive):GRATINGPOS:SEL2") {
+  field(DESC, "Grating Position")
+  field(FLNK, "$(P,recursive):GRATINGPOS:SEL2COPY")
+  field(SELM, "Specified")
+  field(PREC, "5")
+  field(EGU, "mm")
+}
+
+record(sel, "$(P,recursive):GRATINGPOS:SEL1") {
+  field(DESC, "Grating Position")
+  field(FLNK, "$(P,recursive):GRATINGPOS:SEL1COPY PP")
+  field(SELM, "Specified")
+  field(PREC, "5")
+  field(EGU, "mm")
+}
+
+record(calcout, "$(P,recursive):GRATINGPOS:SELCALC1") {
+  field(FLNK, "$(P,recursive):GRATINGPOS:SELCALC2")
+  field(CALC, "A<12?1:0")
+  field(INPA, "$(P,recursive):GRATINGPOS:SEL.VAL")
+  field(OUT, "$(P,recursive):GRATINGPOS:SEL1.SELN PP")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "A")
+}
+
+record(calcout, "$(P,recursive):GRATINGPOS:SELCALC2") {
+  field(CALC, "A>=12?1:0")
+  field(INPA, "$(P,recursive):GRATINGPOS:SEL")
+  field(OUT, "$(P,recursive):GRATINGPOS:SEL2.SELN PP")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "A-12")
+}
+
+# This record contains the list of positions for motor.
+# The multipositioner writes to the VAL field to select one.
+record(longout, "$(P,recursive):GRATINGPOS:SEL") {
+  field(DESC, "Grating Position")
+  field(FLNK, "$(P,recursive):GRATINGPOS:SELCALC1")
+}
+
+record(ao, "$(P,recursive):GRATINGPOS:SEL1COPY") {
+  field(DOL, "$(P,recursive):GRATINGPOS:SEL1.VAL")
+  field(OMSL, "closed_loop")
+  field(PREC, "5")
+  field(OUT, "$(P,recursive):GRATINGPOS:SETVALUE PP")
+  field(EGU, "mm")
+}
+
+record(ao, "$(P,recursive):GRATINGPOS:SEL2COPY") {
+  field(DOL, "$(P,recursive):GRATINGPOS:SEL2.VAL")
+  field(OMSL, "closed_loop")
+  field(PREC, "5")
+  field(OUT, "$(P,recursive):GRATINGPOS:SETVALUE PP")
+  field(EGU, "mm")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):GRATINGPOS:VALM") {
+  field(DESC, "Thirteenth position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "0")
+  field(OUT, "$(P,recursive):GRATINGPOS:SEL2.A")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):GRATINGPOS:CALCSEL")
+}
+
+record(ao, "$(P,recursive):GRATINGPOS:SETM") {
+  field(DESC, "Set VALM")
+  field(OUT, "$(P,recursive):GRATINGPOS:VALM.VAL PP")
+  field(DOL, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).RBV")
+  field(OMSL, "closed_loop")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):GRATINGPOS:VALN") {
+  field(DESC, "Fourteenth position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "0")
+  field(OUT, "$(P,recursive):GRATINGPOS:SEL2.B")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):GRATINGPOS:CALCSEL")
+}
+
+record(ao, "$(P,recursive):GRATINGPOS:SETN") {
+  field(DESC, "Set VALN")
+  field(OUT, "$(P,recursive):GRATINGPOS:VALN.VAL PP")
+  field(DOL, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).RBV")
+  field(OMSL, "closed_loop")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):GRATINGPOS:VALO") {
+  field(DESC, "Fifteenth position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "0")
+  field(OUT, "$(P,recursive):GRATINGPOS:SEL2.C")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):GRATINGPOS:CALCSEL")
+}
+
+record(ao, "$(P,recursive):GRATINGPOS:SETO") {
+  field(DESC, "Set VALO")
+  field(OUT, "$(P,recursive):GRATINGPOS:VALO.VAL PP")
+  field(DOL, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).RBV")
+  field(OMSL, "closed_loop")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):GRATINGPOS:VALP") {
+  field(DESC, "Sixteenth position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "0")
+  field(OUT, "$(P,recursive):GRATINGPOS:SEL2.D")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):GRATINGPOS:CALCSEL")
+}
+
+record(ao, "$(P,recursive):GRATINGPOS:SETP") {
+  field(DESC, "Set VALP")
+  field(OUT, "$(P,recursive):GRATINGPOS:VALP.VAL PP")
+  field(DOL, "$(P,recursive):$(GRATING_TRANS_SOFT_MOTOR,undefined).RBV")
+  field(OMSL, "closed_loop")
+}
+
+# % macro, __doc__, Template for wrapping a motor as a positioner. This allows
+# it to be controlled by a multipositioner, mapping a list of names onto a
+# list of motor positions
+# % macro, P, Device prefix, must match P of multipositioner
+# % macro, Q, Device suffix
+# % macro, MP, Multipositioner suffix, must match MP of multipositioner
+# % macro, DESC, Positioner description
+# % macro, EGU, Engineering units
+# % macro, PREC, Precision to display to
+# % macro, motor, Motor record pv
+# % macro, VALA, Positioner value for position 1
+# % macro, VALB, Positioner value for position 2
+# % macro, VALC, Positioner value for position 3
+# % macro, VALD, Positioner value for position 4
+# % macro, VALE, Positioner value for position 5
+# % macro, VALF, Positioner value for position 6
+# % macro, VALG, Positioner value for position 7
+# % macro, VALH, Positioner value for position 8
+# % macro, VALI, Positioner value for position 9
+# % macro, VALJ, Positioner value for position 10
+# % macro, VALK, Positioner value for position 11
+# % macro, VALL, Positioner value for position 12
+# % macro, VALM, Positioner value for position 13
+# % macro, VALN, Positioner value for position 14
+# % macro, VALO, Positioner value for position 15
+# % macro, VALP, Positioner value for position 16
+# % macro, pos, Positioner letter (A..H)
+# This record sets the first input link from the multipositioner.
+# This decouples the two templates.
+# The output can only be set after initialisation. Hence this runs on a scan.
+# After running once it is disabled.
+record(stringout, "$(P,recursive):GRATINGPOS:SETINPUT1") {
+  field(DESC, "Set output link from above")
+  field(DTYP, "Soft Channel")
+  field(FLNK, "$(P,recursive):GRATINGPOS:SETINPUT2")
+  field(VAL, "$(P,recursive):GRATINGPOS:SEL PP")
+  field(OUT, "$(P,recursive):GRATINGSELECT:DFANOUTA.OUTB CA")
+  field(SCAN, "1 second")
+}
+
+record(calcout, "$(P,recursive):GRATINGPOS:CALCSEL") {
+  field(CALC, "A")
+  field(INPA, "$(P,recursive):GRATINGSELECT:SELECT")
+  field(OUT, "$(P,recursive):GRATINGPOS:SEL PP")
+  field(DISV, "0")
+  field(SDIS, "$(P,recursive):GRATINGPOS:SETINPUT1.DISA")
+}
+#! Generated by VisualDCT v2.7.1-SNAPSHOT
+
+record(stringout, "$(P,recursive):MIRRORPOS:SETINPUT2") {
+  field(DESC, "Create open gate link")
+  field(DTYP, "Soft Channel")
+  field(FLNK, "$(P,recursive):MIRRORPOS:SETINPUT3")
+  field(VAL, "$(P,recursive):MIRRORPOS:OPENGATE PP")
+  field(OUT, "$(P,recursive):MIRRORSELECT:SFANOUT.OUTA CA")
+}
+
+# This record stops the setting of the input after 1 cycle
+# It also causes the multipositioner's fanout record to be processed.
+# This pushes the current value to the motor.
+record(bo, "$(P,recursive):MIRRORPOS:SETUPDISABLE") {
+  field(DESC, "Disable proc once done")
+  field(DTYP, "Soft Channel")
+  field(FLNK, "$(P,recursive):MIRRORPOS:CALCSEL")
+  field(VAL, "1")
+  field(OUT, "$(P,recursive):MIRRORPOS:SETINPUT1.DISA")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):MIRRORPOS:VALA") {
+  field(DESC, "First position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "$(MPOSA,undefined)")
+  field(OUT, "$(P,recursive):MIRRORPOS:SEL1.A")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):MIRRORPOS:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):MIRRORPOS:VALB") {
+  field(DESC, "Second position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "$(MPOSB,undefined)")
+  field(OUT, "$(P,recursive):MIRRORPOS:SEL1.B")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):MIRRORPOS:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):MIRRORPOS:VALC") {
+  field(DESC, "Third position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "$(MPOSC,undefined)")
+  field(OUT, "$(P,recursive):MIRRORPOS:SEL1.C")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):MIRRORPOS:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):MIRRORPOS:VALD") {
+  field(DESC, "Fourth position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "$(MPOSD,undefined)")
+  field(OUT, "$(P,recursive):MIRRORPOS:SEL1.D")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):MIRRORPOS:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):MIRRORPOS:VALE") {
+  field(DESC, "Fifth position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "$(MPOSE,undefined)")
+  field(OUT, "$(P,recursive):MIRRORPOS:SEL1.E")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):MIRRORPOS:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):MIRRORPOS:VALF") {
+  field(DESC, "Sixth position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "0")
+  field(OUT, "$(P,recursive):MIRRORPOS:SEL1.F")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):MIRRORPOS:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):MIRRORPOS:VALG") {
+  field(DESC, "Seventh position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "0")
+  field(OUT, "$(P,recursive):MIRRORPOS:SEL1.G")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):MIRRORPOS:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):MIRRORPOS:VALH") {
+  field(DESC, "Eigthth position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "0")
+  field(OUT, "$(P,recursive):MIRRORPOS:SEL1.H")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):MIRRORPOS:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):MIRRORPOS:VALI") {
+  field(DESC, "Nineth position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "0")
+  field(OUT, "$(P,recursive):MIRRORPOS:SEL1.I")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):MIRRORPOS:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):MIRRORPOS:VALJ") {
+  field(DESC, "Tenth position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "0")
+  field(OUT, "$(P,recursive):MIRRORPOS:SEL1.J")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):MIRRORPOS:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):MIRRORPOS:VALK") {
+  field(DESC, "Eleventh position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "0")
+  field(OUT, "$(P,recursive):MIRRORPOS:SEL1.K")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):MIRRORPOS:CALCSEL")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):MIRRORPOS:VALL") {
+  field(DESC, "Twelveth position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "0")
+  field(OUT, "$(P,recursive):MIRRORPOS:SEL1.L")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):MIRRORPOS:CALCSEL")
+}
+
+record(ao, "$(P,recursive):MIRRORPOS:SETVALUE") {
+  field(OMSL, "supervisory")
+  field(PREC, "5")
+  field(OUT, "$(P,recursive):MIRRORPOS:SETVALUE2 PP")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):MIRRORPOS:UPD")
+}
+
+# Takes readback and sets value field
+record(ao, "$(P,recursive):MIRRORPOS:SETA") {
+  field(DESC, "Set VALA")
+  field(OUT, "$(P,recursive):MIRRORPOS:VALA PP")
+  field(DOL, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).RBV")
+  field(OMSL, "closed_loop")
+}
+
+record(bo, "$(P,recursive):MIRRORPOS:DMOV") {
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(P,recursive):MIRRORSELECT:DMOV.A PP")
+  field(ZNAM, "Opened")
+  field(ONAM, "Closed")
+}
+
+record(bo, "$(P,recursive):MIRRORPOS:INPOS") {
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(P,recursive):MIRRORSELECT:INPOS.A PP")
+  field(ZNAM, "Opened")
+  field(ONAM, "Closed")
+}
+
+record(dfanout, "$(P,recursive):MIRRORPOS:OPENGATE") {
+  field(DESC, "Fanout open gate command")
+  field(OUTA, "$(P,recursive):MIRRORPOS:DMOV PP")
+  field(OUTB, "$(P,recursive):MIRRORPOS:INPOS PP")
+}
+
+record(ao, "$(P,recursive):MIRRORPOS:SETB") {
+  field(DESC, "Set VALB")
+  field(OUT, "$(P,recursive):MIRRORPOS:VALB PP")
+  field(DOL, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).RBV")
+  field(OMSL, "closed_loop")
+}
+
+record(ao, "$(P,recursive):MIRRORPOS:SETC") {
+  field(DESC, "Set VALC")
+  field(OUT, "$(P,recursive):MIRRORPOS:VALC PP")
+  field(DOL, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).RBV")
+  field(OMSL, "closed_loop")
+}
+
+record(ao, "$(P,recursive):MIRRORPOS:SETD") {
+  field(DESC, "Set VALD")
+  field(OUT, "$(P,recursive):MIRRORPOS:VALD PP")
+  field(DOL, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).RBV")
+  field(OMSL, "closed_loop")
+}
+
+record(ao, "$(P,recursive):MIRRORPOS:SETE") {
+  field(DESC, "Set VALE")
+  field(OUT, "$(P,recursive):MIRRORPOS:VALE PP")
+  field(DOL, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).RBV")
+  field(OMSL, "closed_loop")
+}
+
+record(ao, "$(P,recursive):MIRRORPOS:SETF") {
+  field(DESC, "Set VALF")
+  field(OUT, "$(P,recursive):MIRRORPOS:VALF PP")
+  field(DOL, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).RBV")
+  field(OMSL, "closed_loop")
+}
+
+record(ao, "$(P,recursive):MIRRORPOS:SETL") {
+  field(DESC, "Set VALL")
+  field(OUT, "$(P,recursive):MIRRORPOS:VALL PP")
+  field(DOL, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).RBV")
+  field(OMSL, "closed_loop")
+}
+
+record(ao, "$(P,recursive):MIRRORPOS:SETK") {
+  field(DESC, "Set VALK")
+  field(OUT, "$(P,recursive):MIRRORPOS:VALK PP")
+  field(DOL, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).RBV")
+  field(OMSL, "closed_loop")
+}
+
+record(ao, "$(P,recursive):MIRRORPOS:SETJ") {
+  field(DESC, "Set VALJ")
+  field(OUT, "$(P,recursive):MIRRORPOS:VALJ PP")
+  field(DOL, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).RBV")
+  field(OMSL, "closed_loop")
+}
+
+record(ao, "$(P,recursive):MIRRORPOS:SETG") {
+  field(DESC, "Set VALG")
+  field(OUT, "$(P,recursive):MIRRORPOS:VALG PP")
+  field(DOL, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).RBV")
+  field(OMSL, "closed_loop")
+}
+
+record(ao, "$(P,recursive):MIRRORPOS:SETH") {
+  field(DESC, "Set VALH")
+  field(OUT, "$(P,recursive):MIRRORPOS:VALH PP")
+  field(DOL, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).RBV")
+  field(OMSL, "closed_loop")
+}
+
+record(ao, "$(P,recursive):MIRRORPOS:SETI") {
+  field(DESC, "Set VALI")
+  field(OUT, "$(P,recursive):MIRRORPOS:VALI PP")
+  field(DOL, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).RBV")
+  field(OMSL, "closed_loop")
+}
+
+record(stringout, "$(P,recursive):MIRRORPOS:SETINPUT3") {
+  field(DESC, "Create severity link")
+  field(DTYP, "Soft Channel")
+  field(FLNK, "$(P,recursive):MIRRORPOS:SETINPUT4")
+  field(VAL, "$(P,recursive):MIRRORPOS:UPD.SEVR CP")
+  field(OUT, "$(P,recursive):MIRRORSELECT:ERROR.INPA CA")
+}
+
+record(ao, "$(P,recursive):MIRRORPOS:SETVALUE2") {
+  field(PREC, "5")
+  field(OUT, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined) PP")
+  field(EGU, "mm")
+  field(SDIS, "$(P,recursive):MIRRORPOS:CALCSEL.PACT")
+}
+
+record(stringout, "$(P,recursive):MIRRORPOS:SETINPUT4") {
+  field(DESC, "Store Type")
+  field(DTYP, "Soft Channel")
+  field(FLNK, "$(P,recursive):MIRRORPOS:SETINPUT5")
+  field(VAL, "2")
+  field(OUT, "$(P,recursive):MIRRORSELECT:TYPE.A CA")
+}
+
+record(stringout, "$(P,recursive):MIRRORPOS:DEVNAME") {
+  field(DESC, "Placeholder for name")
+  field(VAL, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined)")
+}
+
+record(transform, "$(P,recursive):MIRRORPOS:UPD") {
+  field(CLCE, "A")
+  field(CLCF, "ABS(D-B)<=C")
+  field(INPA, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).DMOV CP")
+  field(INPB, "$(P,recursive):MIRRORPOS:SETVALUE")
+  field(INPC, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).RDBD")
+  field(INPD, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).RBV CP MS")
+  field(OUTE, "$(P,recursive):MIRRORPOS:DMOV PP")
+  field(OUTF, "$(P,recursive):MIRRORPOS:INPOS PP")
+  field(EGU, "mm")
+  field(PREC, "5")
+}
+
+record(stringout, "$(P,recursive):MIRRORPOS:SETINPUT5") {
+  field(DESC, "Set stop link")
+  field(DTYP, "Soft Channel")
+  field(FLNK, "$(P,recursive):MIRRORPOS:SETUPDISABLE")
+  field(VAL, "$(P,recursive):MIRRORPOS:STOP PP")
+  field(OUT, "$(P,recursive):MIRRORSELECT:STOP.OUTA CA")
+}
+
+# Send stop to motor
+record(bo, "$(P,recursive):MIRRORPOS:STOP") {
+  field(DESC, "Stop motor")
+  field(OMSL, "closed_loop")
+  field(DOL, "1")
+  field(OUT, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).STOP PP")
+}
+
+record(sel, "$(P,recursive):MIRRORPOS:SEL2") {
+  field(DESC, "Mirror Position")
+  field(FLNK, "$(P,recursive):MIRRORPOS:SEL2COPY")
+  field(SELM, "Specified")
+  field(PREC, "5")
+  field(EGU, "mm")
+}
+
+record(sel, "$(P,recursive):MIRRORPOS:SEL1") {
+  field(DESC, "Mirror Position")
+  field(FLNK, "$(P,recursive):MIRRORPOS:SEL1COPY PP")
+  field(SELM, "Specified")
+  field(PREC, "5")
+  field(EGU, "mm")
+}
+
+record(calcout, "$(P,recursive):MIRRORPOS:SELCALC1") {
+  field(FLNK, "$(P,recursive):MIRRORPOS:SELCALC2")
+  field(CALC, "A<12?1:0")
+  field(INPA, "$(P,recursive):MIRRORPOS:SEL.VAL")
+  field(OUT, "$(P,recursive):MIRRORPOS:SEL1.SELN PP")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "A")
+}
+
+record(calcout, "$(P,recursive):MIRRORPOS:SELCALC2") {
+  field(CALC, "A>=12?1:0")
+  field(INPA, "$(P,recursive):MIRRORPOS:SEL")
+  field(OUT, "$(P,recursive):MIRRORPOS:SEL2.SELN PP")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "A-12")
+}
+
+# This record contains the list of positions for motor.
+# The multipositioner writes to the VAL field to select one.
+record(longout, "$(P,recursive):MIRRORPOS:SEL") {
+  field(DESC, "Mirror Position")
+  field(FLNK, "$(P,recursive):MIRRORPOS:SELCALC1")
+}
+
+record(ao, "$(P,recursive):MIRRORPOS:SEL1COPY") {
+  field(DOL, "$(P,recursive):MIRRORPOS:SEL1.VAL")
+  field(OMSL, "closed_loop")
+  field(PREC, "5")
+  field(OUT, "$(P,recursive):MIRRORPOS:SETVALUE PP")
+  field(EGU, "mm")
+}
+
+record(ao, "$(P,recursive):MIRRORPOS:SEL2COPY") {
+  field(DOL, "$(P,recursive):MIRRORPOS:SEL2.VAL")
+  field(OMSL, "closed_loop")
+  field(PREC, "5")
+  field(OUT, "$(P,recursive):MIRRORPOS:SETVALUE PP")
+  field(EGU, "mm")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):MIRRORPOS:VALM") {
+  field(DESC, "Thirteenth position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "0")
+  field(OUT, "$(P,recursive):MIRRORPOS:SEL2.A")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):MIRRORPOS:CALCSEL")
+}
+
+record(ao, "$(P,recursive):MIRRORPOS:SETM") {
+  field(DESC, "Set VALM")
+  field(OUT, "$(P,recursive):MIRRORPOS:VALM.VAL PP")
+  field(DOL, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).RBV")
+  field(OMSL, "closed_loop")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):MIRRORPOS:VALN") {
+  field(DESC, "Fourteenth position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "0")
+  field(OUT, "$(P,recursive):MIRRORPOS:SEL2.B")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):MIRRORPOS:CALCSEL")
+}
+
+record(ao, "$(P,recursive):MIRRORPOS:SETN") {
+  field(DESC, "Set VALN")
+  field(OUT, "$(P,recursive):MIRRORPOS:VALN.VAL PP")
+  field(DOL, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).RBV")
+  field(OMSL, "closed_loop")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):MIRRORPOS:VALO") {
+  field(DESC, "Fifteenth position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "0")
+  field(OUT, "$(P,recursive):MIRRORPOS:SEL2.C")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):MIRRORPOS:CALCSEL")
+}
+
+record(ao, "$(P,recursive):MIRRORPOS:SETO") {
+  field(DESC, "Set VALO")
+  field(OUT, "$(P,recursive):MIRRORPOS:VALO.VAL PP")
+  field(DOL, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).RBV")
+  field(OMSL, "closed_loop")
+}
+
+#% autosave 2 VAL
+record(ao, "$(P,recursive):MIRRORPOS:VALP") {
+  field(DESC, "Sixteenth position")
+  field(DTYP, "Soft Channel")
+  field(VAL, "0")
+  field(OUT, "$(P,recursive):MIRRORPOS:SEL2.D")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "mm")
+  field(FLNK, "$(P,recursive):MIRRORPOS:CALCSEL")
+}
+
+record(ao, "$(P,recursive):MIRRORPOS:SETP") {
+  field(DESC, "Set VALP")
+  field(OUT, "$(P,recursive):MIRRORPOS:VALP.VAL PP")
+  field(DOL, "$(P,recursive):$(MIRROR_TRANS_SOFT_MOTOR,undefined).RBV")
+  field(OMSL, "closed_loop")
+}
+
+# % macro, __doc__, Template for wrapping a motor as a positioner. This allows
+# it to be controlled by a multipositioner, mapping a list of names onto a
+# list of motor positions
+# % macro, P, Device prefix, must match P of multipositioner
+# % macro, Q, Device suffix
+# % macro, MP, Multipositioner suffix, must match MP of multipositioner
+# % macro, DESC, Positioner description
+# % macro, EGU, Engineering units
+# % macro, PREC, Precision to display to
+# % macro, motor, Motor record pv
+# % macro, VALA, Positioner value for position 1
+# % macro, VALB, Positioner value for position 2
+# % macro, VALC, Positioner value for position 3
+# % macro, VALD, Positioner value for position 4
+# % macro, VALE, Positioner value for position 5
+# % macro, VALF, Positioner value for position 6
+# % macro, VALG, Positioner value for position 7
+# % macro, VALH, Positioner value for position 8
+# % macro, VALI, Positioner value for position 9
+# % macro, VALJ, Positioner value for position 10
+# % macro, VALK, Positioner value for position 11
+# % macro, VALL, Positioner value for position 12
+# % macro, VALM, Positioner value for position 13
+# % macro, VALN, Positioner value for position 14
+# % macro, VALO, Positioner value for position 15
+# % macro, VALP, Positioner value for position 16
+# % macro, pos, Positioner letter (A..H)
+# This record sets the first input link from the multipositioner.
+# This decouples the two templates.
+# The output can only be set after initialisation. Hence this runs on a scan.
+# After running once it is disabled.
+record(stringout, "$(P,recursive):MIRRORPOS:SETINPUT1") {
+  field(DESC, "Set output link from above")
+  field(DTYP, "Soft Channel")
+  field(FLNK, "$(P,recursive):MIRRORPOS:SETINPUT2")
+  field(VAL, "$(P,recursive):MIRRORPOS:SEL PP")
+  field(OUT, "$(P,recursive):MIRRORSELECT:DFANOUTA.OUTA CA")
+  field(SCAN, "1 second")
+}
+
+record(calcout, "$(P,recursive):MIRRORPOS:CALCSEL") {
+  field(CALC, "A")
+  field(INPA, "$(P,recursive):MIRRORSELECT:SELECT")
+  field(OUT, "$(P,recursive):MIRRORPOS:SEL PP")
+  field(DISV, "0")
+  field(SDIS, "$(P,recursive):MIRRORPOS:SETINPUT1.DISA")
+}

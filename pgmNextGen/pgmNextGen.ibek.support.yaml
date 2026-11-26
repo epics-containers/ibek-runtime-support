@@ -1,0 +1,512 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/4.10.0/ibek.support.schema.json
+
+# Imported from DLS production support module: pgmNextGen 4-1
+# Source: controls/support/pgmNextGen (DLS GitLab), tag 4-1, db
+# Pristine copies of the two EPICS databases the 4-1 release builds and
+# installs in db/. They are msi expansions of pgmNextGenApp/Db/*.substitutions
+# over the module's own templates and those of pmac and positioner, so they
+# are not in the git tree; take them from a build of the tag. pgmNextGen 4-0
+# installs the same two files.
+#
+# pgmNextGen supports Plane Grating Monochromators (PGMs) running on Delta
+# Tau motion controllers. Its library has no code of its own: it only
+# aggregates dbds. The databases use only these records: ai, ao, bi, bo,
+# calc, calcout, dfanout, fanout, longout, mbbo, sel, seq and stringout from
+# EPICS base, with stringin "Soft Timestamp"; scalcout, sseq and transform
+# from calc; busy from busy; soft channel motor records from motor; and asyn
+# records plus asynFloat64 records that read and write PMAC variables through
+# the pmac driver's parameters. So they run on a generic IOC image that builds
+# calc, busy, motor and pmac, such as ioc-pmac, with no compiling.
+#
+# The entity model names are the builder class names and the parameter names
+# are the builder XML attribute names. The builder `name` parameter is not
+# declared: no record uses it, and builder2ibek drops it. NPOS is declared,
+# although only GUI comments use it, because IOCs set it.
+#
+# To check for updates: diff this pattern's files against the db/ of a build
+# of a newer tag of controls/support/pgmNextGen.
+
+module: pgmNextGen
+
+entity_models:
+  - name: pgmNextGen
+    description: |-
+      Plane Grating Monochromator on a Delta Tau motion controller: energy
+      and CFF co-ordinate system variables, grating and mirror selection
+      positioners, and automatic decoupling of the translation motors.
+    parameters:
+      P:
+        type: str
+        description: Device prefix for the PGM
+      VARIABLE_PREC:
+        type: int
+        description: Display precision of the PMAC variable records
+      COORD_NUM:
+        type: int
+        description: Delta Tau co-ordinate system number used for the PGM Energy
+      GRATINGPITCH:
+        type: str
+        description: Name of grating pitch motor excluding the device prefix
+      MIRRORPITCH:
+        type: str
+        description: Name of mirror pitch motor excluding the device prefix
+      POST_DECOUPLE_DELAY:
+        type: float
+        description: |-
+          Delay in seconds to allow for the disengaged couple (latch) switch
+          signal to update the pitch motor record status
+        default: 0
+      PITCH_PORT:
+        type: str
+        description: |-
+          Asyn port of the PMAC that the Energy co-ordinate system and the
+          pitch motors are on
+      GRATING_AXIS:
+        type: int
+        description: |-
+          Axis number of the grating pitch motor (reads P<axis> as BETA)
+      MIRROR_AXIS:
+        type: int
+        description: |-
+          Axis number of the mirror pitch motor (reads P<axis> as THETA)
+      GRATING_TRANS_REAL_MOTOR:
+        type: str
+        description: Name of the real grating translation motor
+      GRATING_TRANS_SOFT_MOTOR:
+        type: str
+        description: |-
+          Name of the soft motor presented to the user to demand grating
+          translation
+      GRAT_DECOUPLE_DIST:
+        type: float
+        description: |-
+          Size of the extra grating translation move that decouples
+          (unlatches) the pitch
+      MIRROR_TRANS_REAL_MOTOR:
+        type: str
+        description: Name of the real mirror translation motor
+      MIRROR_TRANS_SOFT_MOTOR:
+        type: str
+        description: |-
+          Name of the soft motor presented to the user to demand mirror
+          translation
+      MIRR_DECOUPLE_DIST:
+        type: float
+        description: |-
+          Size of the extra mirror translation move that decouples
+          (unlatches) the pitch
+      MSTRA:
+        type: str
+        description: Label of mirror 1
+      MSTRB:
+        type: str
+        description: Label of mirror 2
+      MSTRC:
+        type: str
+        description: Label of mirror 3
+      MSTRD:
+        type: str
+        description: Label of mirror 4
+      MSTRE:
+        type: str
+        description: Label of mirror 5
+      GSTRA:
+        type: str
+        description: |-
+          Line density of grating 1 in lines/mm; must be numeric, it is used
+          in the Energy and CFF calculations
+      GSTRB:
+        type: str
+        description: |-
+          Line density of grating 2 in lines/mm; must be numeric, it is used
+          in the Energy and CFF calculations
+      GSTRC:
+        type: str
+        description: |-
+          Line density of grating 3 in lines/mm; must be numeric, it is used
+          in the Energy and CFF calculations
+      GSTRD:
+        type: str
+        description: |-
+          Line density of grating 4 in lines/mm; must be numeric, it is used
+          in the Energy and CFF calculations
+      GSTRE:
+        type: str
+        description: |-
+          Line density of grating 5 in lines/mm; must be numeric, it is used
+          in the Energy and CFF calculations
+      GLABA:
+        type: str
+        description: Label of grating 1
+        default: "{{GSTRA}} lines/mm"
+      GLABB:
+        type: str
+        description: Label of grating 2
+        default: "{{GSTRB}} lines/mm"
+      GLABC:
+        type: str
+        description: Label of grating 3
+        default: "{{GSTRC}} lines/mm"
+      GLABD:
+        type: str
+        description: Label of grating 4
+        default: "{{GSTRD}} lines/mm"
+      GLABE:
+        type: str
+        description: Label of grating 5
+        default: "{{GSTRE}} lines/mm"
+      GPOSA:
+        type: float
+        description: Grating translation position of grating 1
+      GPOSB:
+        type: float
+        description: Grating translation position of grating 2
+      GPOSC:
+        type: float
+        description: Grating translation position of grating 3
+      GPOSD:
+        type: float
+        description: Grating translation position of grating 4
+      GPOSE:
+        type: float
+        description: Grating translation position of grating 5
+      MPOSA:
+        type: float
+        description: Mirror translation position of mirror 1
+      MPOSB:
+        type: float
+        description: Mirror translation position of mirror 2
+      MPOSC:
+        type: float
+        description: Mirror translation position of mirror 3
+      MPOSD:
+        type: float
+        description: Mirror translation position of mirror 4
+      MPOSE:
+        type: float
+        description: Mirror translation position of mirror 5
+      NPOS:
+        type: int
+        description: |-
+          Number of positioners. Used by builder only to choose a GUI
+          screen; no record uses it.
+        default: 1
+    databases:
+      - file: pgmNextGen.db
+        args:
+          .*:
+
+  - name: pgmNextGenCalibration
+    description: |-
+      Calibration tables of the grating and mirror pitch offsets of a
+      pgmNextGen PGM, for each combination of grating and mirror.
+    parameters:
+      P:
+        type: str
+        description: Device prefix for the PGM
+      PITCHEGU:
+        type: str
+        description: Engineering units for the pitch
+        default: deg
+      PITCHPREC:
+        type: int
+        description: Display precision for the pitch
+        default: 8
+      VARIABLE_PREC:
+        type: int
+        description: Display precision of the PMAC variable records
+      GRATINGDESC:
+        type: str
+        description: Description of the grating pitch motor
+        default: Grating Pitch
+      GRATINGPITCH:
+        type: str
+        description: Name of grating pitch motor excluding the device prefix
+      GRATINGCAL:
+        type: str
+        description: Field of the grating pitch motor that the calibration sets
+        default: .OFF
+      GRTCLBDESC:
+        type: str
+        description: Label of the grating calibration table
+        default: Grating - Beta Calibration
+      MIRRORDESC:
+        type: str
+        description: Description of the mirror pitch motor
+        default: Mirror Pitch
+      MIRRORPITCH:
+        type: str
+        description: Name of mirror pitch motor excluding the device prefix
+      MIRRORCAL:
+        type: str
+        description: Field of the mirror pitch motor that the calibration sets
+        default: .OFF
+      MIRCLBDESC:
+        type: str
+        description: Label of the mirror calibration table
+        default: Mirror - Theta Calibration
+      GSTRA:
+        type: str
+        description: |-
+          Line density of grating 1 in lines/mm, used only in the default
+          label of grating 1
+      GSTRB:
+        type: str
+        description: |-
+          Line density of grating 2 in lines/mm, used only in the default
+          label of grating 2
+      GSTRC:
+        type: str
+        description: |-
+          Line density of grating 3 in lines/mm, used only in the default
+          label of grating 3
+      GSTRD:
+        type: str
+        description: |-
+          Line density of grating 4 in lines/mm, used only in the default
+          label of grating 4
+      GSTRE:
+        type: str
+        description: |-
+          Line density of grating 5 in lines/mm, used only in the default
+          label of grating 5
+      GLABA:
+        type: str
+        description: Label of grating 1
+        default: "{{GSTRA}} lines/mm"
+      GLABB:
+        type: str
+        description: Label of grating 2
+        default: "{{GSTRB}} lines/mm"
+      GLABC:
+        type: str
+        description: Label of grating 3
+        default: "{{GSTRC}} lines/mm"
+      GLABD:
+        type: str
+        description: Label of grating 4
+        default: "{{GSTRD}} lines/mm"
+      GLABE:
+        type: str
+        description: Label of grating 5
+        default: "{{GSTRE}} lines/mm"
+      G_G1M1:
+        type: float
+        description: Grating pitch calibration offset for grating 1 with mirror 1
+        default: 90
+      G_G2M1:
+        type: float
+        description: Grating pitch calibration offset for grating 2 with mirror 1
+        default: 90
+      G_G3M1:
+        type: float
+        description: Grating pitch calibration offset for grating 3 with mirror 1
+        default: 90
+      G_G4M1:
+        type: float
+        description: Grating pitch calibration offset for grating 4 with mirror 1
+        default: 90
+      G_G5M1:
+        type: float
+        description: Grating pitch calibration offset for grating 5 with mirror 1
+        default: 90
+      G_G1M2:
+        type: float
+        description: Grating pitch calibration offset for grating 1 with mirror 2
+        default: 90
+      G_G2M2:
+        type: float
+        description: Grating pitch calibration offset for grating 2 with mirror 2
+        default: 90
+      G_G3M2:
+        type: float
+        description: Grating pitch calibration offset for grating 3 with mirror 2
+        default: 90
+      G_G4M2:
+        type: float
+        description: Grating pitch calibration offset for grating 4 with mirror 2
+        default: 90
+      G_G5M2:
+        type: float
+        description: Grating pitch calibration offset for grating 5 with mirror 2
+        default: 90
+      G_G1M3:
+        type: float
+        description: Grating pitch calibration offset for grating 1 with mirror 3
+        default: 90
+      G_G2M3:
+        type: float
+        description: Grating pitch calibration offset for grating 2 with mirror 3
+        default: 90
+      G_G3M3:
+        type: float
+        description: Grating pitch calibration offset for grating 3 with mirror 3
+        default: 90
+      G_G4M3:
+        type: float
+        description: Grating pitch calibration offset for grating 4 with mirror 3
+        default: 90
+      G_G5M3:
+        type: float
+        description: Grating pitch calibration offset for grating 5 with mirror 3
+        default: 90
+      G_G1M4:
+        type: float
+        description: Grating pitch calibration offset for grating 1 with mirror 4
+        default: 90
+      G_G2M4:
+        type: float
+        description: Grating pitch calibration offset for grating 2 with mirror 4
+        default: 90
+      G_G3M4:
+        type: float
+        description: Grating pitch calibration offset for grating 3 with mirror 4
+        default: 90
+      G_G4M4:
+        type: float
+        description: Grating pitch calibration offset for grating 4 with mirror 4
+        default: 90
+      G_G5M4:
+        type: float
+        description: Grating pitch calibration offset for grating 5 with mirror 4
+        default: 90
+      G_G1M5:
+        type: float
+        description: Grating pitch calibration offset for grating 1 with mirror 5
+        default: 90
+      G_G2M5:
+        type: float
+        description: Grating pitch calibration offset for grating 2 with mirror 5
+        default: 90
+      G_G3M5:
+        type: float
+        description: Grating pitch calibration offset for grating 3 with mirror 5
+        default: 90
+      G_G4M5:
+        type: float
+        description: Grating pitch calibration offset for grating 4 with mirror 5
+        default: 90
+      G_G5M5:
+        type: float
+        description: Grating pitch calibration offset for grating 5 with mirror 5
+        default: 90
+      M_G1M1:
+        type: float
+        description: Mirror pitch calibration offset for grating 1 with mirror 1
+        default: 90
+      M_G2M1:
+        type: float
+        description: Mirror pitch calibration offset for grating 2 with mirror 1
+        default: 90
+      M_G3M1:
+        type: float
+        description: Mirror pitch calibration offset for grating 3 with mirror 1
+        default: 90
+      M_G4M1:
+        type: float
+        description: Mirror pitch calibration offset for grating 4 with mirror 1
+        default: 90
+      M_G5M1:
+        type: float
+        description: Mirror pitch calibration offset for grating 5 with mirror 1
+        default: 90
+      M_G1M2:
+        type: float
+        description: Mirror pitch calibration offset for grating 1 with mirror 2
+        default: 90
+      M_G2M2:
+        type: float
+        description: Mirror pitch calibration offset for grating 2 with mirror 2
+        default: 90
+      M_G3M2:
+        type: float
+        description: Mirror pitch calibration offset for grating 3 with mirror 2
+        default: 90
+      M_G4M2:
+        type: float
+        description: Mirror pitch calibration offset for grating 4 with mirror 2
+        default: 90
+      M_G5M2:
+        type: float
+        description: Mirror pitch calibration offset for grating 5 with mirror 2
+        default: 90
+      M_G1M3:
+        type: float
+        description: Mirror pitch calibration offset for grating 1 with mirror 3
+        default: 90
+      M_G2M3:
+        type: float
+        description: Mirror pitch calibration offset for grating 2 with mirror 3
+        default: 90
+      M_G3M3:
+        type: float
+        description: Mirror pitch calibration offset for grating 3 with mirror 3
+        default: 90
+      M_G4M3:
+        type: float
+        description: Mirror pitch calibration offset for grating 4 with mirror 3
+        default: 90
+      M_G5M3:
+        type: float
+        description: Mirror pitch calibration offset for grating 5 with mirror 3
+        default: 90
+      M_G1M4:
+        type: float
+        description: Mirror pitch calibration offset for grating 1 with mirror 4
+        default: 90
+      M_G2M4:
+        type: float
+        description: Mirror pitch calibration offset for grating 2 with mirror 4
+        default: 90
+      M_G3M4:
+        type: float
+        description: Mirror pitch calibration offset for grating 3 with mirror 4
+        default: 90
+      M_G4M4:
+        type: float
+        description: Mirror pitch calibration offset for grating 4 with mirror 4
+        default: 90
+      M_G5M4:
+        type: float
+        description: Mirror pitch calibration offset for grating 5 with mirror 4
+        default: 90
+      M_G1M5:
+        type: float
+        description: Mirror pitch calibration offset for grating 1 with mirror 5
+        default: 90
+      M_G2M5:
+        type: float
+        description: Mirror pitch calibration offset for grating 2 with mirror 5
+        default: 90
+      M_G3M5:
+        type: float
+        description: Mirror pitch calibration offset for grating 3 with mirror 5
+        default: 90
+      M_G4M5:
+        type: float
+        description: Mirror pitch calibration offset for grating 4 with mirror 5
+        default: 90
+      M_G5M5:
+        type: float
+        description: Mirror pitch calibration offset for grating 5 with mirror 5
+        default: 90
+      PITCHPORT:
+        type: str
+        description: |-
+          Asyn port of the PMAC that the pitch motors and the Pmatch PLC are
+          on
+      PMATCHPLC:
+        type: int
+        description: |-
+          PLC number of the Pmatch PLC in the PMAC, used to make its
+          P-variable numbers
+      NPOS:
+        type: int
+        description: |-
+          Number of positioners. Used by builder only to choose a GUI
+          screen; no record uses it.
+        default: 1
+    databases:
+      - file: pgmNextGenCalibration.db
+        args:
+          .*:
