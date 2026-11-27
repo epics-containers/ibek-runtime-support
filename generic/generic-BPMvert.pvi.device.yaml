@@ -1,0 +1,117 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/pvi/releases/latest/download/pvi.device.schema.json
+# Grouped from the DLS EDM screen generic-BPM-setup.edl (generic 2-39-7).
+# First generated from that screen by builder2ibek tools/pvi-from-edm for
+# ibek-support-dls; maintained by hand here.
+
+label: generic-BPMvert
+children:
+- type: Group
+  name: Inputs
+  layout:
+    type: Grid
+    labelled: true
+  children:
+  - type: SignalR
+    name: Bpmi1
+    label: A
+    read_pv: $(P):BPMI1
+    read_widget:
+      type: TextRead
+  - type: SignalR
+    name: Bpmi2
+    label: B
+    read_pv: $(P):BPMI2
+    read_widget:
+      type: TextRead
+  - type: SignalR
+    name: Bpmi3
+    label: C
+    read_pv: $(P):BPMI3
+    read_widget:
+      type: TextRead
+  - type: SignalR
+    name: Bpmi4
+    label: D
+    read_pv: $(P):BPMI4
+    read_widget:
+      type: TextRead
+- type: Group
+  name: Parameters
+  layout:
+    type: Grid
+    labelled: true
+  children:
+  - type: SignalW
+    name: Da
+    label: DA
+    write_pv: $(P):DA
+    write_widget:
+      type: TextWrite
+  - type: SignalW
+    name: Db
+    label: DB
+    write_pv: $(P):DB
+    write_widget:
+      type: TextWrite
+  - type: SignalW
+    name: Dc
+    label: DC
+    write_pv: $(P):DC
+    write_widget:
+      type: TextWrite
+  - type: Group
+    name: RowDd
+    label: DD
+    layout:
+      type: Row
+    children:
+    - type: SignalW
+      name: Dd
+      write_pv: $(P):DD
+      write_widget:
+        type: TextWrite
+    - type: SignalW
+      name: PosscanScan
+      write_pv: $(P):POSSCAN.SCAN
+      write_widget:
+        type: ComboBox
+  - type: SignalW
+    name: Kx
+    label: KX
+    write_pv: $(P):KX
+    write_widget:
+      type: TextWrite
+  - type: SignalW
+    name: Ky
+    label: KY
+    write_pv: $(P):KY
+    write_widget:
+      type: TextWrite
+- type: Group
+  name: Calculations
+  layout:
+    type: Grid
+    labelled: true
+  children:
+  - type: SignalR
+    name: Inten
+    label: I = (A-DA)+(B-DB)+(C-DC)+(D-DD) =
+    read_pv: $(P):INTEN
+    read_widget:
+      type: TextRead
+  - type: SignalR
+    name: Xpos
+    read_pv: $(P):XPOS
+    read_widget:
+      type: TextRead
+  - type: SignalR
+    name: Ypos
+    read_pv: $(P):YPOS
+    read_widget:
+      type: TextRead
+  - type: SignalR
+    name: Q
+    label: Q = ((A-DA)-(B-DB)+(C-DC)-(D-DD))/I =
+    read_pv: $(P):Q
+    read_widget:
+      type: TextRead
