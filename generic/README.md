@@ -44,7 +44,8 @@ which are the builder XML attributes, with the template's defaults.
 - `name`, `gda_name`, `gda_desc` and `gda_curr_name` are not declared: the templates
   use them only in gui and GDA tag comments, and builder2ibek drops them.
 - The BPM offsets `DA` to `DD` and gains `KX` and `KY` are floats, as in the
-  ibek-support-dls models they replace, so a gain of `1` loads as `1.0`.
+  ibek-support-dls models they replace, so their `ao` records get `VAL` `1.0` where
+  the builder IOCs had `1`, and `0.0` for `0`: the same value.
 - The BPM models have PVI screens, `generic-BPMvert.pvi.device.yaml` and
   `generic-BPMdiag.pvi.device.yaml`, first generated from the release's
   `generic-BPM-setup.edl` and maintained by hand here.
