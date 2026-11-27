@@ -1,0 +1,122 @@
+# File PGM.template
+#
+# % macro, __doc__, PGM template from the pgmNextGen module, supporting Plane Grating Monochromators (PGMs) running on Delta Tau Motion Control systems.
+# % macro, P,            Mandatory. Device prefix for the PGM.
+# % macro, COORD_NUM,    Mandatory. Delta Tau co-ordinate system number used for the PGM Energy.
+# % macro, PORT,         Mandatory. Port name for the PMAC the Energy co-ordinate system is on.
+# % macro, GRATINGPITCH, Mandatory. Name of grating pitch motor excl device prefix.
+# % macro, MIRRORPITCH,  Mandatory. Name of mirror pitch motor excl device prefix.
+#
+
+## Ensure that the co-ordinate system is aborted
+## before a move is attempted by following a sequence
+record(seq, "$(P):MOVE_SEQ")
+{
+  field(DLY1, "0.0")
+  field(DOL1, "1")
+  field(LNK1, "$(P):ABORT_COORD.PROC PP")
+  field(DLY2, "1.0")
+  field(DOL2, "1")
+  field(LNK2, "$(P):RUN_COORD.PROC PP")
+}
+
+## Send an abort command to the co-ordinate system
+record(asyn, "$(P):ABORT_COORD")
+{
+  field(DESC, "Abort coord system")
+  field(PORT, "$(PORT)")
+  field(AOUT, "&$(COORD_NUM)a")
+  field(OEOS, "\r")
+  field(IEOS, "\006")
+}
+
+## Send a run command to the co-ordinate system
+record(asyn, "$(P):RUN_COORD")
+{
+  field(DESC, "Run coord system")
+  field(PORT, "$(PORT)")
+  field(AOUT, "&$(COORD_NUM)b10r")
+  field(OEOS, "\r")
+  field(IEOS, "\006")
+}
+
+# When the stop button is pressed, send
+# the stop command to both virtual motors
+# and both physical motors
+record(seq, "$(P):STOP")
+{
+  field(DESC, "Stop all pitch and energy motors")
+  field(DLY1, "0.0")
+  field(DOL1, "1")
+  field(LNK1, "$(P):ENERGY.STOP PP")
+  field(DLY2, "0.0")
+  field(DOL2, "1")
+  field(LNK2, "$(P):CFF.STOP PP")
+  field(DLY3, "0.0")
+  field(DOL3, "1")
+  field(LNK3, "$(P):$(GRATINGPITCH).STOP PP")
+  field(DLY4, "0.0")
+  field(DOL4, "1")
+  field(LNK4, "$(P):$(MIRRORPITCH).STOP PP")
+}
+
+# This is not used for control of the PGM co-ordinate system.
+# However loathe to remove it because believe GDA use it, at least during
+# development and commissioning and there might still be beamlines doing
+# things the prehistoric way.
+# Forward kinematic calculations of 
+# pitch positions from demand energy
+record(transform, "$(P):PGMFORWARDS") 
+{
+  field(DESC, "From soft to real")
+  field(CLCG, "E/(F*F-1)+SQR((E*F/(F*F-1))^2+1)")
+  field(CLCJ, "(ASIN(G+E)*R2D)+H")
+  field(INPF, "$(P):CFFDEMAND CP")
+  field(CMTA, "Soft energy request")
+  field(CMTB, "Constant")
+  field(CMTD, "No. lines")
+  field(CMTE, "SASB calculation")
+  field(CMTF, "CFF")
+  field(CMTG, "SA calculation")
+  field(CMTJ, "Beta calculation")
+  field(CMTL, "Theta calculation")
+  field(CLCE, "B*C*D/A")
+  field(CLCL, "((J-H+ASIN(G)*R2D)/2)+K")
+  field(INPA, "$(P):ENERGYDEMAND CP")
+  field(INPB, "1.239842E-3")
+  field(INPC, "$(P):ORDER CP")
+  field(INPD, "$(P):GRATLINE:SEL1 CP")
+  field(INPH, "0")
+  field(INPK, "0")
+  field(CMTC, "Diffraction order")
+  field(CMTH, "Grating offset")
+  field(CMTK, "Mirror offset")
+  field(OUTJ, "")
+  field(OUTL, "")
+}
+
+# This does not seem to be doing what the description says.
+record(seq, "$(P):MOVE")
+{
+  field(DESC, "Move both translations")
+  field(DLY1, "0.0")
+  field(DLY1, "0.1")
+  field(DOL1, "$(P):PGMFORWARDS.J")
+  field(LNK1, "$(P):$(GRATINGPITCH).VAL PP")
+  field(DLY2, "0.0")
+  field(DOL2, "$(P):PGMFORWARDS.L")
+  field(LNK2, "$(P):$(MIRRORPITCH).VAL PP")
+}
+
+# Calculate the difference between 
+# the two pitch motor angles
+# This is displayed on GUI screens to help users.
+record(calc, "$(P):DIFFERENCE")
+{
+  field(DESC, "Difference between angles")
+  field(INPA, "$(P):$(MIRRORPITCH).RBV CPP")
+  field(INPB, "$(P):$(GRATINGPITCH).RBV CPP")
+  field(CALC, "A-B")
+  field(SCAN, "Passive")
+}
+

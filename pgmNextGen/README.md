@@ -2,20 +2,28 @@
 
 Runtime pattern imported from the DLS support module `pgmNextGen`, release `4-1`
 (GitLab `controls/support/pgmNextGen`): Plane Grating Monochromators on Delta Tau
-motion controllers. `pgmNextGen.db` and `pgmNextGenCalibration.db` are pristine
-copies of the databases a build of that release installs in `db/` (msi expansions of
-its substitutions files, so not in the git tree).
+motion controllers.
 
-The databases use soft records from EPICS base, calc and busy, soft channel motor
-records, and asyn records and `asynFloat64` records on the pmac driver's PMAC
-variable parameters. A generic IOC image that builds calc, busy, motor and pmac, such
-as ioc-pmac, can load them without compiling. Provenance is in the header of
+`PGM.template`, `AutoDecouple.template` and `pgmNextGenCal.template` are pristine
+copies of the module's own templates from `pgmNextGenApp/Db`. pgmNextGen 4-1's
+Makefile builds `pgmNextGen.db` and `pgmNextGenCalibration.db` from
+`pgmNextGen.substitutions` and `pgmNextGenCalibration.substitutions` with msi. The
+expansion that the Makefile and msi did at build time is done per instance by ibek:
+each entry in an entity model's `databases:` list is one row of a substitutions file,
+in the same order, with the row and its line number quoted in a comment above it. The
+files are otherwise pristine.
+
+The substitutions files also load templates from the pmac and positioner support
+modules (`pmacVariableWrite.template`, `multipositioner.template`,
+`positioner.template` and `motorpositioner.template`). Those come from the generic
+IOC image, which must build calc, busy, motor, pmac and positioner, such as ioc-pmac.
+Nothing needs compiling. Provenance and the macro mapping are in the header of
 [`pgmNextGen.ibek.support.yaml`](pgmNextGen.ibek.support.yaml).
 
-| Entity model | Database |
-|---|---|
-| `pgmNextGen.pgmNextGen` | `pgmNextGen.db` |
-| `pgmNextGen.pgmNextGenCalibration` | `pgmNextGenCalibration.db` |
+| Entity model | Substitutions file | Templates |
+|---|---|---|
+| `pgmNextGen.pgmNextGen` | `pgmNextGen.substitutions` | `pmacVariableWrite`, `PGM`, `AutoDecouple`, `multipositioner`, `positioner`, `motorpositioner` |
+| `pgmNextGen.pgmNextGenCalibration` | `pgmNextGenCalibration.substitutions` | `pgmNextGenCal`, `multipositioner`, `positioner`, `pmacVariableWrite` |
 
-[`ibek.manifest.yaml`](ibek.manifest.yaml) vendors the support YAML and the
-databases into an IOC instance's `config/`. This README stays in the library.
+[`ibek.manifest.yaml`](ibek.manifest.yaml) vendors the support YAML and the three
+templates into an IOC instance's `config/`. This README stays in the library.

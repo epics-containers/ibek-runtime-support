@@ -1,30 +1,55 @@
 # yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/4.10.0/ibek.support.schema.json
 
 # Imported from DLS production support module: pgmNextGen 4-1
-# Source: controls/support/pgmNextGen (DLS GitLab), tag 4-1, db
-# Pristine copies of the two EPICS databases the 4-1 release builds and
-# installs in db/. They are msi expansions of pgmNextGenApp/Db/*.substitutions
-# over the module's own templates and those of pmac and positioner, so they
-# are not in the git tree; take them from a build of the tag. pgmNextGen 4-0
-# installs the same two files.
+# Source: controls/support/pgmNextGen (DLS GitLab), tag 4-1, pgmNextGenApp/Db
+#
+# PGM.template, AutoDecouple.template and pgmNextGenCal.template are pristine
+# copies of the module's own templates. pgmNextGen 4-1's Makefile builds
+# pgmNextGen.db and pgmNextGenCalibration.db from pgmNextGen.substitutions and
+# pgmNextGenCalibration.substitutions with msi. The expansion that the
+# Makefile and msi did at build time is done per instance by ibek: each entry
+# in an entity model's `databases:` list below is one row of a substitutions
+# file, in the same order, with the row and its line number in the comment
+# above it. The files are otherwise pristine.
+#
+# The substitutions files also load templates from two other support modules,
+# which the generic IOC image builds:
+#   $(PMAC)/db/pmacVariableWrite.template        pmac
+#   $(POSITIONER)/db/multipositioner.template    positioner
+#   $(POSITIONER)/db/positioner.template         positioner
+#   $(POSITIONER)/db/motorpositioner.template    positioner
+# They are named below without the $(PMAC)/db/ or $(POSITIONER)/db/ folder:
+# msi finds them on the IOC's ${SUPPORT}/*/db include path. pgmNextGen 4-1
+# built against pmac 2-5-22 and positioner 3-8; the IOC uses the versions its
+# image builds.
+#
+# How the substitutions macros map:
+#   $(X)                     a parameter of the entity, written {{X}}
+#   $(dollar=$)(X=default)   a parameter of the entity with that default; the
+#                            escape only carried the macro past the module
+#                            build to the IOC build
+# A few rows take a macro that is not a column of the substitutions row: one
+# that the 4-1 build left unexpanded in its .db for the IOC build to set, such
+# as VARIABLE_PREC in pmacVariableWrite.template. The comment above each such
+# block names it.
 #
 # pgmNextGen supports Plane Grating Monochromators (PGMs) running on Delta
 # Tau motion controllers. Its library has no code of its own: it only
-# aggregates dbds. The databases use only these records: ai, ao, bi, bo,
-# calc, calcout, dfanout, fanout, longout, mbbo, sel, seq and stringout from
-# EPICS base, with stringin "Soft Timestamp"; scalcout, sseq and transform
-# from calc; busy from busy; soft channel motor records from motor; and asyn
-# records plus asynFloat64 records that read and write PMAC variables through
-# the pmac driver's parameters. So they run on a generic IOC image that builds
-# calc, busy, motor and pmac, such as ioc-pmac, with no compiling.
+# aggregates dbds. The records are ai, ao, bi, bo, calc, calcout, dfanout,
+# fanout, longout, mbbo, sel, seq and stringout from EPICS base, with
+# stringin "Soft Timestamp"; scalcout, sseq and transform from calc; busy
+# from busy; soft channel motor records from motor; and asyn records plus
+# asynFloat64 records that read and write PMAC variables through the pmac
+# driver's parameters. So they run on a generic IOC image that builds calc,
+# busy, motor, pmac and positioner, such as ioc-pmac, with no compiling.
 #
 # The entity model names are the builder class names and the parameter names
 # are the builder XML attribute names. The builder `name` parameter is not
 # declared: no record uses it, and builder2ibek drops it. NPOS is declared,
 # although only GUI comments use it, because IOCs set it.
 #
-# To check for updates: diff this pattern's files against the db/ of a build
-# of a newer tag of controls/support/pgmNextGen.
+# To check for updates: diff the three templates and the two substitutions
+# files of a newer tag of controls/support/pgmNextGen against 4-1.
 
 module: pgmNextGen
 
@@ -34,33 +59,20 @@ entity_models:
       Plane Grating Monochromator on a Delta Tau motion controller: energy
       and CFF co-ordinate system variables, grating and mirror selection
       positioners, and automatic decoupling of the translation motors.
+    # in the order the rows of pgmNextGen.substitutions first use them
     parameters:
+      # pmacVariableWrite.template rows and PGM.template row
       P:
         type: str
         description: Device prefix for the PGM
-      VARIABLE_PREC:
-        type: int
-        description: Display precision of the PMAC variable records
-      COORD_NUM:
-        type: int
-        description: Delta Tau co-ordinate system number used for the PGM Energy
-      GRATINGPITCH:
-        type: str
-        description: Name of grating pitch motor excluding the device prefix
-      MIRRORPITCH:
-        type: str
-        description: Name of mirror pitch motor excluding the device prefix
-      POST_DECOUPLE_DELAY:
-        type: float
-        description: |-
-          Delay in seconds to allow for the disengaged couple (latch) switch
-          signal to update the pitch motor record status
-        default: 0
       PITCH_PORT:
         type: str
         description: |-
           Asyn port of the PMAC that the Energy co-ordinate system and the
           pitch motors are on
+      COORD_NUM:
+        type: int
+        description: Delta Tau co-ordinate system number used for the PGM Energy
       GRATING_AXIS:
         type: int
         description: |-
@@ -69,6 +81,22 @@ entity_models:
         type: int
         description: |-
           Axis number of the mirror pitch motor (reads P<axis> as THETA)
+      VARIABLE_PREC:
+        type: int
+        description: Display precision of the PMAC variable records
+      GRATINGPITCH:
+        type: str
+        description: Name of grating pitch motor excluding the device prefix
+      MIRRORPITCH:
+        type: str
+        description: Name of mirror pitch motor excluding the device prefix
+
+      # AutoDecouple.template rows
+      GRAT_DECOUPLE_DIST:
+        type: float
+        description: |-
+          Size of the extra grating translation move that decouples
+          (unlatches) the pitch
       GRATING_TRANS_REAL_MOTOR:
         type: str
         description: Name of the real grating translation motor
@@ -77,10 +105,10 @@ entity_models:
         description: |-
           Name of the soft motor presented to the user to demand grating
           translation
-      GRAT_DECOUPLE_DIST:
+      MIRR_DECOUPLE_DIST:
         type: float
         description: |-
-          Size of the extra grating translation move that decouples
+          Size of the extra mirror translation move that decouples
           (unlatches) the pitch
       MIRROR_TRANS_REAL_MOTOR:
         type: str
@@ -90,26 +118,15 @@ entity_models:
         description: |-
           Name of the soft motor presented to the user to demand mirror
           translation
-      MIRR_DECOUPLE_DIST:
+      POST_DECOUPLE_DELAY:
         type: float
         description: |-
-          Size of the extra mirror translation move that decouples
-          (unlatches) the pitch
-      MSTRA:
-        type: str
-        description: Label of mirror 1
-      MSTRB:
-        type: str
-        description: Label of mirror 2
-      MSTRC:
-        type: str
-        description: Label of mirror 3
-      MSTRD:
-        type: str
-        description: Label of mirror 4
-      MSTRE:
-        type: str
-        description: Label of mirror 5
+          Delay in seconds to allow for the disengaged couple (latch) switch
+          signal to update the pitch motor record status
+        default: 0
+
+      # multipositioner.template and positioner.template rows; GSTRA-E come
+      # first because the GLABA-E defaults use them
       GSTRA:
         type: str
         description: |-
@@ -155,6 +172,23 @@ entity_models:
         type: str
         description: Label of grating 5
         default: "{{GSTRE}} lines/mm"
+      MSTRA:
+        type: str
+        description: Label of mirror 1
+      MSTRB:
+        type: str
+        description: Label of mirror 2
+      MSTRC:
+        type: str
+        description: Label of mirror 3
+      MSTRD:
+        type: str
+        description: Label of mirror 4
+      MSTRE:
+        type: str
+        description: Label of mirror 5
+
+      # motorpositioner.template rows
       GPOSA:
         type: float
         description: Grating translation position of grating 1
@@ -185,25 +219,153 @@ entity_models:
       MPOSE:
         type: float
         description: Mirror translation position of mirror 5
+
+      # used by no row
       NPOS:
         type: int
         description: |-
           Number of positioners. Used by builder only to choose a GUI
           screen; no record uses it.
         default: 1
+
+    # pgmNextGen.substitutions, row by row
     databases:
-      - file: pgmNextGen.db
-        args:
-          .*:
+      # line 6: file $(PMAC)/db/pmacVariableWrite.template
+      #         pattern { P, Q, PORT, VAR, EGU }
+      # VARIABLE_PREC is not a column: 4-1 left $(VARIABLE_PREC) in
+      # pgmNextGen.db for the IOC build to set.
+
+      # line 9: { $(P), :LINES, $(PITCH_PORT), &$(COORD_NUM)Q21, ""}
+      - file: pmacVariableWrite.template
+        args: {P: "{{P}}", Q: ":LINES", PORT: "{{PITCH_PORT}}", VAR: "&{{COORD_NUM}}Q21", EGU: "",
+               VARIABLE_PREC: "{{VARIABLE_PREC}}"}
+      # line 10: { $(P), :ORDER, $(PITCH_PORT), &$(COORD_NUM)Q22, ""}
+      - file: pmacVariableWrite.template
+        args: {P: "{{P}}", Q: ":ORDER", PORT: "{{PITCH_PORT}}", VAR: "&{{COORD_NUM}}Q22", EGU: "",
+               VARIABLE_PREC: "{{VARIABLE_PREC}}"}
+      # line 11: { $(P), :ENERGYDEMAND, $(PITCH_PORT), &$(COORD_NUM)Q77, eV}
+      - file: pmacVariableWrite.template
+        args: {P: "{{P}}", Q: ":ENERGYDEMAND", PORT: "{{PITCH_PORT}}", VAR: "&{{COORD_NUM}}Q77", EGU: "eV",
+               VARIABLE_PREC: "{{VARIABLE_PREC}}"}
+      # line 12: { $(P), :CFFDEMAND, $(PITCH_PORT), &$(COORD_NUM)Q78, ""}
+      - file: pmacVariableWrite.template
+        args: {P: "{{P}}", Q: ":CFFDEMAND", PORT: "{{PITCH_PORT}}", VAR: "&{{COORD_NUM}}Q78", EGU: "",
+               VARIABLE_PREC: "{{VARIABLE_PREC}}"}
+      # line 13: { $(P), :BETA, $(PITCH_PORT), P$(GRATING_AXIS), deg}
+      - file: pmacVariableWrite.template
+        args: {P: "{{P}}", Q: ":BETA", PORT: "{{PITCH_PORT}}", VAR: "P{{GRATING_AXIS}}", EGU: "deg",
+               VARIABLE_PREC: "{{VARIABLE_PREC}}"}
+      # line 14: { $(P), :THETA, $(PITCH_PORT), P$(MIRROR_AXIS), deg}
+      - file: pmacVariableWrite.template
+        args: {P: "{{P}}", Q: ":THETA", PORT: "{{PITCH_PORT}}", VAR: "P{{MIRROR_AXIS}}", EGU: "deg",
+               VARIABLE_PREC: "{{VARIABLE_PREC}}"}
+      # line 15: { $(P), :CURRENTENERGY, $(PITCH_PORT), &$(COORD_NUM)Q7, eV}
+      - file: pmacVariableWrite.template
+        args: {P: "{{P}}", Q: ":CURRENTENERGY", PORT: "{{PITCH_PORT}}", VAR: "&{{COORD_NUM}}Q7", EGU: "eV",
+               VARIABLE_PREC: "{{VARIABLE_PREC}}"}
+      # (lines 16-17 are the commented-out :CFF row)
+
+      # line 20: file PGM.template
+      #          pattern {P, PORT, COORD_NUM}
+      # GRATINGPITCH and MIRRORPITCH are not columns: 4-1 left them in
+      # pgmNextGen.db for the IOC build to set.
+
+      # line 23: {$(P), $(PITCH_PORT), $(COORD_NUM)}
+      - file: PGM.template
+        args: {P: "{{P}}", PORT: "{{PITCH_PORT}}", COORD_NUM: "{{COORD_NUM}}",
+               GRATINGPITCH: "{{GRATINGPITCH}}", MIRRORPITCH: "{{MIRRORPITCH}}"}
+
+      # line 33: file AutoDecouple.template
+      #          pattern {P, DECOUPLING_DISTANCE, REAL_MOTOR, SOFT_MOTOR, DESC, POST_DECOUPLE_DELAY}
+
+      # line 36: {$(P), $(GRAT_DECOUPLE_DIST), $(GRATING_TRANS_REAL_MOTOR), $(GRATING_TRANS_SOFT_MOTOR),
+      #           "Grating Translation", $(dollar=$)(POST_DECOUPLE_DELAY=0)}
+      - file: AutoDecouple.template
+        args: {P: "{{P}}", DECOUPLING_DISTANCE: "{{GRAT_DECOUPLE_DIST}}",
+               REAL_MOTOR: "{{GRATING_TRANS_REAL_MOTOR}}", SOFT_MOTOR: "{{GRATING_TRANS_SOFT_MOTOR}}",
+               DESC: "Grating Translation", POST_DECOUPLE_DELAY: "{{POST_DECOUPLE_DELAY}}"}
+      # line 37: {$(P), $(MIRR_DECOUPLE_DIST), $(MIRROR_TRANS_REAL_MOTOR), $(MIRROR_TRANS_SOFT_MOTOR),
+      #           "Mirror Translation", $(dollar=$)(POST_DECOUPLE_DELAY=0)}
+      - file: AutoDecouple.template
+        args: {P: "{{P}}", DECOUPLING_DISTANCE: "{{MIRR_DECOUPLE_DIST}}",
+               REAL_MOTOR: "{{MIRROR_TRANS_REAL_MOTOR}}", SOFT_MOTOR: "{{MIRROR_TRANS_SOFT_MOTOR}}",
+               DESC: "Mirror Translation", POST_DECOUPLE_DELAY: "{{POST_DECOUPLE_DELAY}}"}
+
+      # line 42: file $(POSITIONER)/db/multipositioner.template
+      #          pattern {P, MP, DESC, STRA, STRB, STRC, STRD, STRE, STRF, STRG, STRH, STRI, STRJ, STRK,
+      #                   STRL, gda_name, gda_desc }
+
+      # line 45: {$(P), :GRATINGSELECT, "Grating Positioner", "$(dollar=$)(GLABA=$(GSTRA) lines/mm)",
+      #           "$(dollar=$)(GLABB=$(GSTRB) lines/mm)", "$(dollar=$)(GLABC=$(GSTRC) lines/mm)",
+      #           "$(dollar=$)(GLABD=$(GSTRD) lines/mm)", "$(dollar=$)(GLABE=$(GSTRE) lines/mm)",
+      #           "", "", "", "", "", "", "", PGM.GRATINGSELECT, "Grating Selection"}
+      - file: multipositioner.template
+        args: {P: "{{P}}", MP: ":GRATINGSELECT", DESC: "Grating Positioner",
+               STRA: "{{GLABA}}", STRB: "{{GLABB}}", STRC: "{{GLABC}}", STRD: "{{GLABD}}", STRE: "{{GLABE}}",
+               STRF: "", STRG: "", STRH: "", STRI: "", STRJ: "", STRK: "", STRL: "",
+               gda_name: "PGM.GRATINGSELECT", gda_desc: "Grating Selection"}
+      # line 46: {$(P), :MIRRORSELECT, "Mirror Positioner", $(MSTRA), $(MSTRB), $(MSTRC), $(MSTRD), $(MSTRE),
+      #           "", "", "", "", "", "", "", PGM.MIRRORSELECT, "Mirror Selection"}
+      - file: multipositioner.template
+        args: {P: "{{P}}", MP: ":MIRRORSELECT", DESC: "Mirror Positioner",
+               STRA: "{{MSTRA}}", STRB: "{{MSTRB}}", STRC: "{{MSTRC}}", STRD: "{{MSTRD}}", STRE: "{{MSTRE}}",
+               STRF: "", STRG: "", STRH: "", STRI: "", STRJ: "", STRK: "", STRL: "",
+               gda_name: "PGM.MIRRORSELECT", gda_desc: "Mirror Selection"}
+
+      # line 53: file $(POSITIONER)/db/positioner.template
+      #          pattern {P, Q, MP, DESC, SET, EGU, PREC, READBACK, STOP, STOPVAL, DEADBAND, VALA, VALB,
+      #                   VALC, VALD, VALE, VALF, VALFG, VALH, VALI, VALJ, VALK, VALL, pos}
+      # VALFG is kept as spelt there; positioner.template has no such macro,
+      # so its VALG keeps its default, as in 4-1.
+
+      # line 56: {$(P), ":GRATLINE", :GRATINGSELECT, "Grating Selection", :LINES, "lines/mm", 1, :LINES,
+      #           0, 0, 0, $(GSTRA), $(GSTRB), $(GSTRC), $(GSTRD), $(GSTRE), "", "", "", "", "", "", "", A}
+      - file: positioner.template
+        args: {P: "{{P}}", Q: ":GRATLINE", MP: ":GRATINGSELECT", DESC: "Grating Selection",
+               SET: ":LINES", EGU: "lines/mm", PREC: "1", READBACK: ":LINES",
+               STOP: "0", STOPVAL: "0", DEADBAND: "0",
+               VALA: "{{GSTRA}}", VALB: "{{GSTRB}}", VALC: "{{GSTRC}}", VALD: "{{GSTRD}}", VALE: "{{GSTRE}}",
+               VALF: "", VALFG: "", VALH: "", VALI: "", VALJ: "", VALK: "", VALL: "", pos: "A"}
+
+      # line 59: file $(POSITIONER)/db/motorpositioner.template
+      #          pattern {P, Q, MP, DESC, EGU, PREC, motor, VALA, VALB, VALC, VALD, VALE, VALF, VALG,
+      #                   VALH, VALI, VALJ, VALK, VALL, pos }
+
+      # line 62: {$(P), :GRATINGPOS, :GRATINGSELECT, "Grating Position", "mm", 5,
+      #           :$(GRATING_TRANS_SOFT_MOTOR), $(GPOSA), $(GPOSB), $(GPOSC), $(GPOSD), $(GPOSE),
+      #           0, 0, 0, 0, 0, 0, 0, B}
+      - file: motorpositioner.template
+        args: {P: "{{P}}", Q: ":GRATINGPOS", MP: ":GRATINGSELECT", DESC: "Grating Position",
+               EGU: "mm", PREC: "5", motor: ":{{GRATING_TRANS_SOFT_MOTOR}}",
+               VALA: "{{GPOSA}}", VALB: "{{GPOSB}}", VALC: "{{GPOSC}}", VALD: "{{GPOSD}}", VALE: "{{GPOSE}}",
+               VALF: "0", VALG: "0", VALH: "0", VALI: "0", VALJ: "0", VALK: "0", VALL: "0", pos: "B"}
+      # line 63: {$(P), :MIRRORPOS, :MIRRORSELECT, "Mirror Position", "mm", 5,
+      #           :$(MIRROR_TRANS_SOFT_MOTOR), $(MPOSA), $(MPOSB), $(MPOSC), $(MPOSD), $(MPOSE),
+      #           0, 0, 0, 0, 0, 0, 0, A}
+      - file: motorpositioner.template
+        args: {P: "{{P}}", Q: ":MIRRORPOS", MP: ":MIRRORSELECT", DESC: "Mirror Position",
+               EGU: "mm", PREC: "5", motor: ":{{MIRROR_TRANS_SOFT_MOTOR}}",
+               VALA: "{{MPOSA}}", VALB: "{{MPOSB}}", VALC: "{{MPOSC}}", VALD: "{{MPOSD}}", VALE: "{{MPOSE}}",
+               VALF: "0", VALG: "0", VALH: "0", VALI: "0", VALJ: "0", VALK: "0", VALL: "0", pos: "A"}
 
   - name: pgmNextGenCalibration
     description: |-
       Calibration tables of the grating and mirror pitch offsets of a
       pgmNextGen PGM, for each combination of grating and mirror.
+    # in the order the rows of pgmNextGenCalibration.substitutions first use
+    # them
     parameters:
+      # pgmNextGenCal.template rows
       P:
         type: str
         description: Device prefix for the PGM
+      GRATINGPITCH:
+        type: str
+        description: Name of grating pitch motor excluding the device prefix
+      GRATINGCAL:
+        type: str
+        description: Field of the grating pitch motor that the calibration sets
+        default: .OFF
       PITCHEGU:
         type: str
         description: Engineering units for the pitch
@@ -212,28 +374,14 @@ entity_models:
         type: int
         description: Display precision for the pitch
         default: 8
-      VARIABLE_PREC:
-        type: int
-        description: Display precision of the PMAC variable records
       GRATINGDESC:
         type: str
         description: Description of the grating pitch motor
         default: Grating Pitch
-      GRATINGPITCH:
-        type: str
-        description: Name of grating pitch motor excluding the device prefix
-      GRATINGCAL:
-        type: str
-        description: Field of the grating pitch motor that the calibration sets
-        default: .OFF
       GRTCLBDESC:
         type: str
         description: Label of the grating calibration table
         default: Grating - Beta Calibration
-      MIRRORDESC:
-        type: str
-        description: Description of the mirror pitch motor
-        default: Mirror Pitch
       MIRRORPITCH:
         type: str
         description: Name of mirror pitch motor excluding the device prefix
@@ -241,10 +389,17 @@ entity_models:
         type: str
         description: Field of the mirror pitch motor that the calibration sets
         default: .OFF
+      MIRRORDESC:
+        type: str
+        description: Description of the mirror pitch motor
+        default: Mirror Pitch
       MIRCLBDESC:
         type: str
         description: Label of the mirror calibration table
         default: Mirror - Theta Calibration
+
+      # multipositioner.template rows; GSTRA-E come first because the
+      # GLABA-E defaults use them
       GSTRA:
         type: str
         description: |-
@@ -290,6 +445,8 @@ entity_models:
         type: str
         description: Label of grating 5
         default: "{{GSTRE}} lines/mm"
+
+      # positioner.template rows :CLB:GRT:M1 to :CLB:GRT:M5
       G_G1M1:
         type: float
         description: Grating pitch calibration offset for grating 1 with mirror 1
@@ -390,6 +547,8 @@ entity_models:
         type: float
         description: Grating pitch calibration offset for grating 5 with mirror 5
         default: 90
+
+      # positioner.template rows :CLB:MIR:M1 to :CLB:MIR:M5
       M_G1M1:
         type: float
         description: Mirror pitch calibration offset for grating 1 with mirror 1
@@ -490,6 +649,8 @@ entity_models:
         type: float
         description: Mirror pitch calibration offset for grating 5 with mirror 5
         default: 90
+
+      # pmacVariableWrite.template rows
       PITCHPORT:
         type: str
         description: |-
@@ -500,13 +661,203 @@ entity_models:
         description: |-
           PLC number of the Pmatch PLC in the PMAC, used to make its
           P-variable numbers
+      VARIABLE_PREC:
+        type: int
+        description: Display precision of the PMAC variable records
+
+      # used by no row
       NPOS:
         type: int
         description: |-
           Number of positioners. Used by builder only to choose a GUI
           screen; no record uses it.
         default: 1
+
+    # pgmNextGenCalibration.substitutions, row by row
     databases:
-      - file: pgmNextGenCalibration.db
-        args:
-          .*:
+      # line 11: file pgmNextGenCal.template
+      #          pattern { P, R, PITCHMOTOR, PITCHCAL, PITCHEGU, PITCHPREC, PITCHDESC, CLBDESC }
+
+      # line 14: { $(P), ":CLB:GRT", :$(GRATINGPITCH), $(dollar=$)(GRATINGCAL=.OFF),
+      #            "$(dollar=$)(PITCHEGU=deg)", "$(dollar=$)(PITCHPREC=8)",
+      #            "$(dollar=$)(GRATINGDESC=Grating Pitch)", "$(dollar=$)(GRTCLBDESC=Grating - Beta Calibration)" }
+      - file: pgmNextGenCal.template
+        args: {P: "{{P}}", R: ":CLB:GRT", PITCHMOTOR: ":{{GRATINGPITCH}}", PITCHCAL: "{{GRATINGCAL}}",
+               PITCHEGU: "{{PITCHEGU}}", PITCHPREC: "{{PITCHPREC}}", PITCHDESC: "{{GRATINGDESC}}",
+               CLBDESC: "{{GRTCLBDESC}}"}
+      # line 15: { $(P), ":CLB:MIR", :$(MIRRORPITCH), $(dollar=$)(MIRRORCAL=.OFF),
+      #            "$(dollar=$)(PITCHEGU=deg)", "$(dollar=$)(PITCHPREC=8)",
+      #            "$(dollar=$)(MIRRORDESC=Mirror Pitch)", "$(dollar=$)(MIRCLBDESC=Mirror - Theta Calibration)" }
+      - file: pgmNextGenCal.template
+        args: {P: "{{P}}", R: ":CLB:MIR", PITCHMOTOR: ":{{MIRRORPITCH}}", PITCHCAL: "{{MIRRORCAL}}",
+               PITCHEGU: "{{PITCHEGU}}", PITCHPREC: "{{PITCHPREC}}", PITCHDESC: "{{MIRRORDESC}}",
+               CLBDESC: "{{MIRCLBDESC}}"}
+
+      # line 22: file $(POSITIONER)/db/multipositioner.template
+      #          pattern {P, MP, DESC, STRA, STRB, STRC, STRD, STRE}
+
+      # line 25: {$(P), :CLB:GRT:GSEL, "Grating Calib Grating Selector",
+      #           "$(dollar=$)(GLABA=$(GSTRA) lines/mm)", "$(dollar=$)(GLABB=$(GSTRB) lines/mm)",
+      #           "$(dollar=$)(GLABC=$(GSTRC) lines/mm)", "$(dollar=$)(GLABD=$(GSTRD) lines/mm)",
+      #           "$(dollar=$)(GLABE=$(GSTRE) lines/mm)" }
+      - file: multipositioner.template
+        args: {P: "{{P}}", MP: ":CLB:GRT:GSEL", DESC: "Grating Calib Grating Selector",
+               STRA: "{{GLABA}}", STRB: "{{GLABB}}", STRC: "{{GLABC}}", STRD: "{{GLABD}}", STRE: "{{GLABE}}"}
+      # line 26: {$(P), :CLB:MIR:GSEL, "Mirror  Calib Grating Selector",
+      #           "$(dollar=$)(GLABA=$(GSTRA) lines/mm)", "$(dollar=$)(GLABB=$(GSTRB) lines/mm)",
+      #           "$(dollar=$)(GLABC=$(GSTRC) lines/mm)", "$(dollar=$)(GLABD=$(GSTRD) lines/mm)",
+      #           "$(dollar=$)(GLABE=$(GSTRE) lines/mm)" }
+      - file: multipositioner.template
+        args: {P: "{{P}}", MP: ":CLB:MIR:GSEL", DESC: "Mirror  Calib Grating Selector",
+               STRA: "{{GLABA}}", STRB: "{{GLABB}}", STRC: "{{GLABC}}", STRD: "{{GLABD}}", STRE: "{{GLABE}}"}
+
+      # line 57: file $(POSITIONER)/db/positioner.template
+      #          pattern { P, Q, MP, DESC, SET, EGU, PREC, READBACK, STOP, STOPVAL, DEADBAND,
+      #                    VALA, VALB, VALC, VALD, VALE, pos }
+
+      # line 60: { $(P), ":CLB:GRT:GS", :GRATINGSELECT, "Grating Calibration Grating selector",
+      #            :CLB:GRT:GSEL:SELECT, "", 0, :CLB:GRT:GSEL:SELECT, 0, 0, 0,
+      #            "0", "1", "2", "3", "4", C }
+      - file: positioner.template
+        args: {P: "{{P}}", Q: ":CLB:GRT:GS", MP: ":GRATINGSELECT", DESC: "Grating Calibration Grating selector",
+               SET: ":CLB:GRT:GSEL:SELECT", EGU: "", PREC: "0", READBACK: ":CLB:GRT:GSEL:SELECT",
+               STOP: "0", STOPVAL: "0", DEADBAND: "0",
+               VALA: "0", VALB: "1", VALC: "2", VALD: "3", VALE: "4", pos: "C"}
+      # line 61: { $(P), ":CLB:MIR:GS", :GRATINGSELECT, "Mirror Calibration Grating selector",
+      #            :CLB:MIR:GSEL:SELECT, "", 0, :CLB:MIR:GSEL:SELECT, 0, 0, 0,
+      #            "0", "1", "2", "3", "4", D }
+      - file: positioner.template
+        args: {P: "{{P}}", Q: ":CLB:MIR:GS", MP: ":GRATINGSELECT", DESC: "Mirror Calibration Grating selector",
+               SET: ":CLB:MIR:GSEL:SELECT", EGU: "", PREC: "0", READBACK: ":CLB:MIR:GSEL:SELECT",
+               STOP: "0", STOPVAL: "0", DEADBAND: "0",
+               VALA: "0", VALB: "1", VALC: "2", VALD: "3", VALE: "4", pos: "D"}
+      # line 62: { $(P), ":CLB:GRT:M1", :CLB:GRT:GSEL, "Grating M1 Calibration Table", :CLB:GRT:M1_CAL,
+      #            "$(dollar=$)(PITCHEGU=deg)", "$(dollar=$)(PITCHPREC=8)", :CLB:GRT:M1_CAL, 0, 0, 0,
+      #            "$(dollar=$)(G_G1M1=90)", "$(dollar=$)(G_G2M1=90)", "$(dollar=$)(G_G3M1=90)",
+      #            "$(dollar=$)(G_G4M1=90)", "$(dollar=$)(G_G5M1=90)", A }
+      - file: positioner.template
+        args: {P: "{{P}}", Q: ":CLB:GRT:M1", MP: ":CLB:GRT:GSEL", DESC: "Grating M1 Calibration Table",
+               SET: ":CLB:GRT:M1_CAL", EGU: "{{PITCHEGU}}", PREC: "{{PITCHPREC}}", READBACK: ":CLB:GRT:M1_CAL",
+               STOP: "0", STOPVAL: "0", DEADBAND: "0",
+               VALA: "{{G_G1M1}}", VALB: "{{G_G2M1}}", VALC: "{{G_G3M1}}", VALD: "{{G_G4M1}}", VALE: "{{G_G5M1}}",
+               pos: "A"}
+      # line 63: { $(P), ":CLB:GRT:M2", :CLB:GRT:GSEL, "Grating M2 Calibration Table", :CLB:GRT:M2_CAL,
+      #            "$(dollar=$)(PITCHEGU=deg)", "$(dollar=$)(PITCHPREC=8)", :CLB:GRT:M2_CAL, 0, 0, 0,
+      #            "$(dollar=$)(G_G1M2=90)", "$(dollar=$)(G_G2M2=90)", "$(dollar=$)(G_G3M2=90)",
+      #            "$(dollar=$)(G_G4M2=90)", "$(dollar=$)(G_G5M2=90)", B }
+      - file: positioner.template
+        args: {P: "{{P}}", Q: ":CLB:GRT:M2", MP: ":CLB:GRT:GSEL", DESC: "Grating M2 Calibration Table",
+               SET: ":CLB:GRT:M2_CAL", EGU: "{{PITCHEGU}}", PREC: "{{PITCHPREC}}", READBACK: ":CLB:GRT:M2_CAL",
+               STOP: "0", STOPVAL: "0", DEADBAND: "0",
+               VALA: "{{G_G1M2}}", VALB: "{{G_G2M2}}", VALC: "{{G_G3M2}}", VALD: "{{G_G4M2}}", VALE: "{{G_G5M2}}",
+               pos: "B"}
+      # line 64: { $(P), ":CLB:GRT:M3", :CLB:GRT:GSEL, "Grating M3 Calibration Table", :CLB:GRT:M3_CAL,
+      #            "$(dollar=$)(PITCHEGU=deg)", "$(dollar=$)(PITCHPREC=8)", :CLB:GRT:M3_CAL, 0, 0, 0,
+      #            "$(dollar=$)(G_G1M3=90)", "$(dollar=$)(G_G2M3=90)", "$(dollar=$)(G_G3M3=90)",
+      #            "$(dollar=$)(G_G4M3=90)", "$(dollar=$)(G_G5M3=90)", C }
+      - file: positioner.template
+        args: {P: "{{P}}", Q: ":CLB:GRT:M3", MP: ":CLB:GRT:GSEL", DESC: "Grating M3 Calibration Table",
+               SET: ":CLB:GRT:M3_CAL", EGU: "{{PITCHEGU}}", PREC: "{{PITCHPREC}}", READBACK: ":CLB:GRT:M3_CAL",
+               STOP: "0", STOPVAL: "0", DEADBAND: "0",
+               VALA: "{{G_G1M3}}", VALB: "{{G_G2M3}}", VALC: "{{G_G3M3}}", VALD: "{{G_G4M3}}", VALE: "{{G_G5M3}}",
+               pos: "C"}
+      # line 65: { $(P), ":CLB:GRT:M4", :CLB:GRT:GSEL, "Grating M4 Calibration Table", :CLB:GRT:M4_CAL,
+      #            "$(dollar=$)(PITCHEGU=deg)", "$(dollar=$)(PITCHPREC=8)", :CLB:GRT:M4_CAL, 0, 0, 0,
+      #            "$(dollar=$)(G_G1M4=90)", "$(dollar=$)(G_G2M4=90)", "$(dollar=$)(G_G3M4=90)",
+      #            "$(dollar=$)(G_G4M4=90)", "$(dollar=$)(G_G5M4=90)", D }
+      - file: positioner.template
+        args: {P: "{{P}}", Q: ":CLB:GRT:M4", MP: ":CLB:GRT:GSEL", DESC: "Grating M4 Calibration Table",
+               SET: ":CLB:GRT:M4_CAL", EGU: "{{PITCHEGU}}", PREC: "{{PITCHPREC}}", READBACK: ":CLB:GRT:M4_CAL",
+               STOP: "0", STOPVAL: "0", DEADBAND: "0",
+               VALA: "{{G_G1M4}}", VALB: "{{G_G2M4}}", VALC: "{{G_G3M4}}", VALD: "{{G_G4M4}}", VALE: "{{G_G5M4}}",
+               pos: "D"}
+      # line 66: { $(P), ":CLB:GRT:M5", :CLB:GRT:GSEL, "Grating M5 Calibration Table", :CLB:GRT:M5_CAL,
+      #            "$(dollar=$)(PITCHEGU=deg)", "$(dollar=$)(PITCHPREC=8)", :CLB:GRT:M5_CAL, 0, 0, 0,
+      #            "$(dollar=$)(G_G1M5=90)", "$(dollar=$)(G_G2M5=90)", "$(dollar=$)(G_G3M5=90)",
+      #            "$(dollar=$)(G_G4M5=90)", "$(dollar=$)(G_G5M5=90)", E }
+      - file: positioner.template
+        args: {P: "{{P}}", Q: ":CLB:GRT:M5", MP: ":CLB:GRT:GSEL", DESC: "Grating M5 Calibration Table",
+               SET: ":CLB:GRT:M5_CAL", EGU: "{{PITCHEGU}}", PREC: "{{PITCHPREC}}", READBACK: ":CLB:GRT:M5_CAL",
+               STOP: "0", STOPVAL: "0", DEADBAND: "0",
+               VALA: "{{G_G1M5}}", VALB: "{{G_G2M5}}", VALC: "{{G_G3M5}}", VALD: "{{G_G4M5}}", VALE: "{{G_G5M5}}",
+               pos: "E"}
+      # line 67: { $(P), ":CLB:MIR:M1", :CLB:MIR:GSEL, "Mirror M1 Calibration Table", :CLB:MIR:M1_CAL,
+      #            "$(dollar=$)(PITCHEGU=deg)", "$(dollar=$)(PITCHPREC=8)", :CLB:MIR:M1_CAL, 0, 0, 0,
+      #            "$(dollar=$)(M_G1M1=90)", "$(dollar=$)(M_G2M1=90)", "$(dollar=$)(M_G3M1=90)",
+      #            "$(dollar=$)(M_G4M1=90)", "$(dollar=$)(M_G5M1=90)", A }
+      - file: positioner.template
+        args: {P: "{{P}}", Q: ":CLB:MIR:M1", MP: ":CLB:MIR:GSEL", DESC: "Mirror M1 Calibration Table",
+               SET: ":CLB:MIR:M1_CAL", EGU: "{{PITCHEGU}}", PREC: "{{PITCHPREC}}", READBACK: ":CLB:MIR:M1_CAL",
+               STOP: "0", STOPVAL: "0", DEADBAND: "0",
+               VALA: "{{M_G1M1}}", VALB: "{{M_G2M1}}", VALC: "{{M_G3M1}}", VALD: "{{M_G4M1}}", VALE: "{{M_G5M1}}",
+               pos: "A"}
+      # line 68: { $(P), ":CLB:MIR:M2", :CLB:MIR:GSEL, "Mirror M2 Calibration Table", :CLB:MIR:M2_CAL,
+      #            "$(dollar=$)(PITCHEGU=deg)", "$(dollar=$)(PITCHPREC=8)", :CLB:MIR:M2_CAL, 0, 0, 0,
+      #            "$(dollar=$)(M_G1M2=90)", "$(dollar=$)(M_G2M2=90)", "$(dollar=$)(M_G3M2=90)",
+      #            "$(dollar=$)(M_G4M2=90)", "$(dollar=$)(M_G5M2=90)", B }
+      - file: positioner.template
+        args: {P: "{{P}}", Q: ":CLB:MIR:M2", MP: ":CLB:MIR:GSEL", DESC: "Mirror M2 Calibration Table",
+               SET: ":CLB:MIR:M2_CAL", EGU: "{{PITCHEGU}}", PREC: "{{PITCHPREC}}", READBACK: ":CLB:MIR:M2_CAL",
+               STOP: "0", STOPVAL: "0", DEADBAND: "0",
+               VALA: "{{M_G1M2}}", VALB: "{{M_G2M2}}", VALC: "{{M_G3M2}}", VALD: "{{M_G4M2}}", VALE: "{{M_G5M2}}",
+               pos: "B"}
+      # line 69: { $(P), ":CLB:MIR:M3", :CLB:MIR:GSEL, "Mirror M3 Calibration Table", :CLB:MIR:M3_CAL,
+      #            "$(dollar=$)(PITCHEGU=deg)", "$(dollar=$)(PITCHPREC=8)", :CLB:MIR:M3_CAL, 0, 0, 0,
+      #            "$(dollar=$)(M_G1M3=90)", "$(dollar=$)(M_G2M3=90)", "$(dollar=$)(M_G3M3=90)",
+      #            "$(dollar=$)(M_G4M3=90)", "$(dollar=$)(M_G5M3=90)", C }
+      - file: positioner.template
+        args: {P: "{{P}}", Q: ":CLB:MIR:M3", MP: ":CLB:MIR:GSEL", DESC: "Mirror M3 Calibration Table",
+               SET: ":CLB:MIR:M3_CAL", EGU: "{{PITCHEGU}}", PREC: "{{PITCHPREC}}", READBACK: ":CLB:MIR:M3_CAL",
+               STOP: "0", STOPVAL: "0", DEADBAND: "0",
+               VALA: "{{M_G1M3}}", VALB: "{{M_G2M3}}", VALC: "{{M_G3M3}}", VALD: "{{M_G4M3}}", VALE: "{{M_G5M3}}",
+               pos: "C"}
+      # line 70: { $(P), ":CLB:MIR:M4", :CLB:MIR:GSEL, "Mirror M4 Calibration Table", :CLB:MIR:M4_CAL,
+      #            "$(dollar=$)(PITCHEGU=deg)", "$(dollar=$)(PITCHPREC=8)", :CLB:MIR:M4_CAL, 0, 0, 0,
+      #            "$(dollar=$)(M_G1M4=90)", "$(dollar=$)(M_G2M4=90)", "$(dollar=$)(M_G3M4=90)",
+      #            "$(dollar=$)(M_G4M4=90)", "$(dollar=$)(M_G5M4=90)", D }
+      - file: positioner.template
+        args: {P: "{{P}}", Q: ":CLB:MIR:M4", MP: ":CLB:MIR:GSEL", DESC: "Mirror M4 Calibration Table",
+               SET: ":CLB:MIR:M4_CAL", EGU: "{{PITCHEGU}}", PREC: "{{PITCHPREC}}", READBACK: ":CLB:MIR:M4_CAL",
+               STOP: "0", STOPVAL: "0", DEADBAND: "0",
+               VALA: "{{M_G1M4}}", VALB: "{{M_G2M4}}", VALC: "{{M_G3M4}}", VALD: "{{M_G4M4}}", VALE: "{{M_G5M4}}",
+               pos: "D"}
+      # line 71: { $(P), ":CLB:MIR:M5", :CLB:MIR:GSEL, "Mirror M5 Calibration Table", :CLB:MIR:M5_CAL,
+      #            "$(dollar=$)(PITCHEGU=deg)", "$(dollar=$)(PITCHPREC=8)", :CLB:MIR:M5_CAL, 0, 0, 0,
+      #            "$(dollar=$)(M_G1M5=90)", "$(dollar=$)(M_G2M5=90)", "$(dollar=$)(M_G3M5=90)",
+      #            "$(dollar=$)(M_G4M5=90)", "$(dollar=$)(M_G5M5=90)", E }
+      - file: positioner.template
+        args: {P: "{{P}}", Q: ":CLB:MIR:M5", MP: ":CLB:MIR:GSEL", DESC: "Mirror M5 Calibration Table",
+               SET: ":CLB:MIR:M5_CAL", EGU: "{{PITCHEGU}}", PREC: "{{PITCHPREC}}", READBACK: ":CLB:MIR:M5_CAL",
+               STOP: "0", STOPVAL: "0", DEADBAND: "0",
+               VALA: "{{M_G1M5}}", VALB: "{{M_G2M5}}", VALC: "{{M_G3M5}}", VALD: "{{M_G4M5}}", VALE: "{{M_G5M5}}",
+               pos: "E"}
+      # line 72: { $(P), ":CLB:GRT:MS", :MIRRORSELECT, "Grating Calibration Mir Choice Apply",
+      #            :CLB:GRT:M_CAL.SELN, "", 0, :CLB:GRT:M_CAL.SELN, 0, 0, 0,
+      #            "0", "1", "2", "3", "4", C }
+      - file: positioner.template
+        args: {P: "{{P}}", Q: ":CLB:GRT:MS", MP: ":MIRRORSELECT", DESC: "Grating Calibration Mir Choice Apply",
+               SET: ":CLB:GRT:M_CAL.SELN", EGU: "", PREC: "0", READBACK: ":CLB:GRT:M_CAL.SELN",
+               STOP: "0", STOPVAL: "0", DEADBAND: "0",
+               VALA: "0", VALB: "1", VALC: "2", VALD: "3", VALE: "4", pos: "C"}
+      # line 73: { $(P), ":CLB:MIR:MS", :MIRRORSELECT, "Mirror Calibration Mir Choice Apply",
+      #            :CLB:MIR:M_CAL.SELN, "", 0, :CLB:MIR:M_CAL.SELN, 0, 0, 0,
+      #            "0", "1", "2", "3", "4", D }
+      - file: positioner.template
+        args: {P: "{{P}}", Q: ":CLB:MIR:MS", MP: ":MIRRORSELECT", DESC: "Mirror Calibration Mir Choice Apply",
+               SET: ":CLB:MIR:M_CAL.SELN", EGU: "", PREC: "0", READBACK: ":CLB:MIR:M_CAL.SELN",
+               STOP: "0", STOPVAL: "0", DEADBAND: "0",
+               VALA: "0", VALB: "1", VALC: "2", VALD: "3", VALE: "4", pos: "D"}
+
+      # line 88: file $(PMAC)/db/pmacVariableWrite.template
+      #          pattern { P, Q, PORT, VAR, EGU }
+      # VARIABLE_PREC is not a column: 4-1 left $(VARIABLE_PREC) in
+      # pgmNextGenCalibration.db for the IOC build to set.
+
+      # line 91: { $(P), ":CLB:PMATCH_STATE", $(PITCHPORT), P$(PMATCHPLC)00, "" }
+      - file: pmacVariableWrite.template
+        args: {P: "{{P}}", Q: ":CLB:PMATCH_STATE", PORT: "{{PITCHPORT}}", VAR: "P{{PMATCHPLC}}00", EGU: "",
+               VARIABLE_PREC: "{{VARIABLE_PREC}}"}
+      # line 92: { $(P), ":CLB:PMATCH_DO", $(PITCHPORT), P$(PMATCHPLC)01, "" }
+      - file: pmacVariableWrite.template
+        args: {P: "{{P}}", Q: ":CLB:PMATCH_DO", PORT: "{{PITCHPORT}}", VAR: "P{{PMATCHPLC}}01", EGU: "",
+               VARIABLE_PREC: "{{VARIABLE_PREC}}"}
