@@ -1,0 +1,316 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/4.10.0/ibek.support.schema.json
+
+# Imported from DLS production support module: generic 2-39-7
+# Source: /dls_sw/prod/R3.14.12.7/support/generic/2-39-7/db
+# (controls/support/generic on DLS GitLab, tag 2-39-7).
+# Pristine copies of four of the release's compiled templates. They are the
+# VisualDCT output of genericApp/Db/*.vdb, already expanded: the expand()
+# lines that pull in generic-9menu are comments, so they are plain msi
+# templates. Release 2-39-5, which i05 builds, has the same records; its
+# templates differ only in the paths in those expand() comments.
+#
+# generic has no compiled code. genericApp/src has no sources, and
+# generic.dbd only gathers record types from base, sscan and calc. The
+# templates use only these records: ai, ao, bo, mbbo, stringout and waveform
+# from EPICS base, sscan from sscan, and scalcout, sseq and transform from
+# calc. So they run on any generic IOC image that builds sscan and calc,
+# such as ioc-generic, ioc-pmac and ioc-streamdevice-runtime. builder.py
+# also lists std as a dependency, but no template uses it.
+#
+# The entity models are generic's etc/builder.py classes. Each is an
+# AutoSubstitution of one template, so the parameter names are the
+# template's macros, which are the builder XML attributes, and the defaults
+# are the template's own. Not declared, because no record uses them and
+# builder2ibek drops them from every entity: name (gui tags only), and
+# gda_name, gda_desc and gda_curr_name (GDA tag comments only).
+# The offsets and gains of the BPM models are floats, so that the models
+# accept what the ibek-support-dls generic models did; every IOC sets them
+# to whole numbers.
+#
+# Not in this pattern: generic-9menu.template, which the two scan templates
+# already contain, and generic-gda-pv.template, which builder.py has no class
+# for (it holds no records).
+#
+# To check for updates: diff the templates against the newest
+# /dls_sw/prod/R3.14.12.7/support/generic/ release's db/ folder.
+
+module: generic
+
+entity_models:
+  - name: generic_scan
+    description: |-
+      Template wrapping a scan record with some menus that store previous
+      values of detectors, triggers, etc.
+    parameters:
+      P:
+        type: str
+        description: Device prefix
+      S:
+        type: str
+        description: Device suffix
+      MPTS:
+        type: int
+        description: Maximum number of points in a scan
+        default: 1000
+      P1:
+        type: str
+        description: Positioner 1 default pv
+        default: ""
+      P2:
+        type: str
+        description: Positioner 2 default pv
+        default: ""
+      P3:
+        type: str
+        description: Positioner 3 default pv
+        default: ""
+      P4:
+        type: str
+        description: Positioner 4 default pv
+        default: ""
+      T1:
+        type: str
+        description: Trigger 1 default pv
+        default: ""
+      T2:
+        type: str
+        description: Trigger 2 default pv
+        default: ""
+      T3:
+        type: str
+        description: Trigger 3 default pv
+        default: ""
+      T4:
+        type: str
+        description: Trigger 4 default pv
+        default: ""
+      D01:
+        type: str
+        description: Detector 1 default pv
+        default: ""
+      D02:
+        type: str
+        description: Detector 2 default pv
+        default: ""
+      D03:
+        type: str
+        description: Detector 3 default pv
+        default: ""
+      D04:
+        type: str
+        description: Detector 4 default pv
+        default: ""
+      D05:
+        type: str
+        description: Detector 5 default pv
+        default: ""
+      D06:
+        type: str
+        description: Detector 6 default pv
+        default: ""
+      D07:
+        type: str
+        description: Detector 7 default pv
+        default: ""
+      D08:
+        type: str
+        description: Detector 8 default pv
+        default: ""
+
+    databases:
+      - file: generic-scan.template
+        args:
+          .*:
+
+  - name: generic_2d_scan
+    description: |-
+      Template wrapping 2 scan records with some menus that store previous
+      values of detectors, triggers, etc. and setting them up to form a 2d
+      scan
+    parameters:
+      P:
+        type: str
+        description: Device prefix
+      S:
+        type: str
+        description: Device suffix
+      MPTS:
+        type: int
+        description: Maximum number of points in a scan
+        default: 1000
+      P1:
+        type: str
+        description: Positioner 1 default pv (Outer trace)
+        default: ""
+      P2:
+        type: str
+        description: Positioner 2 default pv (Inner trace)
+        default: ""
+      T1:
+        type: str
+        description: Trigger 1 default pv
+        default: ""
+      T2:
+        type: str
+        description: Trigger 2 default pv
+        default: ""
+      T3:
+        type: str
+        description: Trigger 3 default pv
+        default: ""
+      T4:
+        type: str
+        description: Trigger 4 default pv
+        default: ""
+      D01:
+        type: str
+        description: Detector 1 default pv
+        default: ""
+      D02:
+        type: str
+        description: Detector 2 default pv
+        default: ""
+      D03:
+        type: str
+        description: Detector 3 default pv
+        default: ""
+      D04:
+        type: str
+        description: Detector 4 default pv
+        default: ""
+      D05:
+        type: str
+        description: Detector 5 default pv
+        default: ""
+      D06:
+        type: str
+        description: Detector 6 default pv
+        default: ""
+      D07:
+        type: str
+        description: Detector 7 default pv
+        default: ""
+      D08:
+        type: str
+        description: Detector 8 default pv
+        default: ""
+
+    databases:
+      - file: generic-2d-scan.template
+        args:
+          .*:
+
+  - name: generic_BPM_vert
+    description: |-
+      Four-quadrant BPM with its electrodes at top, bottom, left and right:
+      calculates X and Y position, intensity and Q from the 4 current
+      inputs.
+    parameters:
+      P:
+        type: str
+        description: PV prefix
+      A:
+        type: str
+        description: Current input A component (+ve Y)
+      B:
+        type: str
+        description: Current input B component (-ve X)
+      C:
+        type: str
+        description: Current input C component (-ve Y)
+      D:
+        type: str
+        description: Current input D component (+ve X)
+      DA:
+        type: float
+        description: Current input A offset
+        default: 0
+      DB:
+        type: float
+        description: Current input B offset
+        default: 0
+      DC:
+        type: float
+        description: Current input C offset
+        default: 0
+      DD:
+        type: float
+        description: Current input D offset
+        default: 0
+      KX:
+        type: float
+        description: Gain factor for X
+      KY:
+        type: float
+        description: Gain factor for Y
+      SCAN:
+        type: str
+        description: Scan rate of update, e.g. "1 second" or Passive
+
+    databases:
+      - file: generic-BPMvert.template
+        args:
+          .*:
+
+    pvi:
+      yaml_path: generic-BPMvert.pvi.device.yaml
+      ui_macros:
+        P:
+      pv_prefix: "$(P):"
+
+  - name: generic_BPM_diag
+    description: |-
+      Four-quadrant BPM with its electrodes on the diagonals: calculates X
+      and Y position, intensity and Q from the 4 current inputs.
+    parameters:
+      P:
+        type: str
+        description: PV prefix
+      A:
+        type: str
+        description: Current input A component (+X+Y)
+      B:
+        type: str
+        description: Current input B component (-X+Y)
+      C:
+        type: str
+        description: Current input C component (-X-Y)
+      D:
+        type: str
+        description: Current input D component (+X-Y)
+      DA:
+        type: float
+        description: Current input A offset
+        default: 0
+      DB:
+        type: float
+        description: Current input B offset
+        default: 0
+      DC:
+        type: float
+        description: Current input C offset
+        default: 0
+      DD:
+        type: float
+        description: Current input D offset
+        default: 0
+      KX:
+        type: float
+        description: Gain factor for X
+      KY:
+        type: float
+        description: Gain factor for Y
+      SCAN:
+        type: str
+        description: Scan rate of update, e.g. "1 second" or Passive
+
+    databases:
+      - file: generic-BPMdiag.template
+        args:
+          .*:
+
+    pvi:
+      yaml_path: generic-BPMdiag.pvi.device.yaml
+      ui_macros:
+        P:
+      pv_prefix: "$(P):"
