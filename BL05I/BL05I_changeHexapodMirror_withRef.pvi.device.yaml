@@ -142,7 +142,7 @@ children:
       - type: SignalX
         name: BsyUnset
         label: Frees up busy.
-        write_pv: $(P)$(R):BSY:UNSET
+        write_pv: $(P)$(R):BSY:UNSET.PROC
         write_widget:
           type: ButtonPanel
           actions:
