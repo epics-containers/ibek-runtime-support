@@ -26,6 +26,8 @@
 # Processing: a change of VOLTAGE, GAINSETTING or ENERGY processes FCALC,
 # which writes FCURR, which forward-links RESPONSIVITY, which forward-links
 # FLUX. A change of a coefficient B0..B6 processes RESPONSIVITY, then FLUX.
+# RESPONSIVITY and FLUX read the energy from FCALC.C, the value FCALC read,
+# so one pass uses one energy, as the aSub did with its single input C.
 
 # fluxCalculation(), first step: Current = femtoCurrent(gainSetting,
 # adcVoltage), which divides the voltage by femtoGain[gainSetting] and gives
@@ -64,7 +66,7 @@ record(ao, "$(P)$(R):FCURR")
 record(calc, "$(P)$(R):RESPONSIVITY")
 {
     field(DESC, "Diode responsivity")
-    field(INPA, "$(ENERGY)")
+    field(INPA, "$(P)$(R):FCALC.C")
     field(INPB, "$(P)$(R):B0 CP")
     field(INPC, "$(P)$(R):B1 CP")
     field(INPD, "$(P)$(R):B2 CP")
@@ -88,7 +90,7 @@ record(calc, "$(P)$(R):FLUX")
 {
     field(DESC, "photon flux")
     field(INPA, "$(P)$(R):FCURR")
-    field(INPB, "$(ENERGY)")
+    field(INPB, "$(P)$(R):FCALC.C")
     field(INPC, "$(P)$(R):RESPONSIVITY")
     field(CALC, "D:=1000*1.60217657E-19*B*C;D=0?0:MAX(A/D,0)")
     field(PREC, "2")

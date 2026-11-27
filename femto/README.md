@@ -81,8 +81,9 @@ the same macros, so no compiled code is needed:
 | `BCALC`, `BCOEFF` | aSub `bcoeffCompile`, waveform | removed | `RESPONSIVITY` reads `B0`..`B6` directly |
 | `B0`..`B6` | ai | ai, unchanged | |
 
-The calc expressions apply the C operations in the same order with the same `pow()`,
-so they give the same doubles. `FLUX`, `RESPONSIVITY`, `FCURR` and `B0`..`B6`, the PVs
+`RESPONSIVITY` and `FLUX` take the energy from `FCALC.C`, the value `FCALC` read, so
+each pass uses one energy, as the aSub did. The calc expressions apply the C operations
+in the same order with the same `pow()`, so they give the same doubles. `FLUX`, `RESPONSIVITY`, `FCURR` and `B0`..`B6`, the PVs
 that `FluxCalcs.edl` and the PVI screen show, keep their names, units and precision.
 Comments in the template trace each record to the C.
 
