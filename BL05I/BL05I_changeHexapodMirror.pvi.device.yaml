@@ -111,12 +111,12 @@ children:
         read_widget:
           type: LED
 
-      - type: SignalW
+      - type: SignalR
         name: BsyChanging
         label: PLC $(PLC) is busy.
-        write_pv: $(P)$(R):BSY:CHANGING
-        write_widget:
-          type: ToggleButton
+        read_pv: $(P)$(R):BSY:CHANGING
+        read_widget:
+          type: LED
 
       - type: SignalRW
         name: StsReset

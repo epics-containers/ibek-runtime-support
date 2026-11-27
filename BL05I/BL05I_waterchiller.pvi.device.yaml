@@ -602,52 +602,12 @@ children:
           type: TextRead
 
       - type: SignalRW
-        name: V1PidTcDmd
-        label: Valve 1 PID time cst demand
-        write_pv: $(V1NAME):PID:TC:DMD
-        write_widget:
-          type: TextWrite
-        read_pv: $(V1NAME):PID:TC:DMD
-        read_widget:
-          type: TextRead
-
-      - type: SignalRW
-        name: V1PidTfDmd
-        label: Valve1 PID Filter time demand
-        write_pv: $(V1NAME):PID:TF:DMD
-        write_widget:
-          type: TextWrite
-        read_pv: $(V1NAME):PID:TF:DMD
-        read_widget:
-          type: TextRead
-
-      - type: SignalRW
         name: V2DrawSet
         label: Valve 2 Demand control.
         write_pv: $(PLCNAME):V2:DRAW:SET
         write_widget:
           type: TextWrite
         read_pv: $(PLCNAME):V2:DRAW:SET
-        read_widget:
-          type: TextRead
-
-      - type: SignalRW
-        name: V2PidTcDmd
-        label: Valve 2 PID time cst demand
-        write_pv: $(V2NAME):PID:TC:DMD
-        write_widget:
-          type: TextWrite
-        read_pv: $(V2NAME):PID:TC:DMD
-        read_widget:
-          type: TextRead
-
-      - type: SignalRW
-        name: V2PidTfDmd
-        label: Valve2 PID Filter time demand
-        write_pv: $(V2NAME):PID:TF:DMD
-        write_widget:
-          type: TextWrite
-        read_pv: $(V2NAME):PID:TF:DMD
         read_widget:
           type: TextRead
 
