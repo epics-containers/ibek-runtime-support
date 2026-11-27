@@ -21,9 +21,9 @@ load them, and one that also builds std for `BL05I_He_Recovery`. Three models ne
   [ibek-runtime-streamdevice](https://github.com/epics-containers/ibek-runtime-streamdevice)
   into the same IOC instance. It puts `Hostlink.proto` in `config/`, and the IOC
   places it on `STREAM_PROTOCOL_PATH` at start-up. Use the `HostLink` pattern from
-  the ibek-runtime-streamdevice release after 0.8.3: the one that includes
-  [ibek-runtime-streamdevice#53](https://github.com/epics-containers/ibek-runtime-streamdevice/pull/53),
-  which is not released yet.
+  ibek-runtime-streamdevice
+  [0.9.0](https://github.com/epics-containers/ibek-runtime-streamdevice/releases/tag/0.9.0)
+  or later, the first release with `Hostlink.proto`.
 
 ## Files: pristine and translated
 

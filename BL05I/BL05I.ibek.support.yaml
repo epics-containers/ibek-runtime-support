@@ -42,9 +42,9 @@
 #   record, so an image with StreamDevice and asyn. Hostlink.proto is not in
 #   this pattern: add the HostLink pattern of ibek-runtime-streamdevice to the
 #   same IOC instance. It vendors the protocol into config/, from where the
-#   IOC places it on STREAM_PROTOCOL_PATH. Use HostLink from the
-#   ibek-runtime-streamdevice release after 0.8.3, the one that includes
-#   ibek-runtime-streamdevice PR #53 (not released yet).
+#   IOC places it on STREAM_PROTOCOL_PATH. Use HostLink from
+#   ibek-runtime-streamdevice 0.9.0 or later, the first release with
+#   Hostlink.proto.
 #
 # Entity model names are the builder class names, and the auto_* models are
 # builder's automatic classes for the templates that have no class of their
