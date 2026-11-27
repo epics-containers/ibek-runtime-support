@@ -223,13 +223,7 @@ instance's `config/` as a `*.ibek.support.yaml`. It is not recorded in
 2. Drop in the file-set:
    - `mydetector.ibek.support.yaml` — the `ibek` support module (module name, one or
      more `entity_models` with their parameters and `sub_entities`/`databases`),
-   - any `*.template`/`*.db`/`*.req` files that support yaml references. A
-     `databases:` entry may also name, by file name alone, a template of a support
-     module that the generic IOC image builds (msi finds it on the image's
-     `${SUPPORT}/*/db` include path), as `pgmNextGen` does with pmac's
-     `pmacVariableWrite.template`. Add such a name to `image_templates` in
-     `.github/workflows/ci.yml`, which otherwise requires every database file to
-     be in the pattern's folder.
+   - any `*.template`/`*.db`/`*.req` files that support yaml references.
 3. Keep every file **pristine**: exactly the content an IOC instance needs.
 4. Validate locally by vendoring into a scratch IOC instance:
    `ibek pattern add ibek-runtime-support:mydetector@HEAD <instance>` (or test against a

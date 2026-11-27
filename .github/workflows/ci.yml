@@ -31,22 +31,13 @@ jobs:
           paths = sorted(Path(".").glob("*/*.ibek.support.yaml"))
           assert paths, "no *.ibek.support.yaml found"
           EntityFactory().make_entity_models(paths)
-          # database files are named relative to their pattern's folder, except
-          # these, which support modules built into the generic IOC image supply
-          # on msi's ${SUPPORT}/*/db include path
-          image_templates = {
-              "pmacVariableWrite.template",  # pmac
-              "multipositioner.template",  # positioner
-              "positioner.template",  # positioner
-              "motorpositioner.template",  # positioner
-          }
+          # database files are named relative to their pattern's folder
           missing = [
               f"{p}: {db.file}"
               for p in paths
               for model in Support(**YAML(typ="safe").load(p)).entity_models
               for db in model.databases
-              if db.file not in image_templates
-              and not (p.parent / db.file).is_file()
+              if not (p.parent / db.file).is_file()
           ]
           assert not missing, "missing database files:\n" + "\n".join(missing)
           print("\n".join(f"ok: {p}" for p in paths))
