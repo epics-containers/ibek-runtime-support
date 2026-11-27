@@ -27,8 +27,8 @@ module: adamCPW
 entity_models:
   - name: adamCPWplus
     description: |-
-      Support for the ADAM CPW plus 150 balance: gross, net, tare, offset
-      and measured weights, and a tare command.
+      Support for the ADAM CPW plus 150 balance: reads its gross, net,
+      tare, offset and measured weights.
     parameters:
       P:
         type: str

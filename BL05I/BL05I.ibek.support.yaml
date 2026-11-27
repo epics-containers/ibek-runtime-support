@@ -17,7 +17,8 @@
 #   record FAN:UPDATE is gone because the driver polls the variables. Why:
 #   generic pmac variable access instead of a beamline protocol file,
 #   decision 2026-11-27. Only the transport changed; the record logic, its
-#   known defects included, is as released. Each template's header says what
+#   known defects included, is as released, apart from PINI YES on the three
+#   readbacks FAN:UPDATE processed. Each template's header says what
 #   changed, and each translated record carries a "# was:" comment with its
 #   StreamDevice DTYP and INP/OUT.
 # - BL05I_waterChiller_settings.req: the PVs of BL05I_waterChiller.template's
@@ -41,7 +42,9 @@
 #   record, so an image with StreamDevice and asyn. Hostlink.proto is not in
 #   this pattern: add the HostLink pattern of ibek-runtime-streamdevice to the
 #   same IOC instance. It vendors the protocol into config/, from where the
-#   IOC places it on STREAM_PROTOCOL_PATH.
+#   IOC places it on STREAM_PROTOCOL_PATH. Use HostLink from the
+#   ibek-runtime-streamdevice release after 0.8.3, the one that includes
+#   ibek-runtime-streamdevice PR #53 (not released yet).
 #
 # Entity model names are the builder class names, and the auto_* models are
 # builder's automatic classes for the templates that have no class of their

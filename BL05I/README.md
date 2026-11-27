@@ -20,7 +20,10 @@ load them, and one that also builds std for `BL05I_He_Recovery`. Three models ne
   pattern: vendor the `HostLink` pattern of
   [ibek-runtime-streamdevice](https://github.com/epics-containers/ibek-runtime-streamdevice)
   into the same IOC instance. It puts `Hostlink.proto` in `config/`, and the IOC
-  places it on `STREAM_PROTOCOL_PATH` at start-up.
+  places it on `STREAM_PROTOCOL_PATH` at start-up. Use the `HostLink` pattern from
+  the ibek-runtime-streamdevice release after 0.8.3: the one that includes
+  [ibek-runtime-streamdevice#53](https://github.com/epics-containers/ibek-runtime-streamdevice/pull/53),
+  which is not released yet.
 
 ## Files: pristine and translated
 
@@ -43,7 +46,10 @@ records polled by the driver), writes `PMAC_WI_<var>`, and the mirror-change com
 `PMAC_C_WRITE_CMD`, all asyn parameters of pmac 2-7-9's controller. Each template's
 header says what changed, and each translated record has a `# was:` comment giving its
 StreamDevice `DTYP` and `INP`/`OUT`. Only the transport changed: the record logic,
-including the defects listed below, is as released.
+including the defects listed below, is as released. The one addition is `PINI YES` on
+`GET:MIRROR`, `GET:STATE` and `GET:STATUS`, which the removed 0.2 s poller processed:
+the driver only calls back when a value changes, so without it a readback that stays
+0 would stay UDF.
 
 How each file was obtained is also recorded in the header of
 [`BL05I.ibek.support.yaml`](BL05I.ibek.support.yaml). That header is vendored with the

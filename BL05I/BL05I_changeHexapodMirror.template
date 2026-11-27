@@ -15,7 +15,10 @@
 # BRICK06), no longer the asyn IP port to the GeoBrick. Each translated record
 # has a "# was:" comment giving its StreamDevice DTYP and INP/OUT. The record
 # $(P)$(R):FAN:UPDATE, which polled the readbacks every 0.2 s, is removed: the
-# driver polls them now. All other records, and their logic, are unchanged.
+# driver polls them now. GET:MIRROR, GET:STATE and GET:STATUS, which it
+# processed, have PINI YES: the driver only calls back when a value changes,
+# so without it a readback that stays 0 would stay UDF. All other records,
+# and their logic, are unchanged.
 #
 # File BL05I_changeHexapodMirror.template for BL05I module.
 #
@@ -130,11 +133,14 @@ record(dfanout, "$(P)$(R):DFAN:M2INDEX"){
 # was: DTYP stream, INP "@changeHexapod.proto getIntVar(P$(PLC)05) $(PORT)"
 #   SCAN Passive, processed every 0.2 s by FAN:UPDATE. Now I/O Intr on
 #   the driver's medium loop (2 s); it processes when the value changes.
+#   PINI YES is part of that translation: the driver only calls back on
+#   a change, so without it a value that stays 0 would leave the record
+#   UDF, where the 0.2 s poll used to read it at once.
 record(ai, "$(P)$(R):GET:MIRROR") {
   field(DESC, "Read current mirror index.")
   field(DTYP, "asynInt32")
   field(SCAN, "I/O Intr")
-  field(PINI, "NO")
+  field(PINI, "YES")
   field(INP,  "@asyn($(PORT),0)PMAC_VIM_P$(PLC)05")
   field(FLNK,  "$(P)$(R):RBV:MIRROR PP")
   field(PREC, "0")
@@ -165,11 +171,14 @@ record(mbbi, "$(P)$(R):RBV:MIRROR") {
 # was: DTYP stream, INP "@changeHexapod.proto getIntVar(P$(PLC)07) $(PORT)"
 #   SCAN Passive, processed every 0.2 s by FAN:UPDATE. Now I/O Intr on
 #   the driver's medium loop (2 s); it processes when the value changes.
+#   PINI YES is part of that translation: the driver only calls back on
+#   a change, so without it a value that stays 0 would leave the record
+#   UDF, where the 0.2 s poll used to read it at once.
 record(ai, "$(P)$(R):GET:STATE") {
   field(DESC, "Read current mirror state.")
   field(DTYP, "asynInt32")
   field(SCAN, "I/O Intr")
-  field(PINI, "NO")
+  field(PINI, "YES")
   field(INP,  "@asyn($(PORT),0)PMAC_VIM_P$(PLC)07")
   field(FLNK,  "$(P)$(R):RBV:STATE PP")
   field(PREC, "0")
@@ -206,13 +215,17 @@ record(mbbi, "$(P)$(R):RBV:STATE") {
 # was: DTYP stream, INP "@changeHexapod.proto getIntVar(P$(PLC)08) $(PORT)"
 #   SCAN Passive, processed every 0.2 s by FAN:UPDATE. Now I/O Intr on
 #   the driver's medium loop (2 s); it processes when the value changes.
-#   SEQ:CONTINUE still processes it to refresh the status: that now
-#   reads the value the driver last polled, not the PMAC itself.
+#   PINI YES is part of that translation: the driver only calls back on
+#   a change, so without it a value that stays 0 would leave the record
+#   UDF, where the 0.2 s poll used to read it at once.
+#   SEQ:CONTINUE is meant to process it to refresh the status, but its
+#   LNK1 names GET:RVB:STATUS, which does not exist (an upstream defect
+#   kept as is), so that refresh never happens.
 record(ai, "$(P)$(R):GET:STATUS") {
   field(DESC, "Read current status.")
   field(DTYP, "asynInt32")
   field(SCAN, "I/O Intr")
-  field(PINI, "NO")
+  field(PINI, "YES")
   field(INP,  "@asyn($(PORT),0)PMAC_VIM_P$(PLC)08")
   field(FLNK,  "$(P)$(R):RBV:STATUS PP")
   field(PREC, "0")

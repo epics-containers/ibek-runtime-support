@@ -77,11 +77,9 @@ entity_models:
       AUTOPV:
         type: str
         description: Shutter PV 1 to monitor to disable the PID
-        default: ""
       AUTOPV2:
         type: str
         description: Shutter PV 2 to monitor to disable the PID
-        default: ""
       TITLE:
         type: str
         description: Title of the EDM screen

@@ -52,13 +52,9 @@ children:
         read_widget:
           type: TextRead
 
-      - type: SignalRW
+      - type: SignalR
         name: RbvMirror
-        label: Send cmd to change mirror
-        write_pv: $(P)$(R):SET:MIRROR
-        write_widget:
-          type: TextWrite
-          format: string
+        label: Index number of current mirror
         read_pv: $(P)$(R):RBV:MIRROR
         read_widget:
           type: TextRead
@@ -114,16 +110,6 @@ children:
         read_pv: $(P)$(R):STS:INPROGRESS
         read_widget:
           type: LED
-
-      - type: SignalX
-        name: BsySet
-        label: BSY:SET
-        write_pv: $(P)$(R):BSY:SET
-        write_widget:
-          type: ButtonPanel
-          actions:
-            Go: '1'
-        value: '1'
 
       - type: SignalW
         name: BsyChanging
@@ -198,6 +184,14 @@ children:
         read_pv: $(P)$(R):CMD:MIRROR
         read_widget:
           type: TextRead
+
+      - type: SignalR
+        name: SetMirror
+        label: Last cmd sent to change mirror
+        read_pv: $(P)$(R):SET:MIRROR
+        read_widget:
+          type: TextRead
+          format: string
 
       - type: SignalR
         name: BsyCheck
