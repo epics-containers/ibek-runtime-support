@@ -1,0 +1,35 @@
+# File BL05I-slit_BPM_dummies.template
+#
+# Database of dummy records for the currents on slits where only X or Y blades have current monitoring.
+# This is a horrible hack to shut up the automatically built DEVSTA PVs in the GUI build going into alarm and whiting out the device widget.
+#
+# The first records override COPT setting on the transform record already loaded.
+# This is to get round a bug in the GUI build which has the plot widget updating on change of X and Y when it should be X or Y.  Not sure that option behaves as documented anyway.
+#
+# % macro, __doc__, BPM dummy records for slits which don't have current monitoring on all sets of blades (X or Y).
+# % macro, SLITS, Slit device name
+# % macro, BLADES, Set of Slit Blades without current monitoring (X or Y)
+
+record(transform, "$(SLITS):POSCALC")
+{
+    field(COPT, "Always")
+}
+
+record(calc, "$(SLITS):$(BLADES)DUMMY:PLUS:I")
+{
+    field(DESC, "Dummy $(BLADES)PLUS BPM current.")
+    field(CALC, "A")
+    field(SCAN, "Passive")
+    field(INPA, "0")
+    field(PINI, "YES")
+}
+
+record(calc, "$(SLITS):$(BLADES)DUMMY:MINUS:I")
+{
+    field(DESC, "Dummy $(BLADES)MINUS BPM current")
+    field(CALC, "A")
+    field(SCAN, "Passive")
+    field(INPA, "0")
+    field(PINI, "YES")
+}
+

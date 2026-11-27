@@ -1,0 +1,214 @@
+# File BL05I_OpenSequence.template.
+#
+# To assist users by automatically resetting and opening/arming Valves
+# on the beamline and then the shutter.  Originally written for the
+# I-branch GV13 and SHTR1 (now Part 2) and extended to include FV1 and
+# GV6 (in Part1).  The reason for having a template was to make it
+# easier to fiddle with the delays via macros.  Extra macros have been
+# added to avoid hardcoded device names, but it is still not really a
+# general purpose template because of the interlock.  It might be
+# possible to reuse it on the J-branch.  The devices must all have a
+# valve-style interface.
+#
+# Sequence of actions.
+# First Action:   Reset device1     Reset FV1.
+# Second Action:  Open device1      Arm   FV1.
+# Third Action:   Reset device2     Reset GV6.
+# Fourth Action:  Open device2      Open  GV6.
+# Fifth Action:   Reset device3     Reset GV13
+# Sixth Action:   Open device3      Open  GV13
+# Seventh Action: Reset interlock   Reset VLVCC-03 INT1
+# Eighth Action:  Reset device4     Reset PS1
+# Ninth Action:   Open device4      Open  PS1
+#
+# % macro, __doc__,      Template to automate opening a sequence of beamline valves.
+#
+# % macro, P,            Mandatory.  Device prefix name for the sequence.
+# % macro, R,            Mandatory.  Device record name prefix for the sequence.
+# % macro, device1,      Mandatory.  Name of first valve/device to reset and open/arm.
+# % macro, device2,      Mandatory.  Name of second valve/device to reset and open/arm.
+# % macro, device3,      Mandatory.  Name of second valve/device to reset and open/arm.
+# % macro, device4,      Mandatory.  Name of second valve/device to reset and open/arm.
+# % macro, ilkname,      Mandatory.  Name of interlock to reset after opening device3 before resetting device4.
+# % macro, DESC,         Optional.   Description of the sequence.  Defaults to "Open valves"
+# % macro, dly_reset1,   Optional.   Delay before resetting device 1.  Defaults to zero.
+# % macro, dly_open1,    Optional.   Delay before opening device 1 (after resetting device 1).     Defaults to 7.
+# % macro, dly_reset2,   Optional.   Delay before resetting device 2 (after opening device 1).     Defaults to 7.
+# % macro, dly_open2,    Optional.   Delay before opening device 2 (after resetting device 2).     Defaults to 7.
+# % macro, dly_reset3,   Optional.   Delay before resetting device 3 (after opening device 2).     Defaults to 7.
+# % macro, dly_open3,    Optional.   Delay before opening device 3 (after resetting device 3).     Defaults to 7.
+# % macro, dly_resetilk, Optional.   Delay before resetting interlock (after opening device 3).    Defaults to 7.
+# % macro, dly_reset4,   Optional.   Delay before resetting device 4 (after resetting interlock).  Defaults to 7.
+# % macro, dly_open4,    Optional.   Delay before opening device 4 (after resetting device 4).     Defaults to 7.
+# % macro, dly_final,    Optional.   Settling time delay before setting status complete (after opening device 4).  Defaults to 7.
+# % macro, lvl_reset1,   Optional.   Integer value of command to reset device1.  Defaults to 2 as per current version of vacuumValve.template CON record.
+# % macro, lvl_reset2,   Optional.   Integer value of command to reset device2.  Defaults to 2 as per current version of vacuumValve.template CON record.
+# % macro, lvl_reset3,   Optional.   Integer value of command to reset device3.  Defaults to 2 as per current version of vacuumValve.template CON record.
+# % macro, lvl_reset4,   Optional.   Integer value of command to reset device4.  Defaults to 2 as per current version of vacuumValve.template CON record.
+# % macro, lvl_open1,    Optional.   Integer value of command to open/arm device1.  Defaults to 0 as per open current version of vacuumValve.template CON record.
+# % macro, lvl_open2,    Optional.   Integer value of command to open/arm device2.  Defaults to 0 as per open current version of vacuumValve.template CON record.
+# % macro, lvl_open3,    Optional.   Integer value of command to open/arm device3.  Defaults to 0 as per open current version of vacuumValve.template CON record.
+# % macro, lvl_open4,    Optional.   Integer value of command to open/arm device4.  Defaults to 0 as per open current version of vacuumValve.template CON record.
+#
+# The interlock does not need a level macro because we always write to
+# the PROC field on the RESET record.  The final delay is needed in
+# case something else needs to check the status PV before proceeding
+# with its business, so it gives a bit of settling time after the last
+# device has been opened.
+#
+# The PVs linked to are not all in this IOC, so some of the action is
+# via channel access.
+#
+# **********
+# * STATUS *
+# **********
+#
+# Might get away with a bi, but are likely to need more states as this
+# evolves, so lets provide an mbbi interface similar to the standard
+# one for valves.  Initialise to the Not Running state.
+#
+record(mbbi, "$(P)$(R):STA")
+{
+  field(DESC, "$(DESC=Open valves) sequence run status")
+  field(ZRST, "Fault")
+  field(ONST, "Not Running")
+  field(TWST, "Running Part1")
+  field(THST, "Running Part2")
+  field(ZRSV, "NO_ALARM")
+  field(ONSV, "NO_ALARM")
+  field(TWSV, "NO_ALARM")
+  field(THSV, "NO_ALARM")
+  field(VAL, "1")
+  field(PINI, "YES")
+}
+
+# ************
+# * SEQUENCE *
+# ************
+#
+# The sequence records do all the work.
+# Part 1
+#  1) Wait for initial delay (hardcoded to zero).
+#     Set status PV to Running Part 1
+#  2) Wait dly_reset1 (defaults to zero).
+#     Reset device1
+#  3) Wait dly_open1 (defaults to 7).
+#     Open device1
+#  4) Wait dly_reset2 (defaults to 7).
+#     Reset device2
+#  5) Wait dly_open2 (defaults to 7).
+#     Open device2
+#  6) Wait for a Part 1 tail end interim delay (hardcoded to zero).
+#     Start processing of Part 2 of the sequence record.
+#
+# Part 2
+#  7) Wait for a Part 2 initial delay (hardcoded to zero).
+#     Set status PV to Running Part 2
+#  8) Wait dly_reset3 (defaults to 7).
+#     Reset device3
+#  9) Wait dly_open3 (defaults to 7).
+#     Open device3
+# 10) Wait dly_resetilk (defaults to 7).
+#     Reset ilkname
+# 11) Wait dly_reset4 (defaults to 7).
+#     Reset device4
+# 12) Wait dly_open4 (defaults to 7).
+#     Open device4
+# 13) Wait dly_final (defaults to 7).
+#     Set status PV to Not running.
+#
+# The wait durations are set by the dly_ macros.
+# There is no attempt to check the previous step has succeded
+# before proceding to the next one or any attempt to recover from problems.
+#
+# Two sequence records are needed to get enough actions.  The exact
+# split of actions between Part 1 and Part 2 was to preserve the bit
+# which was originally tested and working as much as possible.
+#
+# Open Sequence Part 1
+#
+record(seq, "$(P)$(R):OPENSEQ:PART1")
+{
+  field(SCAN, "Passive")
+  field(PINI, "NO")
+
+  field(DESC, "$(DESC=Open valves) Part 1")
+  field(SELM, "All")
+
+  # Change status PV to report sequence is running.
+  field(DLY1, "0")
+  field(DOL1, "2")
+  field(LNK1, "$(P)$(R):STA PP")
+
+  # First Action: Reset the first device.
+  field(DLY2, "$(dly_reset1=0)")
+  field(DOL2, "$(lvl_reset1=2)")
+  field(LNK2, "$(device1):CON PP")
+
+  # Second Action: Open/Arm the first device.
+  field(DLY3, "$(dly_open1=7)")
+  field(DOL3, "$(lvl_open1=0)")
+  field(LNK3, "$(device1):CON PP")
+
+  # Third Action: Reset the second device.
+  field(DLY4, "$(dly_reset2=7)")
+  field(DOL4, "$(lvl_reset2=2)")
+  field(LNK4, "$(device2):CON PP")
+
+  # Fourth Action: Open/Arm the second device
+  field(DLY5, "$(dly_open2=7)")
+  field(DOL5, "$(lvl_open2=0)")
+  field(LNK5, "$(device2):CON PP")
+
+  # Start Part 2 of the sequence.
+  field(DLY6, "0")
+  field(DOL6, "1")
+  field(LNK6, "$(P)$(R):OPENSEQ:PART2.PROC PP")
+}
+
+#
+# Open Sequence Part 2
+#
+record(seq, "$(P)$(R):OPENSEQ:PART2")
+{
+  field(SCAN, "Passive")
+  field(PINI, "NO")
+
+  field(DESC, "$(DESC=Open valves) Part 2")
+  field(SELM, "All")
+
+  # Change status PV to report part 2 of sequence is running.
+  field(DLY1, "0")
+  field(DOL1, "3")
+  field(LNK1, "$(P)$(R):STA PP")
+
+  # Fifth Action: Reset the third device.
+  field(DLY2, "$(dly_reset3=7)")
+  field(DOL2, "$(lvl_reset3=2)")
+  field(LNK2, "$(device3):CON PP")
+
+  # Sixth Action: Open the third device.
+  field(DLY3, "$(dly_open3=7)")
+  field(DOL3, "$(lvl_open3=0)")
+  field(LNK3, "$(device3):CON PP")
+
+  # Seventh Action: Reset the interlock.
+  field(DLY4, "$(dly_resetilk=7)")
+  field(DOL4, "1")
+  field(LNK4, "$(ilkname):RESET.PROC PP")
+
+  # Eighth Action: Reset the fourth device.
+  field(DLY5, "$(dly_reset4=7)")
+  field(DOL5, "$(lvl_reset4=2)")
+  field(LNK5, "$(device4):CON PP")
+
+  # Ninth Action: Open the fourth device.
+  field(DLY6, "$(dly_open4=7)")
+  field(DOL6, "$(lvl_open4=0)")
+  field(LNK6, "$(device4):CON PP")
+
+  # Finally set status to not running.
+  field(DLY7, "$(dly_final=7)")
+  field(DOL7, "1")
+  field(LNK7, "$(P)$(R):STA PP")
+}

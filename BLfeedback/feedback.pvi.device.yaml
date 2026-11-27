@@ -1,0 +1,202 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/pvi/releases/latest/download/pvi.device.schema.json
+# Grouped from the DLS EDM screen feedback.edl (BLfeedback 2-26).
+# Generated from that screen. Hand edits may be overwritten by regeneration.
+
+label: feedback
+children:
+- type: Group
+  name: General
+  layout:
+    type: Grid
+    labelled: true
+  children:
+  - type: SignalR
+    name: FieldInp
+    label: Readback PV
+    read_pv: $(P)$(PID).INP
+    read_widget:
+      type: TextRead
+      format: string
+  - type: SignalR
+    name: RcOut
+    label: Control PV
+    read_pv: $(P)$(PID):RC.OUT
+    read_widget:
+      type: TextRead
+      format: string
+  - type: SignalR
+    name: AutocalcInpb
+    label: Auto On/Off PV
+    read_pv: $(P)$(PID):AUTOCALC.INPB
+    read_widget:
+      type: TextRead
+      format: string
+  - type: SignalR
+    name: AutocalcInpc
+    read_pv: $(P)$(PID):AUTOCALC.INPC
+    read_widget:
+      type: TextRead
+      format: string
+  - type: SignalW
+    name: Setpoint
+    label: Setpoint
+    write_pv: $(P)$(PID):SP:TWD.PROC
+    write_widget:
+      type: ButtonPanel
+      actions:
+        Setpoint: '1'
+  - type: SignalW
+    name: PPid
+    write_pv: $(P)$(PID)
+    write_widget:
+      type: TextWrite
+  - type: SignalW
+    name: Setpoint2
+    label: Setpoint
+    write_pv: $(P)$(PID):SP:TWU.PROC
+    write_widget:
+      type: ButtonPanel
+      actions:
+        Setpoint: '1'
+  - type: SignalW
+    name: SpTw
+    label: Tweak step
+    write_pv: $(P)$(PID):SP:TW
+    write_widget:
+      type: TextWrite
+  - type: SignalR
+    name: FieldCval
+    label: Readback
+    read_pv: $(P)$(PID).CVAL
+    read_widget:
+      type: TextRead
+  - type: SignalW
+    name: FieldScan
+    label: Update rate
+    write_pv: $(P)$(PID).SCAN
+    write_widget:
+      type: ComboBox
+  - type: Group
+    name: RowAuto
+    label: Feedback
+    layout:
+      type: Row
+    children:
+    - type: SignalRW
+      name: Auto
+      write_pv: $(P)$(PID):AUTO
+      write_widget:
+        type: ToggleButton
+      read_pv: $(P)$(PID):AUTO
+      read_widget:
+        type: LED
+    - type: SignalR
+      name: FieldFbon
+      read_pv: $(P)$(PID).FBON
+      read_widget:
+        type: TextRead
+- type: Group
+  name: PidParameters
+  label: PID Parameters
+  layout:
+    type: Grid
+    labelled: true
+  children:
+  - type: SignalW
+    name: FieldKp
+    label: KP
+    write_pv: $(P)$(PID).KP
+    write_widget:
+      type: TextWrite
+  - type: SignalW
+    name: FieldKi
+    label: KI
+    write_pv: $(P)$(PID).KI
+    write_widget:
+      type: TextWrite
+  - type: SignalW
+    name: FieldKd
+    label: KD
+    write_pv: $(P)$(PID).KD
+    write_widget:
+      type: TextWrite
+  - type: SignalR
+    name: FieldDt
+    label: Delta time
+    read_pv: $(P)$(PID).DT
+    read_widget:
+      type: TextRead
+  - type: SignalR
+    name: FieldErr
+    label: Error
+    read_pv: $(P)$(PID).ERR
+    read_widget:
+      type: TextRead
+  - type: SignalW
+    name: RcOroc
+    label: Rate of Change
+    write_pv: $(P)$(PID):RC.OROC
+    write_widget:
+      type: TextWrite
+  - type: SignalR
+    name: FieldOval
+    label: Output
+    read_pv: $(P)$(PID).OVAL
+    read_widget:
+      type: TextRead
+  - type: SignalW
+    name: LimitsDisa
+    label: Output limits
+    write_pv: $(P)$(PID):LIMITS.DISA
+    write_widget:
+      type: TextWrite
+  - type: SignalW
+    name: FieldDrvl
+    label: Low limit
+    write_pv: $(P)$(PID).DRVL
+    write_widget:
+      type: TextWrite
+  - type: SignalW
+    name: FieldDrvh
+    label: High limit
+    write_pv: $(P)$(PID).DRVH
+    write_widget:
+      type: TextWrite
+  - type: SignalR
+    name: FieldP
+    label: P
+    read_pv: $(P)$(PID).P
+    read_widget:
+      type: TextRead
+  - type: SignalW
+    name: FieldI
+    label: I
+    write_pv: $(P)$(PID).I
+    write_widget:
+      type: TextWrite
+  - type: SignalR
+    name: FieldD
+    label: D
+    read_pv: $(P)$(PID).D
+    read_widget:
+      type: TextRead
+- type: Group
+  name: ProtectedControls
+  label: Protected Controls
+  layout:
+    type: SubScreen
+    labelled: false
+  children:
+  - type: Group
+    name: ProtectedGeneral
+    label: General
+    layout:
+      type: Grid
+      labelled: true
+    children:
+    - type: SignalW
+      name: FieldFbon
+      label: Feedback
+      write_pv: $(P)$(PID).FBON
+      write_widget:
+        type: ComboBox

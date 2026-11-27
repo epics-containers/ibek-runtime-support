@@ -1,0 +1,106 @@
+# File BL05I_PGM_homingPLC_steps.template
+#
+# To provide support for GUI status indication of steps during homing PLC (PLC10).
+# Written for PGM.
+# Needs the presence of records STEP_POINT for the current step point and the re-entry point
+# and the homing status.
+
+# % macro, P, 		Mandatory	Pv Prefix
+# % macro, R, 		Mandatory	Pv Suffix
+# % macro, HM,		Mandatory	Pv suffix so it can find the homing status records from the homing template definitions.
+# % macro, HMC,		Mandatory	Pv suffix so it can find the custom homing status records from the pmacVariableWrite template definitions.
+# % macro, STEP,	Mandatory	Step number of PLC homing step.
+# % macro, DESCNAME,	Mandatory	Descriptive name of the PLC homing step.
+
+record (mbbi, "$(P)$(R):STEP$(STEP):STATE") {
+  field (DESC, "STEP$(STEP) symbol state/colour")
+  field (ZRST, "White")
+  field (ZRVL, "0")
+  field (ONST, "Green On")
+  field (ONVL, "1")
+  field (TWST, "Yellow On")
+  field (TWVL, "2")
+  field (THST, "Red On")
+  field (THVL, "3")
+  field (FRST, "Green Off")
+  field (FRVL, "4")
+  field (FVST, "Yellow Off")
+  field (FVVL, "5")
+  field (SXST, "Red Off")
+  field (SXVL, "6")
+}
+
+record (bi, "$(P)$(R):STEP$(STEP):TICKORCROSS") {
+  field(DESC, "STEP$(STEP) tick or cross")
+  field(ZNAM, "Cross")
+  field(ONAM, "Tick")
+}
+
+record (stringin, "$(P)$(R):STEP$(STEP):DESCNAME") {
+  field(DESC, "STEP$(STEP) descriptive name")
+  field(PINI, "YES")
+  field(VAL, "$(DESCNAME)")
+}
+
+record (bi, "$(P)$(R):STEP$(STEP):CURRENT") {
+  field(DESC, "STEP$(STEP) is current step")
+  field(ZNAM, "Not current")
+  field(ONAM, "Current")
+}
+
+# Transform the info we have into statuses we want for the GUI.
+record (transform, "$(P)$(R):STEP$(STEP):TFM") {
+  field(SCAN, "Passive")
+  field(CMTA, "Current step number.")
+  field(INPA, "$(P)$(HMC):STEP_POINT:RBV CP")
+  field(CMTB, "Step number to reenter PLC at.")
+  field(INPB, "$(P)$(HMC):LAST_REENTRY:RBV CP")
+  field(CMTC, "Current homing PLC status.")
+  field(INPC, "$(P)$(HM):STATUS CP" )
+
+  field(CMTD, "Is this the current step?")
+  field(CLCD, "(A=$(STEP))?1:0")
+  field(OUTD, "$(P)$(R):STEP$(STEP):CURRENT PP")
+
+  field(CMTE, "Is this step done?")
+  field(CLCE, "(A>$(STEP))?1:0")
+
+# Is this step one to be done on reentry (greater than equal to reentry step?
+# This is an intermediate calculation for other fields which follow, even though it is not written to other records.
+  field(CMTF, "Is this step after reentry?")
+  field(CLCF, "(B>=$(STEP))?0:1")
+
+# Is the homing PLC status a good one or a bad one?
+  field(CMTG, "Is homing status bad?")
+  field(CLCG, "(C=0||C=1||C=8||C=9)?0:1")
+
+# Has the PLC finished running? Not sure this is needed yet.
+  field(CLCH, "")
+
+# If this step is before reentry or not yet done, set cross, otherwise tick
+  field(CMTI, "Decides tick or cross")
+  field(CLCI, "(F=0||E=0)?0:1")
+  field(OUTI, "$(P)$(R):STEP$(STEP):TICKORCROSS PP")
+
+# If this step is before reentry point and does not get done anyway, set its status to green off.
+  field(CMTJ, "Decides colour of skipped steps")
+  field(CLCJ, "(F=0)?4:0")
+  field(OUTJ, "$(P)$(R):STEP$(STEP):STATE PP")
+
+# If the step is after reentry and has been done, set green on.
+  field(CLCK, "(F>0&&E=1)?2:0")
+  field(OUTK, "$(P)$(R):STEP$(STEP):STATE PP")
+
+# If the step is after reentry and status is good, set green on.
+  field(CLCL, "(F>0&&G=0)?1:0")
+  field(OUTL, "$(P)$(R):STEP$(STEP):STATE PP")
+
+# If the step is after reentry and is the current step and status is bad, set red on.
+  field(CLCM, "(F>0&&D>0&&G>0)?3:0")
+  field(OUTM, "$(P)$(R):STEP$(STEP):STATE PP")
+
+# If the step is after reentry and is not the current step and has not been done and status is bad, set red off.
+  field(CLCN, "(F>0&&D=0&&I=0&&G>0)?6:0")
+  field(OUTN, "$(P)$(R):STEP$(STEP):STATE PP")
+}
+

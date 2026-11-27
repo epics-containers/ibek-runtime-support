@@ -1,0 +1,219 @@
+# File WaterChillerInterlock.template
+#
+# Since we have the Water Pump and the UV Steriliser both needing similar interlock records, put this into a template to avoid duplicating code.
+# These records are very similar to those defined in the vacuumValve template, but we cannot reuse that.
+
+# % macro, __doc__, 	Template 	Shows the status of various MPS interlocks for a device in the Water Chiller PLC.
+# Substitutions:
+# % macro, device,	Mandatory	Device record prefix of the subcomponent of the Water Chiller System.  Used to build record names.
+# % macro, DDESC,	Mandatory	Sub Device description. Keep shortish because the template adds to the string on different records.
+
+# This associates an edm screen with the template
+# % gui, $(name=), edm, WaterChillerInterlock.edl, device=$(device)
+
+# Terminology of interlock, initial and raw cribbed from vacuum templates.
+
+# The single element slice of the Interlock trio data waveform representing device interlock value (latched?).
+# This is a single value of 16 bits containing all the potential interlock levels.
+record(subArray, "$(device):LRAW") {
+  field(DESC, "Raw $(DDESC) Latched ILK")
+  field(FTVL, "SHORT")
+  field(INP, "$(device):ILKS:RBV.VAL CP MS")
+  field(MALM, "3")
+  field(NELM, "1")
+  field(INDX, "0")
+  field(FLNK, "$(device):ILK PP")
+}
+
+# The single element slice of the Interlock trio data waveform representing device initial interlock value.
+# This is a single value of 16 bits containing all the potential interlock levels.
+record(subArray, "$(device):IRAW") {
+  field(DESC, "Raw $(DDESC) Initial ILK")
+  field(FTVL, "SHORT")
+  field(INP, "$(device):ILKS:RBV.VAL CP MS")
+  field(MALM, "3")
+  field(NELM, "1")
+  field(INDX, "1")
+  field(FLNK, "$(device):INIILK PP")
+}
+
+# The single element slice of the Interlock trio data waveform representing device raw/current interlock value.
+# This is a single value of 16 bits containing all the potential interlock levels.
+record(subArray, "$(device):RRAW") {
+  field(DESC, "Raw $(DDESC) Raw ILK")
+  field(FTVL, "SHORT")
+  field(INP, "$(device):ILKS:RBV.VAL CP MS")
+  field(MALM, "3")
+  field(NELM, "1")
+  field(INDX, "2")
+  field(FLNK, "$(device):RAWILK PP")
+}
+
+# Records to convert from numeric to meaningful strings.
+
+# % archiver 10 Monitor
+record(mbbiDirect, "$(device):ILK") {
+  field(DESC, "$(DDESC) Latched ILKs")
+  field(INP, "$(device):LRAW MS")
+}
+
+# % archiver 10 Monitor
+record(mbbiDirect, "$(device):INIILK") {
+  field(DESC, "$(DDESC) Initial ILKs")
+  field(INP, "$(device):IRAW MS")
+}
+
+# % archiver 10 Monitor
+record(mbbiDirect, "$(device):RAWILK") {
+  field(DESC, "$(DDESC) Initial ILKs")
+  field(INP, "$(device):RRAW MS")
+}
+
+# Individual interlock bit definitions.
+# These adapted from vacuum valve template.  The states are extracted from the Latched interlock records.
+# The ONAM and ZNAM are the same because they are used to label all the interlocks in the interlocks screen.
+# The strings have to allow for either state therefore.
+record(bi, "$(device):ILK0") {
+  field(DESC, "$(DDESC) Interlock 0")
+  field(INP, "$(device):ILK.B0 CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+  field(ZNAM, "$(ilk0=unused)")
+  field(ONAM, "$(ilk0=unused)")
+}
+
+record(bi, "$(device):ILK1") {
+  field(DESC, "$(DDESC) Interlock 1")
+  field(INP, "$(device):ILK.B1 CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+  field(ZNAM, "$(ilk1=unused)")
+  field(ONAM, "$(ilk1=unused)")
+}
+
+
+record(bi, "$(device):ILK2") {
+  field(DESC, "$(DDESC) Interlock 2")
+  field(INP, "$(device):ILK.B2 CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+  field(ZNAM, "$(ilk2=unused)")
+  field(ONAM, "$(ilk2=unused)")
+}
+
+record(bi, "$(device):ILK3") {
+  field(DESC, "$(DDESC) Interlock 3")
+  field(INP, "$(device):ILK.B3 CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+  field(ZNAM, "$(ilk3=unused)")
+  field(ONAM, "$(ilk3=unused)")
+}
+
+record(bi, "$(device):ILK4") {
+  field(DESC, "$(DDESC) Interlock 4")
+  field(INP, "$(device):ILK.B4 CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+  field(ZNAM, "$(ilk4=unused)")
+  field(ONAM, "$(ilk4=unused)")
+}
+
+record(bi, "$(device):ILK5") {
+  field(DESC, "$(DDESC) Interlock 5")
+  field(INP, "$(device):ILK.B5 CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+  field(ZNAM, "$(ilk5=unused)")
+  field(ONAM, "$(ilk5=unused)")
+}
+
+record(bi, "$(device):ILK6") {
+  field(DESC, "$(DDESC) Interlock 6")
+  field(INP, "$(device):ILK.B6 CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+  field(ZNAM, "$(ilk6=unused)")
+  field(ONAM, "$(ilk6=unused)")
+}
+
+record(bi, "$(device):ILK7") {
+  field(DESC, "$(DDESC) Interlock 7")
+  field(INP, "$(device):ILK.B7 CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+  field(ZNAM, "$(ilk7=unused)")
+  field(ONAM, "$(ilk7=unused)")
+}
+
+record(bi, "$(device):ILK8") {
+  field(DESC, "$(DDESC) Interlock 8")
+  field(INP, "$(device):ILK.B8 CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+  field(ZNAM, "$(ilk8=unused)")
+  field(ONAM, "$(ilk8=unused)")
+}
+
+record(bi, "$(device):ILK9") {
+  field(DESC, "$(DDESC) Interlock 9")
+  field(INP, "$(device):ILK.B9 CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+  field(ZNAM, "$(ilk9=unused)")
+  field(ONAM, "$(ilk9=unused)")
+}
+
+record(bi, "$(device):ILK10") {
+  field(DESC, "$(DDESC) Interlock 10")
+  field(INP, "$(device):ILK.BA CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+  field(ZNAM, "$(ilk10=unused)")
+  field(ONAM, "$(ilk10=unused)")
+}
+
+record(bi, "$(device):ILK11") {
+  field(DESC, "$(DDESC) Interlock 11")
+  field(INP, "$(device):ILK.BB CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+  field(ZNAM, "$(ilk11=unused)")
+  field(ONAM, "$(ilk11=unused)")
+}
+
+record(bi, "$(device):ILK12") {
+  field(DESC, "$(DDESC) Interlock 12")
+  field(INP, "$(device):ILK.BC CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+  field(ZNAM, "$(ilk12=unused)")
+  field(ONAM, "$(ilk12=unused)")
+}
+
+record(bi, "$(device):ILK13") {
+  field(DESC, "$(DDESC) Interlock 13")
+  field(INP, "$(device):ILK.BD CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+  field(ZNAM, "$(ilk13=unused)")
+  field(ONAM, "$(ilk13=unused)")
+}
+
+record(bi, "$(device):ILK14") {
+  field(DESC, "$(DDESC) Interlock 14")
+  field(INP, "$(device):ILK.BE CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+  field(ZNAM, "$(ilk14=unused)")
+  field(ONAM, "$(ilk14=unused)")
+}
+
+record(bi, "$(device):ILK15") {
+  field(DESC, "$(DDESC) Interlock 15")
+  field(INP, "$(device):ILK.BF CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+  field(ZNAM, "$(ilk15=unused)")
+  field(ONAM, "$(ilk15=unused)")
+}

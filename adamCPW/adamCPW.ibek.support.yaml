@@ -1,0 +1,360 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/4.10.0/ibek.support.schema.json
+
+# Imported from DLS production support module: adamCPW 1-3-2
+# Source: controls/support/adamCPW (DLS GitLab), tag 1-3-2, adamCPWApp/Db
+# Pristine copy of the EPICS template from that release.
+#
+# adamCPW supports the Adam Equipment CPW plus balance, typically used to
+# monitor the contents of liquid cryogen dewars. The module has no device
+# support or library of its own: its only source builds an example IOC. The
+# template talks to the balance with asyn records over an asyn serial or IP
+# port that the IOC creates, and uses only these records: ai, ao, bo,
+# calcout, seq and stringin from EPICS base, asyn from asyn, and scalcout
+# from calc. So it runs on a stock generic IOC image with asyn and calc.
+#
+# The entity model name is the builder class name and the parameter names
+# are the builder XML attribute names. The builder `name` parameter is not
+# declared: the template does not use it, and builder2ibek drops it.
+#
+# BL05J IOCs also load BL05I.auto_BL05J_adamCPW_patch (the BL05I pattern)
+# after this entity, to fix the weight parsing.
+#
+# To check for updates: diff this pattern's files against a newer tag of
+# controls/support/adamCPW (adamCPWApp/Db).
+
+module: adamCPW
+
+entity_models:
+  - name: adamCPWplus
+    description: |-
+      Support for the ADAM CPW plus 150 balance: reads its gross, net,
+      tare, offset and measured weights.
+    parameters:
+      P:
+        type: str
+        description: Device prefix for PV names
+      R:
+        type: str
+        description: Record name prefix. PV names commence $P$R
+      port:
+        type: str
+        description: Asyn port of the serial connection to the balance
+      disable:
+        type: int
+        description: |-
+          To disable scanning if device is disconnected, 1 for disabled, 0
+          for enabled, defaults to zero.
+        default: 0
+      BALANCEDESC:
+        type: str
+        description: |-
+          Description of the balance. Defaults to Adam CPWplus balance.
+          (Populates DESCRIPTION record VAL field). Example: End St1 LiqHe
+          Balance1.
+        default: Adam CPWplus balance
+      GROSSDESC:
+        type: str
+        description: |-
+          Description of the weight read from the balance. Defaults to Gross
+          Weight. (Populates GROSSWEIGHT RBV record DESC field). Example:
+          Current Dewar Weight.
+        default: Gross Weight
+      NETDESC:
+        type: str
+        description: |-
+          Description of the net weight read from the balance. Defaults to
+          Net Weight. (Populates NETWEIGHT RBV record DESC field). Example:
+          LiqHe Weight Used.
+        default: Net Weight
+      TAREDESC:
+        type: str
+        description: |-
+          Description of the tare weight read from the balance. Defaults to
+          Tare Weight. (Populates TAREWEIGHT RBV record DESC field).
+          Example: Full Dewar Weight.
+        default: Tare Weight
+      OFFSETDESC:
+        type: str
+        description: |-
+          Description of the offset weight. Defaults to Offset Weight.
+          (Populates OFFSETWEIGHT record DESC field). Example: Empty Dewar
+          Weight.
+        default: Offset Weight
+      OFFENTRYDESC:
+        type: str
+        description: |-
+          Description for user to enter/set the offset weight. Defaults to
+          Enter Offset Weight. (Populates OFFSETWEIGHT:ENTRYDESC record VAL
+          field). Example: Enter Empty Dewar Wt.
+        default: Enter Offset Weight
+      MEASUREDDESC:
+        type: str
+        description: |-
+          Description of the measured weight (calculated). Defaults to
+          Measured Weight. (Populates MEASUREDWEIGHT record DESC field).
+          Example: LiqHe Weight Remaining.
+        default: Measured Weight
+      GROSSLOLO:
+        type: str
+        description: |-
+          The low low alarm level value for the gross weight. Defaults to
+          empty. (Populates GROSSWEIGHT RBV record LOLO field).
+        default: ""
+      NETLOLO:
+        type: str
+        description: |-
+          The low low alarm level value for the net weight. Defaults to
+          empty. (Populates NETWEIGHT RBV record LOLO field).
+        default: ""
+      MEASUREDLOLO:
+        type: str
+        description: |-
+          The low low alarm level value for the measured weight. Defaults to
+          empty. (Populates MEASUREDWEIGHT record LOLO field).
+        default: ""
+      GROSSLLSV:
+        type: str
+        description: |-
+          The low low alarm severity for the gross weight. Defaults to
+          NO_ALARM. (Populates GROSSWEIGHT RBV record LLSV field).
+        default: NO_ALARM
+      NETLLSV:
+        type: str
+        description: |-
+          The low low alarm severity for the net weight. Defaults to
+          NO_ALARM. (Populates NETWEIGHT RBV record LLSV field).
+        default: NO_ALARM
+      MEASUREDLLSV:
+        type: str
+        description: |-
+          The low low alarm severity for the measured weight. Defaults to
+          NO_ALARM. (Populates MEASUREDWEIGHT record LLSV field).
+        default: NO_ALARM
+      GROSSLOW:
+        type: str
+        description: |-
+          The low alarm level value for the gross weight. Defaults to empty.
+          (Populates GROSSWEIGHT RBV record LOW field).
+        default: ""
+      NETLOW:
+        type: str
+        description: |-
+          The low alarm level value for the net weight. Defaults to empty.
+          (Populates NETWEIGHT RBV record LOW field).
+        default: ""
+      MEASUREDLOW:
+        type: str
+        description: |-
+          The low alarm level value for the measured weight. Defaults to
+          empty. (Populates MEASUREDWEIGHT record LOW field).
+        default: ""
+      GROSSLSV:
+        type: str
+        description: |-
+          The low alarm severity for the gross weight. Defaults to NO_ALARM.
+          (Populates GROSSWEIGHT RBV record LSV field).
+        default: NO_ALARM
+      NETLSV:
+        type: str
+        description: |-
+          The low alarm severity for the net weight. Defaults to NO_ALARM.
+          (Populates NETWEIGHT RBV record LSV field).
+        default: NO_ALARM
+      MEASUREDLSV:
+        type: str
+        description: |-
+          The low alarm severity for the measured weight. Defaults to
+          NO_ALARM. (Populates MEASUREDWEIGHT record LSV field).
+        default: NO_ALARM
+      GROSSHIGH:
+        type: str
+        description: |-
+          The high alarm level value for the gross weight. Defaults to
+          empty. (Populates GROSSWEIGHT RBV record HIGH field).
+        default: ""
+      NETHIGH:
+        type: str
+        description: |-
+          The high alarm level value for the net weight. Defaults to empty.
+          (Populates NETWEIGHT RBV record HIGH field).
+        default: ""
+      MEASUREDHIGH:
+        type: str
+        description: |-
+          The high alarm level value for the measured weight. Defaults to
+          empty. (Populates MEASUREDWEIGHT record HIGH field).
+        default: ""
+      GROSSHSV:
+        type: str
+        description: |-
+          The high alarm severity for the gross weight. Defaults to
+          NO_ALARM. (Populates GROSSWEIGHT RBV record HSV field).
+        default: NO_ALARM
+      NETHSV:
+        type: str
+        description: |-
+          The high alarm severity for the net weight. Defaults to NO_ALARM.
+          (Populates NETWEIGHT RBV record HSV field).
+        default: NO_ALARM
+      MEASUREDHSV:
+        type: str
+        description: |-
+          The high alarm severity for the measured weight. Defaults to
+          NO_ALARM. (Populates MEASUREDWEIGHT record HSV field).
+        default: NO_ALARM
+      GROSSHIHI:
+        type: str
+        description: |-
+          The high high alarm level value for the gross weight. Defaults to
+          empty. (Populates GROSSWEIGHT RBV record HIHI field).
+        default: ""
+      NETHIHI:
+        type: str
+        description: |-
+          The high high alarm level value for the net weight. Defaults to
+          empty. (Populates NETWEIGHT RBV record HIHI field).
+        default: ""
+      MEASUREDHIHI:
+        type: str
+        description: |-
+          The high high alarm level value for the measured weight. Defaults
+          to empty. (Populates MEASUREDWEIGHT record HIHI field).
+        default: ""
+      GROSSHHSV:
+        type: str
+        description: |-
+          The high high alarm severity for the gross weight. Defaults to
+          NO_ALARM. (Populates GROSSWEIGHT RBV record HHSV field).
+        default: NO_ALARM
+      NETHHSV:
+        type: str
+        description: |-
+          The high high alarm severity for the net weight. Defaults to
+          NO_ALARM. (Populates NETWEIGHT RBV record HHSV field).
+        default: NO_ALARM
+      MEASUREDHHSV:
+        type: str
+        description: |-
+          The high high alarm severity for the measured weight. Defaults to
+          NO_ALARM. (Populates MEASUREDWEIGHT record HHSV field).
+        default: NO_ALARM
+      GROSSHYST:
+        type: str
+        description: |-
+          The alarm hysteresis for the gross weight. Defaults to empty.
+          (Populates GROSSWEIGHT RBV record HYST field).
+        default: ""
+      NETHYST:
+        type: str
+        description: |-
+          The alarm hysteresis for the net weight. Defaults to empty.
+          (Populates NETWEIGHT RBV record HYST field).
+        default: ""
+      MEASUREDHYST:
+        type: str
+        description: |-
+          The alarm hysteresis for the measured weight. Defaults to empty.
+          (Populates MEASUREDWEIGHT record HYST field).
+        default: ""
+      GROSSLOPR:
+        type: str
+        description: |-
+          The low operator value for the gross weight. Defaults to empty.
+          (Populates GROSSWEIGHT RBV record LOPR field).
+        default: ""
+      NETLOPR:
+        type: str
+        description: |-
+          The low operator value for the net weight. Defaults to empty.
+          (Populates NETWEIGHT RBV record LOPR field).
+        default: ""
+      TARELOPR:
+        type: str
+        description: |-
+          The low operator value for the tare weight. Defaults to empty.
+          (Populates TAREWEIGHT RBV record LOPR field).
+        default: ""
+      OFFSETLOPR:
+        type: str
+        description: |-
+          The low operator value for the offset weight. Defaults to empty.
+          (Populates OFFSETWEIGHT record LOPR field).
+        default: ""
+      MEASUREDLOPR:
+        type: str
+        description: |-
+          The low operator value for the measured weight. Defaults to empty.
+          (Populates MEASUREDWEIGHT record LOPR field).
+        default: ""
+      GROSSHOPR:
+        type: str
+        description: |-
+          The high operator value for the gross weight. Defaults to empty.
+          (Populates GROSSWEIGHT RBV record HOPR field).
+        default: ""
+      NETHOPR:
+        type: str
+        description: |-
+          The high operator value for the net weight. Defaults to empty.
+          (Populates NETWEIGHT RBV record HOPR field).
+        default: ""
+      TAREHOPR:
+        type: str
+        description: |-
+          The high operator value for the tare weight. Defaults to empty.
+          (Populates TAREWEIGHT RBV record HOPR field).
+        default: ""
+      OFFSETHOPR:
+        type: str
+        description: |-
+          The high operator value for the offset weight. Defaults to empty.
+          (Populates OFFSETWEIGHT record HOPR field).
+        default: ""
+      MEASUREDHOPR:
+        type: str
+        description: |-
+          The high operator value for the measured weight. Defaults to
+          empty. (Populates MEASUREDWEIGHT record HOPR field).
+        default: ""
+      OFFSETDRVL:
+        type: str
+        description: |-
+          The low drive limit value for the offset weight. Defaults to
+          empty. (Populates OFFSETWEIGHT record DRVL field).
+        default: ""
+      OFFSETDRVH:
+        type: str
+        description: |-
+          The high drive limit value for the offset weight. Defaults to
+          empty. (Populates OFFSETWEIGHT record DRVH field).
+        default: ""
+      OFFSETDFLT:
+        type: float
+        description: |-
+          The default initial value for the offset weight. Defaults to 0.
+          (Populates OFFSETWEIGHT record VAL field).
+        default: 0
+      PREC:
+        type: int
+        description: The EPICS PREC precision fields. Defaults to 2.
+        default: 2
+      EGU:
+        type: str
+        description: |-
+          The EPICS EGU engineering units fields. Defaults to kg. No attempt
+          is made to alter the settings on the device itself to match.
+        default: kg
+      ADEL:
+        type: str
+        description: The EPICS ADEL archiver delta fields. Defaults to empty.
+        default: ""
+      TMOT:
+        type: float
+        description: |-
+          The EPICS TMOT timeout field on ASYN records. Defaults to 3
+          (seconds).
+        default: 3
+    databases:
+      - file: adamCPWplus.template
+        args:
+          .*:

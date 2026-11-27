@@ -1,0 +1,508 @@
+# File adamCPWplus.template
+#
+# % macro , __doc__ , Support for the ADAM CPW plus 150 balance.  Typical application is to monitor contents of liquid cryogas dewars.
+#
+# Linda Pratt, 4th Jan 2016
+#
+# Since so few records involved, instructed to use asyn records in
+# preference to streamDevice protocol.  The device has a command to
+# tare the balance (zero it for doing net weights).  Have been
+# instructed to provide minimal readback only.
+# The unit does not really allow much in the way of control anyway.
+#
+# NOTE: IEOS and OEOS fields have been set to "\r\n" in this database, but there is a warning in the asynRecord documentation that this
+# value is overridden by the initial setting of the port when the connection is made and therefore never used.  Therefore you
+# have to initialise the port in some way yet to be determined.  Documentation says that if the field is written to after connection,
+# then this is done.  Found during development that setting the field on the debug record miraculously made all the others parameters
+# work, so this makes sense.
+#
+# % macro , P            , Mandatory.  Device prefix for PV names.
+# % macro , R            , Mandatory.  Record name prefix.  PV names commence $P$R
+# % macro , port         , Mandatory.  Serial port name.
+# % macro , disable      , Optional.   To disable scanning if device is disconnected, 1 for disabled, 0 for enabled, defaults to zero.
+# % macro , BALANCEDESC  , Optional.   Description of the balance.                              Defaults to Adam CPWplus balance.  (Populates DESCRIPTION     record VAL  field).  Example: End St1 LiqHe Balance1.
+# % macro , GROSSDESC    , Optional.   Description of the weight read from the balance.         Defaults to Gross Weight.          (Populates GROSSWEIGHT RBV record DESC field).  Example: Current Dewar Weight.
+# % macro , NETDESC      , Optional.   Description of the net weight read from the balance.     Defaults to Net Weight.            (Populates NETWEIGHT   RBV record DESC field).  Example: LiqHe Weight Used.
+# % macro , TAREDESC     , Optional.   Description of the tare weight read from the balance.    Defaults to Tare Weight.           (Populates TAREWEIGHT  RBV record DESC field).  Example: Full Dewar Weight.
+# % macro , OFFSETDESC   , Optional.   Description of the offset weight.                        Defaults to Offset Weight.         (Populates OFFSETWEIGHT    record DESC field).  Example: Empty Dewar Weight.
+# % macro , OFFENTRYDESC , Optional.   Description for user to enter/set the offset weight.     Defaults to Enter Offset Weight.   (Populates OFFSETWEIGHT:ENTRYDESC record VAL field).  Example: Enter Empty Dewar Wt.
+# % macro , MEASUREDDESC , Optional.   Description of the measured weight (calculated).         Defaults to Measured Weight.       (Populates MEASUREDWEIGHT  record DESC field).  Example: LiqHe Weight Remaining.
+# % macro , GROSSLOLO    , Optional.   The low low alarm level value for the gross weight.      Defaults to empty.                 (Populates GROSSWEIGHT RBV record LOLO field).
+# % macro , NETLOLO      , Optional.   The low low alarm level value for the net weight.        Defaults to empty.                 (Populates NETWEIGHT   RBV record LOLO field).
+# % macro , MEASUREDLOLO , Optional.   The low low alarm level value for the measured weight.   Defaults to empty.                 (Populates MEASUREDWEIGHT  record LOLO field).
+# % macro , GROSSLLSV    , Optional.   The low low alarm severity for the gross weight.         Defaults to NO_ALARM.              (Populates GROSSWEIGHT RBV record LLSV field).
+# % macro , NETLLSV      , Optional.   The low low alarm severity for the net weight.           Defaults to NO_ALARM.              (Populates NETWEIGHT   RBV record LLSV field).
+# % macro , MEASUREDLLSV , Optional.   The low low alarm severity for the measured weight.      Defaults to NO_ALARM.              (Populates MEASUREDWEIGHT  record LLSV field).
+# % macro , GROSSLOW     , Optional.   The low alarm level value for the gross weight.          Defaults to empty.                 (Populates GROSSWEIGHT RBV record LOW  field).
+# % macro , NETLOW       , Optional.   The low alarm level value for the net weight.            Defaults to empty.                 (Populates NETWEIGHT   RBV record LOW  field).
+# % macro , MEASUREDLOW  , Optional.   The low alarm level value for the measured weight.       Defaults to empty.                 (Populates MEASUREDWEIGHT  record LOW  field).
+# % macro , GROSSLSV     , Optional.   The low alarm severity for the gross weight.             Defaults to NO_ALARM.              (Populates GROSSWEIGHT RBV record LSV  field).
+# % macro , NETLSV       , Optional.   The low alarm severity for the net weight.               Defaults to NO_ALARM.              (Populates NETWEIGHT   RBV record LSV  field).
+# % macro , MEASUREDLSV  , Optional.   The low alarm severity for the measured weight.          Defaults to NO_ALARM.              (Populates MEASUREDWEIGHT  record LSV  field).
+# % macro , GROSSHIGH    , Optional.   The high alarm level value for the gross weight.         Defaults to empty.                 (Populates GROSSWEIGHT RBV record HIGH field).
+# % macro , NETHIGH      , Optional.   The high alarm level value for the net weight.           Defaults to empty.                 (Populates NETWEIGHT   RBV record HIGH field).
+# % macro , MEASUREDHIGH , Optional.   The high alarm level value for the measured weight.      Defaults to empty.                 (Populates MEASUREDWEIGHT  record HIGH field).
+# % macro , GROSSHSV     , Optional.   The high alarm severity for the gross weight.            Defaults to NO_ALARM.              (Populates GROSSWEIGHT RBV record HSV  field).
+# % macro , NETHSV       , Optional.   The high alarm severity for the net weight.              Defaults to NO_ALARM.              (Populates NETWEIGHT   RBV record HSV  field).
+# % macro , MEASUREDHSV  , Optional.   The high alarm severity for the measured weight.         Defaults to NO_ALARM.              (Populates MEASUREDWEIGHT  record HSV  field).
+# % macro , GROSSHIHI    , Optional.   The high high alarm level value for the gross weight.    Defaults to empty.                 (Populates GROSSWEIGHT RBV record HIHI field).
+# % macro , NETHIHI      , Optional.   The high high alarm level value for the net weight.      Defaults to empty.                 (Populates NETWEIGHT   RBV record HIHI field).
+# % macro , MEASUREDHIHI , Optional.   The high high alarm level value for the measured weight. Defaults to empty.                 (Populates MEASUREDWEIGHT  record HIHI field).
+# % macro , GROSSHHSV    , Optional.   The high high alarm severity for the gross weight.       Defaults to NO_ALARM.              (Populates GROSSWEIGHT RBV record HHSV field).
+# % macro , NETHHSV      , Optional.   The high high alarm severity for the net weight.         Defaults to NO_ALARM.              (Populates NETWEIGHT   RBV record HHSV field).
+# % macro , MEASUREDHHSV , Optional.   The high high alarm severity for the measured weight.    Defaults to NO_ALARM.              (Populates MEASUREDWEIGHT  record HHSV field).
+# % macro , GROSSHYST    , Optional.   The alarm hysteresis for the gross weight.               Defaults to empty.                 (Populates GROSSWEIGHT RBV record HYST field).
+# % macro , NETHYST      , Optional.   The alarm hysteresis for the net weight.                 Defaults to empty.                 (Populates NETWEIGHT   RBV record HYST field).
+# % macro , MEASUREDHYST , Optional.   The alarm hysteresis for the measured weight.            Defaults to empty.                 (Populates MEASUREDWEIGHT  record HYST field).
+# % macro , GROSSLOPR    , Optional.   The low operator value for the gross weight.             Defaults to empty.                 (Populates GROSSWEIGHT RBV record LOPR field).
+# % macro , NETLOPR      , Optional.   The low operator value for the net weight.               Defaults to empty.                 (Populates NETWEIGHT   RBV record LOPR field).
+# % macro , TARELOPR     , Optional.   The low operator value for the tare weight.              Defaults to empty.                 (Populates TAREWEIGHT  RBV record LOPR field).
+# % macro , OFFSETLOPR   , Optional.   The low operator value for the offset weight.            Defaults to empty.                 (Populates OFFSETWEIGHT    record LOPR field).
+# % macro , MEASUREDLOPR , Optional.   The low operator value for the measured weight.          Defaults to empty.                 (Populates MEASUREDWEIGHT  record LOPR field).
+# % macro , GROSSHOPR    , Optional.   The high operator value for the gross weight.            Defaults to empty.                 (Populates GROSSWEIGHT RBV record HOPR field).
+# % macro , NETHOPR      , Optional.   The high operator value for the net weight.              Defaults to empty.                 (Populates NETWEIGHT   RBV record HOPR field).
+# % macro , TAREHOPR     , Optional.   The high operator value for the tare weight.             Defaults to empty.                 (Populates TAREWEIGHT  RBV record HOPR field).
+# % macro , OFFSETHOPR   , Optional.   The high operator value for the offset weight.       	Defaults to empty.                 (Populates OFFSETWEIGHT    record HOPR field).
+# % macro , MEASUREDHOPR , Optional.   The high operator value for the measured weight.         Defaults to empty.                 (Populates MEASUREDWEIGHT  record HOPR field).
+# % macro , OFFSETDRVL   , Optional.   The low drive limit value for the offset weight.       	Defaults to empty.                 (Populates OFFSETWEIGHT    record DRVL field).
+# % macro , OFFSETDRVH   , Optional.   The high drive limit value for the offset weight.       	Defaults to empty.                 (Populates OFFSETWEIGHT    record DRVH field).
+# % macro , OFFSETDFLT   , Optional.   The default initial value for the offset weight.         Defaults to 0.                     (Populates OFFSETWEIGHT    record VAL field).
+# % macro , PREC         , Optional.   The EPICS PREC precision fields.                         Defaults to 2. 
+# % macro , EGU          , Optional.   The EPICS EGU engineering units fields.                  Defaults to kg.  No attempt is made to alter the settings on the device itself to match.
+# % macro , ADEL         , Optional.   The EPICS ADEL archiver delta fields.                    Defaults to empty.
+# % macro , TMOT         , Optional.   The EPICS TMOT timeout field on ASYN records.            Defaults to 3 (seconds).
+# 
+# An extra asyn record for debugging, which seems to be a favoured
+# item for this style of implementation.
+#
+record(asyn, "$(P)$(R):DBG:ASYN") {
+  field(DESC, "Spare ASYN for debug")
+  field(SCAN, "Passive")
+  field(PINI, "NO")
+  field(IEOS, "\r\n")
+  field(OEOS, "\r\n")
+  field(TMOT, "$(TMOT=3)" )
+  field(PORT, "$(port)")
+}
+
+#
+# For diverting to when have difficulty parsing.
+#
+record(stringin, "$(P)$(R):DBG:RBV:TESTSTRING") {
+  field(DESC, "String readback for debug")
+  field(SCAN, "Passive")
+  field(PINI, "NO")
+  field(DTYP, "Soft Channel")
+}
+
+#
+# The readback value of the gross weight.
+#
+# Negative values can occur (most likely with low load) due to 
+# the zeroing functionality.
+#
+# This will be the weight of the dewar plus the liquid gas it contains
+# in the typical application.
+#
+# % archiver 120 Monitor
+# % autosave 1 HIHI LOLO HIGH LOW HHSV LLSV HSV LSV HOPR LOPR HYST ADEL
+#
+record(ai, "$(P)$(R):RBV:GROSSWEIGHT") {
+  field(DESC, "$(GROSSDESC=Gross Weight)")
+  field(SCAN, "Passive")
+  field(PINI, "NO")
+  field(DTYP, "Soft Channel")
+  field(PREC, "$(PREC=2)")
+  field(EGU, "$(EGU=kg)")
+  field(ADEL, "$(ADEL=)")
+  field(LOLO, "$(GROSSLOLO=)")
+  field(LLSV, "$(GROSSLLSV=NO_ALARM)")
+  field(LOW, "$(GROSSLOW=)")
+  field(LSV, "$(GROSSLSV=NO_ALARM)")
+  field(HIGH, "$(GROSSHIGH=)")
+  field(HSV, "$(GROSSHSV=NO_ALARM)")
+  field(HIHI, "$(GROSSHIHI=)")
+  field(HHSV, "$(GROSSHHSV=NO_ALARM)")
+  field(HYST, "$(GROSSHYST=)")
+  field(LOPR, "$(GROSSLOPR=)")
+  field(HOPR, "$(GROSSHOPR=)")
+  field(FLNK, "$(P)$(R):CLC:MEASUREDWEIGHT" )
+}
+
+#
+# The readback value of the net weight.
+#
+# The net weight is calculated by the balance as Gross - Tare.
+#
+# Negative values are meaningful.
+#
+# The Tare/Zero button on the balance must have been pressed
+# manually to make this meaningful.  For the typical application
+# this will have been done when a full dewar of liquid gas was
+# on the scale, so the negative value is the weight of liquid
+# gas used.
+#
+# Note that when it comes to the alarm values,
+# no attempt is made to main consistency between the
+# net alarm values, the gross alarm values and the tare
+# zero readback value.
+#
+# % archiver 120 Monitor
+# % autosave 1 HIHI LOLO HIGH LOW HHSV LLSV HSV LSV HOPR LOPR HYST ADEL
+#
+record(ai, "$(P)$(R):RBV:NETWEIGHT") {
+  field(DESC, "$(NETDESC=Net Weight)")
+  field(SCAN, "Passive")
+  field(PINI, "NO")
+  field(DTYP, "Soft Channel")
+  field(PREC, "$(PREC=2)")
+  field(EGU, "$(EGU=kg)")
+  field(ADEL, "$(ADEL=)")
+  field(LOLO, "$(NETLOLO=)")
+  field(LLSV, "$(NETLLSV=NO_ALARM)")
+  field(LOW, "$(NETLOW=)")
+  field(LSV, "$(NETLSV=NO_ALARM)")
+  field(HIGH, "$(NETHIGH=)")
+  field(HSV, "$(NETHSV=NO_ALARM)")
+  field(HIHI, "$(NETHIHI=)")
+  field(HHSV, "$(NETHHSV=NO_ALARM)")
+  field(HYST, "$(NETHYST=)")
+  field(LOPR, "$(NETLOPR=)")
+  field(HOPR, "$(NETHOPR=)")
+}
+
+#
+# The readback value of the tare weight.
+#
+# The tare weight is the value of the gross weight
+# when the Tare/Zero button was last pressed, provided
+# the load was more than 10% of the range of the balance and
+# it defines how the net weight is calculated (by the balance).
+# In the typical application, this would be done when the balance
+# is loaded with a full dewar of liquid gas.
+#
+# % archiver 120 Monitor
+# % autosave 1 HOPR LOPR ADEL
+#
+record(ai, "$(P)$(R):RBV:TAREWEIGHT") {
+  field(DESC, "$(TAREDESC=Tare Weight)")
+  field(SCAN, "Passive")
+  field(PINI, "NO")
+  field(DTYP, "Soft Channel")
+  field(PREC, "$(PREC=2)")
+  field(EGU, "$(EGU=kg)")
+  field(ADEL, "$(ADEL=)")
+  field(LOPR, "$(TARELOPR=)")
+  field(HOPR, "$(TAREHOPR=)")
+}
+
+#
+# Communicate with the device to query the net weight and receive the response.
+#
+#record(asyn, "$(P)$(R):DBG:GET:TESTSTRING") {
+#  field(DESC, "Query test")
+#  field(SCAN, "Passive")
+#  field(PORT, "$(port)")
+#  field(TMOT, "$(TMOT=3)" )
+#  field(IEOS, "\r\n")
+#  field(OEOS, "\r\n")
+#  field(AOUT, "G")
+#  field(FLNK, "$(P)$(R):DBG:CLC:TESTSTRING")
+#}
+
+#
+# Communicate with the device to query the gross weight and receive the response.
+#
+# We assume the device is in the mode where it has to be polled.
+# The continuous mode will probably upset things.
+# This actually issues the command called "Hold" to the balance.
+# This is the name of one of the buttons on the balance and the manual
+# states issuing the command is equivalent to pressing the button.
+# The "Hold" button has multiple functions.
+# This will only work if the balance is in the right mode to do the
+# expected thing (return the weight) on response to the "Hold" command.
+#
+record(asyn, "$(P)$(R):GET:GROSSWEIGHT") {
+  field(DESC, "Query Gross Weight")
+  field(SCAN, "Passive")
+  field(PORT, "$(port)")
+  field(IEOS, "\r\n")
+  field(OEOS, "\r\n")
+  field(TMOT, "$(TMOT=3)" )
+  field(AOUT, "G")
+  field(FLNK, "$(P)$(R):CLC:GROSSWEIGHT")
+}
+
+#
+# Communicate with the device to query the net weight and receive the response.
+#
+record(asyn, "$(P)$(R):GET:NETWEIGHT") {
+  field(DESC, "Query Net Weight")
+  field(SCAN, "Passive")
+  field(PORT, "$(port)")
+  field(IEOS, "\r\n")
+  field(OEOS, "\r\n")
+  field(TMOT, "$(TMOT=3)" )
+  field(AOUT, "N")
+  field(FLNK, "$(P)$(R):CLC:NETWEIGHT")
+}
+
+#
+# Communicate with the device to query the tare weight and receive the response.
+#
+record(asyn, "$(P)$(R):GET:TAREWEIGHT") {
+  field(DESC, "Query Tare Weight")
+  field(SCAN, "Passive")
+  field(PORT, "$(port)")
+  field(IEOS, "\r\n")
+  field(OEOS, "\r\n")
+  field(TMOT, "$(TMOT=3)" )
+  field(AOUT, "T")
+  field(FLNK, "$(P)$(R):CLC:TAREWEIGHT")
+}
+
+#
+# Parse the Gross string response for a numeric value.
+# Yep, know it is already a string at present, but want to keep structure.
+#
+#record(scalcout, "$(P)$(R):DBG:CLC:TESTSTRING") {
+#  field(DESC, "Parse test reply")
+#  field(SCAN, "Passive")
+#  field(PINI, "NO")
+#  field(DTYP, "Soft Channel")
+#  field(DOPT, "Use CALC")
+#  field(CALC, "SSCANF(AA, '%s')")
+#  field(INAA, "$(P)$(R):DBG:GET:TESTSTRING.AINP")
+#  field(OUT, "$(P)$(R):DBG:RBV:TESTSTRING MS PP")
+#}
+
+#
+# Parse the Gross string response for a numeric value.
+#
+# There is a reason for a diabolical parsing formula to read one
+# simple number.  The device always gives a sign character before the
+# number, but the number is padded with zero to two leading spaces
+# after the sign and a straight forward %f scan cannot cope with these
+# possibilities, EPICS sscanf can only have one number or string
+# converted in each call and attempting to search for the spaces to
+# remove could will hit on the trailing space in the zero leading
+# space case.  The combination of conversions gives a single formula,
+# and so avoids the needs for further calc records.  Another way to do
+# it might be to use conditional test involving the sign character,
+# but whatever you do to cover all cases you have to scan the sign and
+# the number separately and recombine.
+#
+# (1) First scan the sign character.
+# (2) Then scan the input again, skipping the first (sign) character and scanning as a real number.
+#     The %f formula will eat any leading spaces and stop on the trailing space (which comes before the units).
+#     The max width of 6 is present for best practice to stop a runaway scan in case of the trailing space being absent.
+# (3) Do a formatted print of the number from (2).  Now have a string consisting of the number without leading sign or space.
+# (4) Concatenate the scanned sign from step (1) with the converted number string from step (3).
+# (5) Scan the resulting string from step (4) again - it is a number with a leading sign character with no spaces before or after, so nothing to upset the format converter.
+#
+record(scalcout, "$(P)$(R):CLC:GROSSWEIGHT") {
+  field(DESC, "Parse Gross Weight reply")
+  field(SCAN, "Passive")
+  field(PINI, "NO")
+  field(DTYP, "Soft Channel")
+  field(DOPT, "Use CALC")
+#              (5)    (1)        (1) (4)(3)     (3)    (2)        (2)           (5)                
+  field(CALC, "SSCANF(SSCANF(AA,'%1s')+(PRINTF('%.2f',(SSCANF(AA,'%*1s%6f')))),'%f')")
+#  field(CALC, "SSCANF(AA, '%f')")
+  field(INAA, "$(P)$(R):GET:GROSSWEIGHT.AINP")
+  field(PREC, "$(PREC=2)")
+  field(EGU, "$(EGU=kg)")
+  field(OUT, "$(P)$(R):RBV:GROSSWEIGHT MS PP")
+}
+
+#
+# Parse the Net string response for a numeric value.
+#
+record(scalcout, "$(P)$(R):CLC:NETWEIGHT") {
+  field(DESC, "Parse Net Weight reply")
+  field(SCAN, "Passive")
+  field(PINI, "NO")
+  field(DTYP, "Soft Channel")
+  field(DOPT, "Use CALC")
+  field(CALC, "SSCANF(SSCANF(AA,'%1s')+(PRINTF('%.2f',(SSCANF(AA,'%*1s%6f')))),'%f')")
+#  field(CALC, "SSCANF(AA, '%f')")
+  field(INAA, "$(P)$(R):GET:NETWEIGHT.AINP")
+  field(PREC, "$(PREC=2)")
+  field(EGU, "$(EGU=kg)")
+  field(OUT, "$(P)$(R):RBV:NETWEIGHT MS PP")
+}
+
+#
+# Parse the Tare string response for a numeric value.
+#
+record(scalcout, "$(P)$(R):CLC:TAREWEIGHT") {
+  field(DESC, "Parse Tare Weight reply")
+  field(SCAN, "Passive")
+  field(PINI, "NO")
+  field(DTYP, "Soft Channel")
+  field(DOPT, "Use CALC")
+  field(CALC, "SSCANF(SSCANF(AA,'%1s')+(PRINTF('%.2f',(SSCANF(AA,'%*1s%6f')))),'%f')")
+#  field(CALC, "SSCANF(AA, '%f')")
+  field(INAA, "$(P)$(R):GET:TAREWEIGHT.AINP")
+  field(PREC, "$(PREC=2)")
+  field(EGU, "$(EGU=kg)")
+  field(OUT, "$(P)$(R):RBV:TAREWEIGHT MS PP")
+}
+
+#
+# This record controls regular scanning of the command to readback the net weight.
+# Set Passive by default, so can enable with a caput.
+# The DISABLE record stops it processing altogether.
+#
+#record(ao, "$(P)$(R):DBG:SCN:TESTSTRING") {
+#  field(DESC, "Scan test query")
+#  field(SCAN, "Passive")
+#  field(VAL, "1")
+#  field(SDIS, "$(P)$(R):DISABLE")
+#  field(FLNK, "$(P)$(R):DBG:GET:TESTSTRING")
+#}
+
+#
+# This record controls regular scanning of the command to readback the weights.
+# The DISABLE record stops it processing altogether.
+#
+record(ao, "$(P)$(R):SCN:WEIGHTSFAST") {
+  field(DESC, "Scan weight queries")
+  field(SCAN, "10 second")
+  field(VAL, "1")
+  field(SDIS, "$(P)$(R):DISABLE")
+  field(FLNK, "$(P)$(R):SEQ:ALLWEIGHTS")
+}
+
+#
+# Propagate scan processing to all the weight queries.
+#
+record(seq, "$(P)$(R):SEQ:ALLWEIGHTS") {
+  field(DESC, "Propagate weight queries")
+  field(DOL1, "1")
+  field(DOL2, "1")
+  field(DOL3, "1")
+  field(DLY1, "0")
+  field(DLY2, "3")
+  field(DLY3, "6")
+  field(LNK1, "$(P)$(R):GET:GROSSWEIGHT.PROC")
+  field(LNK2, "$(P)$(R):GET:NETWEIGHT.PROC")
+  field(LNK3, "$(P)$(R):GET:TAREWEIGHT.PROC")
+  field(SELM, "All")
+}
+
+#
+# This record needed to stop various records scanning and generating lots
+# of error messages if the box is unplugged - this tends to be needed
+# for end station IOCs.
+#
+# % autosave 1 VAL
+#
+record(bo, "$(P)$(R):DISABLE") {
+  field(DESC, "Disable comms/processing")
+  field(PINI, "YES")
+  field(VAL, "$(disable=0)")
+  field(OMSL, "supervisory")
+  field(ZNAM, "Enabled")
+  field(ONAM, "Disabled")
+}
+
+
+#
+# The offset weight.
+#
+# To be set by the user for use in the calculation of the measured weight.
+# This will be the dewar weight in the typical application.
+# Record has been given prefix CFG for configuration.  It has HOPR and LOPR
+# macros for display, but it does not make sense to apply alarms to
+# this quantity.  This one has features special to it because it is an output
+# The VAL field is autosaved because it does not get updated other than by
+# the user so it wont get refreshed on reboot, so this allows it to persist.
+# OFFSETDFLT - allows a predetermined default value other than zero to be defined.
+# OFFSETDRVH - allows definition of restriction to be applied to what can be entered.
+# OFFSETDRVL - ditto
+#
+# % autosave 1 VAL HOPR LOPR DRVH DRVL ADEL
+#
+record(ao, "$(P)$(R):CFG:OFFSETWEIGHT") {
+  field(DESC, "$(OFFSETDESC=Offset Weight)")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(DTYP, "Soft Channel")
+  field(PREC, "$(PREC=2)")
+  field(EGU, "$(EGU=kg)")
+  field(ADEL, "$(ADEL=)")
+  field(LOPR, "$(OFFSETLOPR=)")
+  field(HOPR, "$(OFFSETHOPR=)")
+  field(DRVL, "$(OFFSETDRVL=)")
+  field(DRVH, "$(OFFSETDRVH=)")
+  field(VAL, "$(OFFSETDFLT=0)")
+  field(FLNK, "$(P)$(R):CLC:MEASUREDWEIGHT" )
+}
+
+#
+# The measured weight.
+#
+# The result of the calculation by EPICS = Gross - Offset.
+# The liquid gas weight remaining in the dewar in the typical application.
+#
+# % archiver 120 Monitor
+# % autosave 1 HIHI LOLO HIGH LOW HHSV LLSV HSV LSV HOPR LOPR HYST ADEL
+#
+record(ai, "$(P)$(R):STS:MEASUREDWEIGHT") {
+  field(DESC, "$(MEASUREDDESC=Measured Weight)")
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(PREC, "$(PREC=2)")
+  field(EGU, "$(EGU=kg)")
+  field(ADEL, "$(ADEL=)")
+  field(LOLO, "$(MEASUREDLOLO=)")
+  field(LLSV, "$(MEASUREDLLSV=NO_ALARM)")
+  field(LOW, "$(MEASUREDLOW=)")
+  field(LSV, "$(MEASUREDLSV=NO_ALARM)")
+  field(HIGH, "$(MEASUREDHIGH=)")
+  field(HSV, "$(MEASUREDHSV=NO_ALARM)")
+  field(HIHI, "$(MEASUREDHIHI=)")
+  field(HHSV, "$(MEASUREDHHSV=NO_ALARM)")
+  field(HYST, "$(MEASUREDHYST=)")
+  field(LOPR, "$(MEASUREDLOPR=)")
+  field(HOPR, "$(MEASUREDHOPR=)")
+}
+
+#
+# Calculates the measured weight.
+#
+# This is calculated by EPICS as the difference between the 
+# gross weight read back from the balance and the offset weight
+# entered by the user.
+#
+record(calcout, "$(P)$(R):CLC:MEASUREDWEIGHT") {
+  field(INPA, "$(P)$(R):RBV:GROSSWEIGHT NPP MS")
+  field(INPB, "$(P)$(R):CFG:OFFSETWEIGHT NPP MS")
+  field(CALC, "A-B")
+  field(OUT, "$(P)$(R):STS:MEASUREDWEIGHT PP MS")
+}
+
+# The description of the device, used for screen labels.
+#
+record(stringin, "$(P)$(R):DESCRIPTION") {
+  field(DESC, "Description of the balance.")
+  field(VAL, "$(BALANCEDESC=Adam CPWplus balance)")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+}
+
+#
+# Description of configuring offset weight.
+#
+# Need an screen label next to where the user enters the offset value
+# describing what setting the offset weight does whereas the DESC field on 
+# the offset weight describes the offset weight itself, so implemented
+# a separate string record.  Recommend keep it brief.
+#
+record(stringin, "$(P)$(R):CFG:OFFSETWEIGHT:ENTRYDESC") {
+  field(DESC, "Describes offset weight entry.")
+  field(VAL, "$(OFFENTRYDESC=Enter Offset Weight)")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+}

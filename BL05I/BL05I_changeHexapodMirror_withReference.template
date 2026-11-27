@@ -1,0 +1,571 @@
+# Translated from BL05I 2-95 db/BL05I_changeHexapodMirror_withReference.template
+# (/dls_sw/prod/R3.14.12.7/support/BL05I/2-95, DLS GitLab controls/support/BL05I
+# tag 2-95). Generic pmac variable access instead of a beamline protocol file,
+# decision 2026-11-27.
+#
+# Only the transport changed. Each record that talked to the GeoBrick through
+# StreamDevice and BL05I's changeHexapod.proto now uses the asyn parameters of
+# the pmac driver's controller (pmacController, pmac 2-7-9):
+#   PMAC_VI<loop>_<var>  read integer variable <var>, polled by the driver on
+#                        its fast (F, the motor poll period), medium (M, 2 s) or
+#                        slow (S, 5 s) loop, so the record is SCAN I/O Intr
+#   PMAC_WI_<var>        write integer variable <var> (sends <var>=<value>)
+#   PMAC_C_WRITE_CMD     send a raw command string
+# PORT is now the asyn port of the pmac controller (pmacCreateController, e.g.
+# BRICK06), no longer the asyn IP port to the GeoBrick. Each translated record
+# has a "# was:" comment giving its StreamDevice DTYP and INP/OUT. The record
+# $(P)$(R):FAN:UPDATE, which polled the readbacks every 0.2 s, is removed: the
+# driver polls them now. GET:MIRROR, GET:STATE and GET:STATUS, which it
+# processed, have PINI YES: the driver only calls back when a value changes,
+# so without it a readback that stays 0 would stay UDF. All other records,
+# and their logic, are unchanged.
+#
+# File BL05I_changeHexapodMirror_withReference.template for BL05I module.
+#
+# Interface with a Delta Tau PLC to initiate changing the hexapod kinematics
+# to use another mirror.  Assumes 2 mirrors, but adds a third position for the reference or ideal position.
+# An upgrade of the original BL05I_changeHexapodMirror.template.  Works with an updated version of the mirror change PLC.
+#
+# EPICS interfaces with P-variables mostly and no Q-variables.
+# For PLC12, that would be.
+# PLC variable defined name     Number  Function          
+# plc12_mirror1_number 		P1203	GET (only need this once at start).
+# plc12_mirror2_number 		P1204	GET (only need this once at start).
+# plc12_mirrorRef_number 	P1212	GET (only need this once at start).
+# plc12_current_mirror_number 	P1205	GET (polled)
+# plc12_new_mirror_number 	P1206	SET
+# plc12_mirrorState		P1207 	GET (polled)
+# plc12_Status			P1208	GET (polled)
+# plc12_Abort			P1209	SET
+# (Unnamed) Run flag		M5012	GET (polled) - tells us whether PLC12 is running or not.
+#
+# % macro, __doc__, Interfaces to PLC for changing set up from one mirror to another,
+# (which actually involves setting a new value for the Y part of the TCP (Tool Centre Point)
+# and running another PLC (de facto PLC9) to recalculate everything.)
+# % macro, P,        Mandatory.  Device PV Prefix                                                    No default.
+# % macro, R,        Mandatory.  Record PV Prefix                                                    No default.
+# % macro, PLC,      Mandatory.  PLC number of Delta Tau PLC to interface with.                      No default.
+# % macro, PORT,     Mandatory.  Asyn port of the pmac controller.                            No default.
+# % macro, YMTR,     Mandatory.  Name of the motor record for the Y-translation of the hexapod.      No default.
+#                                (Not declared in this template, but ends up built in the same database). 
+#
+# % macro, M1NAME,   Optional.   Name or label string for first mirror.                              Defaults to Mirror1.
+# % macro, M2NAME,   Optional.   Name or label string for second mirror.                             Defaults to Mirror2.
+# % macro, MREFNAME, Optional.   Name or label string for the reference position.                    Defaults to Reference.
+# % macro, M1HLM,    Optional.   High soft limit value for Y motor record when using first mirror.   Defaults to  45.0.
+# % macro, M2HLM,    Optional.   High soft limit value for Y motor record when using second mirror.  Defaults to 107.0.
+# % macro, MREFHLM,  Optional.   High soft limit value for Y motor record when using reference posn. Defaults to  76.0.
+# % macro, M1LLM,    Optional.   Low soft limit value for Y motor record when using first mirror.    Defaults to -45.0.
+# % macro, M2LLM,    Optional.   Low soft limit value for Y motor record when using second mirror.   Defaults to  17.0.
+# % macro, MREFLLM,  Optional.   Low soft limit value for Y motor record when using refernce posn.   Defaults to -14.0.
+#
+# was: DTYP stream, OUT "@changeHexapod.proto setIntVar(P$(PLC)09) $(PORT)"
+record(bo, "$(P)$(R):SET:ABORT") {
+  field(DESC, "Send abort cmd")
+  field(SCAN, "Passive")
+  field(PINI, "NO")
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0)PMAC_WI_P$(PLC)09")
+}
+
+record(bo, "$(P)$(R):DMD:ABORT") {
+  field(DESC, "Send abort cmd")
+  field(SCAN, "Passive")
+  field(PINI, "NO")
+  field(VAL,  "1")
+  field(OUT,  "$(P)$(R):SET:ABORT PP")
+}
+
+# These 2 records will read the P variables P$(PLC)03 and P$(PLC)04
+# from the PMAC in one command to get the mirror index numbers
+# on startup
+# was: DTYP stream, INP "@changeHexapod.proto getIntVar(P$(PLC)03) $(PORT)"
+#   SCAN Passive, PINI YES: read once at iocInit. Now I/O Intr on the
+#   driver's slow loop, so it also follows a change made on the PMAC;
+#   PINI still reads the driver's value at iocInit.
+record(ai, "$(P)$(R):RBV:M1INDEX") {
+  field(DESC, "Read $(M1NAME=Mirror1) index from PMAC")
+  field(DTYP, "asynInt32")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(INP,  "@asyn($(PORT),0)PMAC_VIS_P$(PLC)03")
+  field(FLNK,  "$(P)$(R):DFAN:M1INDEX PP")
+  field(PREC, "0")
+}
+
+# was: DTYP stream, INP "@changeHexapod.proto getIntVar(P$(PLC)04) $(PORT)"
+#   SCAN Passive, PINI YES: read once at iocInit. Now I/O Intr on the
+#   driver's slow loop, so it also follows a change made on the PMAC;
+#   PINI still reads the driver's value at iocInit.
+record(ai, "$(P)$(R):RBV:M2INDEX") {
+  field(DESC, "Read $(M2NAME=Mirror2) index from PMAC")
+  field(DTYP, "asynInt32")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(INP,  "@asyn($(PORT),0)PMAC_VIS_P$(PLC)04")
+  field(FLNK,  "$(P)$(R):DFAN:M2INDEX PP")
+  field(PREC, "0")
+}
+
+# was: DTYP stream, INP "@changeHexapod.proto getIntVar(P$(PLC)12) $(PORT)"
+#   SCAN Passive, PINI YES: read once at iocInit. Now I/O Intr on the
+#   driver's slow loop, so it also follows a change made on the PMAC;
+#   PINI still reads the driver's value at iocInit.
+record(ai, "$(P)$(R):RBV:MREFINDEX") {
+  field(DESC, "Read $(MREFNAME=Reference) index from PMAC")
+  field(DTYP, "asynInt32")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(INP,  "@asyn($(PORT),0)PMAC_VIS_P$(PLC)12")
+  field(FLNK,  "$(P)$(R):DFAN:MREFINDEX PP")
+  field(PREC, "0")
+}
+
+# Fan out the index options to the mbbi records that need it.
+record(dfanout, "$(P)$(R):DFAN:M1INDEX"){
+  field(DESC, "Fanout M1 index value.")
+  field(SCAN, "Passive")
+  field(OMSL, "closed_loop")
+  field(SELM, "All")
+  field(DOL,  "$(P)$(R):RBV:M1INDEX")
+  field(OUTA, "$(P)$(R):RBV:MIRROR.ONVL PP")
+  field(OUTB, "$(P)$(R):DMD:MIRROR.ONVL")
+}
+
+record(dfanout, "$(P)$(R):DFAN:M2INDEX"){
+  field(DESC, "Fanout M2 index value.")
+  field(SCAN, "Passive")
+  field(OMSL, "closed_loop")
+  field(SELM, "All")
+  field(DOL,  "$(P)$(R):RBV:M2INDEX")
+  field(OUTA, "$(P)$(R):RBV:MIRROR.TWVL PP")
+  field(OUTB, "$(P)$(R):DMD:MIRROR.TWVL")
+}
+
+record(dfanout, "$(P)$(R):DFAN:MREFINDEX"){
+  field(DESC, "Fanout MRef index value.")
+  field(SCAN, "Passive")
+  field(OMSL, "closed_loop")
+  field(SELM, "All")
+  field(DOL,  "$(P)$(R):RBV:MREFINDEX")
+  field(OUTA, "$(P)$(R):RBV:MIRROR.THVL PP")
+  field(OUTB, "$(P)$(R):DMD:MIRROR.THVL")
+}
+
+# This record controls the scanning/polling of most of the readbacks from the PMAC.
+# was: record(fanout, "$(P)$(R):FAN:UPDATE"), SCAN ".2 second", which
+# processed GET:MIRROR, GET:STATE, GET:STATUS and RBV:RUNFLAG to poll
+# the PMAC through StreamDevice. Removed: the pmac driver polls those
+# variables itself and the records are now SCAN I/O Intr.
+
+# Read current mirror number from PMAC.  Read as ai and convert to 0 precision
+# to convert to integer.
+# was: DTYP stream, INP "@changeHexapod.proto getIntVar(P$(PLC)05) $(PORT)"
+#   SCAN Passive, processed every 0.2 s by FAN:UPDATE. Now I/O Intr on
+#   the driver's medium loop (2 s); it processes when the value changes.
+#   PINI YES is part of that translation: the driver only calls back on
+#   a change, so without it a value that stays 0 would leave the record
+#   UDF, where the 0.2 s poll used to read it at once.
+record(ai, "$(P)$(R):GET:MIRROR") {
+  field(DESC, "Read current mirror index.")
+  field(DTYP, "asynInt32")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(INP,  "@asyn($(PORT),0)PMAC_VIM_P$(PLC)05")
+  field(FLNK,  "$(P)$(R):RBV:MIRROR PP")
+  field(PREC, "0")
+}
+
+# Readback value for current mirror number.
+# If PLC$(PLC) has never been run on the GeoBrick since power up, this may be
+# unknown, a change can still be commanded, and PLC$(PLC) will sort things out
+# first time through.
+#% archiver 10 Monitor
+record(mbbi, "$(P)$(R):RBV:MIRROR") {
+  field(DESC, "Index number of current mirror")
+  field(SCAN, "Passive")
+  field(INP,  "$(P)$(R):GET:MIRROR")
+  field(PINI, "NO")
+  field(ZRST, "Unknown")
+  field(ZRVL, "0")
+  field(ZRSV, "MINOR")
+  field(ONST, "$(M1NAME=Mirror1)")
+# field(ONVL, "1") - Not needed - this is set by index initialisation records.
+  field(ONSV, "NO_ALARM")
+  field(TWST, "$(M2NAME=Mirror2)")
+# field(TWVL, "2") - Not needed - this is set by index initialisation records.
+  field(TWSV, "NO_ALARM")
+  field(THST, "$(MREFNAME=Reference)")
+# field(THVL, "3") - Not needed - this is set by index initialisation records.
+  field(THSV, "NO_ALARM")
+}
+
+# Read current mirror state from PMAC.
+# was: DTYP stream, INP "@changeHexapod.proto getIntVar(P$(PLC)07) $(PORT)"
+#   SCAN Passive, processed every 0.2 s by FAN:UPDATE. Now I/O Intr on
+#   the driver's medium loop (2 s); it processes when the value changes.
+#   PINI YES is part of that translation: the driver only calls back on
+#   a change, so without it a value that stays 0 would leave the record
+#   UDF, where the 0.2 s poll used to read it at once.
+record(ai, "$(P)$(R):GET:STATE") {
+  field(DESC, "Read current mirror state.")
+  field(DTYP, "asynInt32")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(INP,  "@asyn($(PORT),0)PMAC_VIM_P$(PLC)07")
+  field(FLNK,  "$(P)$(R):RBV:STATE PP")
+  field(PREC, "0")
+}
+
+# Readback value of current state.
+# This may be "Undefined" if PLC$(PLC) has never been run since power up.
+# Note that "Mirror1" is a state, and does not refer to which actual
+# mirror is in place (that is held in RBV:MIRROR).  It means the first
+# possible mirror in the current hexapod, not M1 on the beamline.
+record(mbbi, "$(P)$(R):RBV:STATE") {
+  field(DESC, "Mirror Setup State")
+  field(SCAN, "Passive")
+  field(PINI, "NO")
+  field(INP,  "$(P)$(R):GET:STATE")
+  field(ZRST, "Undefined")
+  field(ZRVL, "0")
+  field(ZRSV, "MINOR")
+  field(ONST, "Mirror1")
+  field(ONVL, "1")
+  field(ONSV, "NO_ALARM")
+  field(TWST, "Mirror2")
+  field(TWVL, "2")
+  field(TWSV, "NO_ALARM")
+  field(THST, "Changing")
+  field(THVL, "3")
+  field(THSV, "NO_ALARM")
+  field(FRST, "Resetting")
+  field(FRVL, "4")
+  field(FRSV, "NO_ALARM")
+  field(FVST, "MirrorRef")
+  field(FVVL, "5")
+  field(FVSV, "NO_ALARM")
+}
+
+# Read current mirror PLC$(PLC) status from PMAC.
+# was: DTYP stream, INP "@changeHexapod.proto getIntVar(P$(PLC)08) $(PORT)"
+#   SCAN Passive, processed every 0.2 s by FAN:UPDATE. Now I/O Intr on
+#   the driver's medium loop (2 s); it processes when the value changes.
+#   PINI YES is part of that translation: the driver only calls back on
+#   a change, so without it a value that stays 0 would leave the record
+#   UDF, where the 0.2 s poll used to read it at once.
+#   SEQ:CONTINUE still processes it to refresh the status: that now
+#   reads the value the driver last polled, not the PMAC itself.
+record(ai, "$(P)$(R):GET:STATUS") {
+  field(DESC, "Read current status.")
+  field(DTYP, "asynInt32")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(INP,  "@asyn($(PORT),0)PMAC_VIM_P$(PLC)08")
+  field(FLNK,  "$(P)$(R):RBV:STATUS PP")
+  field(PREC, "0")
+}
+
+# Read back value of current PLC$(PLC) status.
+record(mbbi, "$(P)$(R):RBV:STATUS") {
+  field(DESC, "Mirror control status")
+  field(SCAN, "Passive")
+  field(PINI, "NO")
+  field(INP,  "$(P)$(R):GET:STATUS")
+  field(ZRST, "OK")
+  field(ZRVL, "0")
+  field(ZRSV, "NO_ALARM")
+  field(ONST, "Invalid")
+  field(ONVL, "1")
+  field(ONSV, "MINOR")
+  field(TWST, "Aborted")
+  field(TWVL, "2")
+  field(TWSV, "MINOR")
+}
+
+# This record establishes whether PLC $(PLC) is running or not by reading back
+# the value of M50$(PLC).
+# This info is already effectively retrieved as part of the pmacStatus template
+# but would need to introduce another macro to know which GeoBrick 
+# was involved to retrieve it and it is not in the form we want it.
+# This way we get back the answer in the form we want just knowing the port number we
+# need for everything else anyway.
+# The value is the same as displayed PLCs Disabled on the pmac status screen
+# 0 = Running     = not disabled = dark green
+# 1 = Not Running = disabled     = bright green
+#
+# was: DTYP stream, INP "@changeHexapod.proto getIntVar(M50$(PLC)) $(PORT)"
+#   SCAN Passive, processed every 0.2 s by FAN:UPDATE. Now I/O Intr on
+#   the driver's fast loop: BSY:CHECK must see the PLC running, so this
+#   flag needs the shortest poll the driver has.
+record(bi, "$(P)$(R):RBV:RUNFLAG") {
+  field(DESC, "Mirror PLC running.")
+  field(SCAN, "I/O Intr")
+  field(PINI, "NO")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0)PMAC_VIF_M50$(PLC)")
+  field(ZNAM, "Running")
+  field(ONAM, "Not running")
+}
+
+# The mirror the user wants to change to.
+# Setting this does not intiatiate the change, it just defines which mirror the
+# user wants.
+record(mbbo, "$(P)$(R):DMD:MIRROR") {
+  field(DESC, "Index no of mirror demanded by the user.")
+  field(SCAN, "Passive")
+  field(PINI, "NO")
+  field(DTYP, "Soft Channel")
+  field(ZRST, "None Selected")
+  field(ZRVL, "0")
+  field(ONST, "Mirror1 - $(M1NAME=Mirror1)")
+# field(ONVL, "1") - Not needed - this is set by index initialisation records.
+  field(ONSV, "NO_ALARM")
+  field(TWST, "Mirror2 - $(M2NAME=Mirror2)")
+# field(TWVL, "2") - Not needed - this is set by index initialisation records.
+  field(TWSV, "NO_ALARM")
+  field(THST, "MirrorRef - $(MREFNAME=Reference)")
+# field(THVL, "3") - Not needed - this is set by index initialisation records.
+  field(THSV, "NO_ALARM")
+  field(VAL,  "0")
+}
+
+# There is a deliberate break in the processing chain here.
+# Plan to put a go button on the GUI to write to the PROC field of this
+# record so the user has the chance to change their mind about which mirror
+# before commanding the change.
+record(seq, "$(P)$(R):SEQ:CHNG:MIRROR") {
+  field(DESC, "Change mirror.")
+  field(SCAN, "Passive")
+  field(DOL1, "1")
+  field(LNK1, "$(P)$(R):STS:INPROGRESS PP")
+  field(DOL2, "1")
+  field(LNK2, "$(P)$(R):CMD:MIRROR.PROC PP MS")
+}
+
+# Record to say whether EPICS is busy, but it is not a busy record per se.
+record(bi, "$(P)$(R):STS:INPROGRESS") {
+  field(DESC, "Change Mirror Sequences running.")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(ZNAM, "Not Running")
+  field(ONAM, "Running")
+  field(VAL, "0")
+}
+
+# Wanna set P1206 and run PLC12 - expansion set P$(PLC)06 and run PLC$(PLC).
+# This record constructs the command string to do this.
+# The stream device manual shows use of double quotes round the prinf format.
+# This does not work, it upsets the EPICS parser as they are already inside
+# double quotes.  Use single quotes instead.
+# Makesure the AA and BB val fields are set for the constant strings,
+# otherwise it gets upset by spaces and = if you use INPAA and INPBB.
+record(scalcout, "$(P)$(R):CMD:MIRROR") {
+  field(DESC, "Construct PMAC command")
+  field(CALC, "AA+PRINTF('%d',A)+BB")
+  field(AA,   "P$(PLC)06=")
+  field(INPA, "$(P)$(R):DMD:MIRROR")
+  field(BB,   " ENA PLC$(PLC)")
+  field(OUT,  "$(P)$(R):SET:MIRROR PP")
+}
+
+# Send the change command string to the GeoBrick.
+# was: DTYP stream, OUT "@changeHexapod.proto sendString $(PORT)"
+record(stringout, "$(P)$(R):SET:MIRROR") {
+  field(DESC, "Send cmd to change mirror")
+  field(SCAN, "Passive")
+  field(PINI, "NO")
+  field(DTYP, "asynOctetWrite")
+  field(OUT,  "@asyn($(PORT),0)PMAC_C_WRITE_CMD")
+  field(FLNK, "$(P)$(R):BSY:SET")
+}
+
+# Set the busy record to start the wait for the PLC to complete.
+record(bo, "$(P)$(R):BSY:SET"){
+  field(SCAN, "Passive")
+  field(PINI, "NO")
+  field(VAL,  "1")
+  field(OUT, "$(P)$(R):BSY:CHANGING PP")
+}
+
+# Wait here (busy us up) until the check completes (PLC$(PLC) finishes).
+record(busy, "$(P)$(R):BSY:CHANGING") {
+  field(DESC, "PLC $(PLC) is busy.")
+  field(FLNK, "$(P)$(R):SEQ:CONTINUE")
+}
+
+# 
+# Record to change the state of the busy record to done (when PLC
+# complete.  The record has to use a CA link for the busy mechanism 
+# to work.  The calculations are done in other records or you can caput
+# if things have locked up.
+# 
+record(bo, "$(P)$(R):BSY:UNSET") {
+  field(DESC, "Frees up busy.")
+  field(SCAN, "Passive")
+  field(OMSL, "supervisory")
+  field(PINI, "NO")
+  field(VAL, "0")
+  field(OUT, "$(P)$(R):BSY:CHANGING CA")
+}
+
+#
+# See if the PLC$(PLC) is still running.  
+#
+# REMEMBER: The RUNFLAG is inverted to what you might expect, 0 = Running, 1 = Not Running.
+# Therefore A=0 is testing for Running and will result in true or 1 when Running and false or 0 when Not Running.
+# Thus the output will only happen when transition from Running to Not Running.
+#
+# WARNING: Be very careful about the capitalisation of the values in
+# the OOPT field.  They do not seem to be documented correctly in at
+# least some versions of the EPICS record reference manual.
+#
+# WARNING: This relies on EPICS having seen the RUNFLAG having changed as 
+# a result of the PLC starting.  The original PLC was very fast and when upgrading
+# EPICS dependencies suddenly found that it started and finished so quickly that
+# it beat the status polling and the runflag never registered as running.  
+# Have therefore introduced significant delays into the PLC to allow EPICS RUNFLAG 
+# to catch up and make this logic work.
+#
+# The logic is easier to understand using OCAL. The OVAL value is a 1 flag to write to the 
+# PROC field of another record.  The VAL field is the result of the logic acted on as in OOPT.
+#
+record(calcout, "$(P)$(R):BSY:CHECK") {
+  field(CALC, "A=0")
+  field(INPA, "$(P)$(R):RBV:RUNFLAG CP")
+  field(OUT, "$(P)$(R):BSY:UNSET.PROC PP")
+  field(OOPT, "Transition To Zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "1")
+}
+
+# Continue with the job after PLC$(PLC) completes.
+# Force the status to be updated without waiting for poll.
+# Check the status.
+record(seq, "$(P)$(R):SEQ:CONTINUE") {
+  field(DESC, "After the PLC has run.")
+  field(SCAN, "Passive")
+  field(DOL1, "1")
+  field(LNK1, "$(P)$(R):GET:STATUS.PROC PP")
+  field(DOL2, "1")
+  field(DLY2, "10")
+  field(LNK2, "$(P)$(R):STS:GOOD PP")
+  field(DOL3, "1")
+  field(LNK3, "$(P)$(R):STS:BAD PP")
+}
+
+# Check the status from the PLC$(PLC) run and set the limits and the demand if good.
+record(calcout, "$(P)$(R):STS:GOOD") {
+  field(DESC, "Act on good status")
+  field(SCAN, "Passive")
+  field(CALC, "A")
+  field(INPA, "$(P)$(R):RBV:STATUS")
+  field(OUT,  "$(P)$(R):FAN:CHNG:LIMS.PROC PP")
+  field(OOPT, "When Zero")
+}
+
+# If the status is bad we have finished, so just change progress flag.
+record(calcout, "$(P)$(R):STS:BAD") {
+  field(DESC, "Act on bad status")
+  field(SCAN, "Passive")
+  field(CALC, "A")
+  field(INPA, "$(P)$(R):RBV:STATUS")
+  field(OUT,  "$(P)$(R):STS:RESET.PROC PP")  
+  field(OOPT, "When Non-zero")
+}
+
+# Reset the progress flag - EPICS has finished.
+record(ao, "$(P)$(R):STS:RESET") {
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(VAL,  "0")
+  field(OUT,  "$(P)$(R):STS:INPROGRESS PP") 
+}
+
+# Fanout the instruction to change the Y motor record ($(YMTR)) fields.
+record(fanout, "$(P)$(R):FAN:CHNG:LIMS") {
+  field(DESC, "Change motor limits.")
+  field(SCAN, "Passive")
+  field(LNK1, "$(P)$(R):CHNG:MLLM.PROC PP")
+  field(LNK2, "$(P)$(R):CHNG:MHLM.PROC PP")
+  field(LNK3, "$(P)$(R):CHNG:MDMD.PROC PP")
+  field(LNK4, "$(P)$(R):STS:RESET.PROC PP")
+}
+
+# Value of the soft high limit to use on the Y motor record when using Mirror1.
+record(ai, "$(P)$(R):PRM:M1HLM") {
+  field(DESC, "$(M1NAME="Mirror1") high limit")
+  field(PINI, "YES")
+  field(VAL, "$(M1HLM=45.0)")
+}
+
+# Value of the soft high limit to use on the Y motor record when using Mirror2.
+record(ai, "$(P)$(R):PRM:M2HLM") {
+  field(DESC, "$(M2NAME="Mirror2") high limit")
+  field(PINI, "YES")
+  field(VAL, "$(M2HLM=107.0)")
+}
+
+# Value of the soft high limit to use on the Y motor record when using MirrorRef.
+record(ai, "$(P)$(R):PRM:MREFHLM") {
+  field(DESC, "$(MREFNAME="Reference") high limit")
+  field(PINI, "YES")
+  field(VAL, "$(MREFHLM=76.0)")
+}
+
+# Value of the soft low limit to use on the Y motor record when using Mirror1.
+record(ai, "$(P)$(R):PRM:M1LLM") {
+  field(DESC, "$(M1NAME="Mirror1") low limit")
+  field(PINI, "YES")
+  field(VAL, "$(M1LLM=-45.0)")
+}
+
+# Value of the soft low limit to use on the Y motor record when using Mirror2.
+record(ai, "$(P)$(R):PRM:M2LLM") {
+  field(DESC, "$(M2NAME="Mirror2") low limit")
+  field(PINI, "YES")
+  field(VAL, "$(M2LLM=17.0)")
+}
+
+# Value of the soft low limit to use on the Y motor record when using MirrorRef.
+record(ai, "$(P)$(R):PRM:MREFLLM") {
+  field(DESC, "$(MREFNAME="Reference") low limit")
+  field(PINI, "YES")
+  field(VAL, "$(MREFLLM=-14.0)")
+}
+
+# Select and set the value of the Y motor record low limit based on the mirror number.
+record(calcout, "$(P)$(R):CHNG:MLLM") {
+  field(DESC, "Choose low limit")
+  field(CALC, "A=1?B:(A=2?C:(A=5?D:0))")
+  field(INPA, "$(P)$(R):RBV:STATE")
+  field(INPB, "$(P)$(R):PRM:M1LLM PP")
+  field(INPC, "$(P)$(R):PRM:M2LLM PP")
+  field(INPD, "$(P)$(R):PRM:MREFLLM PP")
+  field(OUT,  "$(YMTR).LLM")
+}
+
+# Select and set the value of the Y motor record high limit based on the mirror number.
+record(calcout, "$(P)$(R):CHNG:MHLM") {
+  field(DESC, "Choose high limit")
+  field(CALC, "A=1?B:(A=2?C:(A=5?D:0))")
+  field(INPA, "$(P)$(R):RBV:STATE")
+  field(INPB, "$(P)$(R):PRM:M1HLM PP")
+  field(INPC, "$(P)$(R):PRM:M2HLM PP")
+  field(INPD, "$(P)$(R):PRM:MREFHLM PP")
+  field(OUT,  "$(YMTR).HLM")
+}
+
+# Copy the readback position to the demand value on the Y motor record.
+# This is needed because the readback position that has just jumped and any
+# demand value that was stored was based on a previous readback position and
+# is now meaningless and might cause an unwanted move next time the record is
+# processed.  In newer versions of EPICS the motor record has a field to write
+# to to tell it to do this itself, however not yet ready, so just use calc
+# to do the job.
+record(calcout, "$(P)$(R):CHNG:MDMD") {
+  field(DESC, "Copy readback to demand.")
+  field(CALC, "A")
+  field(INPA, "$(YMTR).RBV")
+  field(OUT,  "$(YMTR).VAL")
+}

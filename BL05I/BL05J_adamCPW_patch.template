@@ -1,0 +1,28 @@
+# Patch implemented on 05/12/2017 by Linda P. for the Adams balance on J05.
+#
+# Fix the initialisation of the asyn record's IEOS and OEOS fields
+# (in and out end of message terminators for the communication protocol).
+# This record changes the string parsing and is used in combination with asynOctetSetInputEos/OutputEos() commands.
+#
+# % macro, P, Device PV prefix
+#
+# Original received string is 'G\r\n+  0.00 kg \n\r' or maybe 'G\r\n+ 55.5 kg \n\r'
+# NB there may be up to 2 spaces following the  '+' (or  '-') character. 
+# Here we substitute the first two spaces after the '+' with '0' (i.e. add leading zeros or possibly trailing)
+# We then substitute 'G\r\n' with spaces if it exists in the string
+# We now have something like '   +000.00 kg \n\r' or '   +055.50 kg \n\r' which works with SSCANF %f
+
+record(scalcout, "$(P):CLC:GROSSWEIGHT") 
+{
+field(CALC, "SSCANF(AA{' ','0'}{' ','0'}{'G\r\n','   '},'%f')")
+}
+
+record(scalcout, "$(P):CLC:NETWEIGHT") 
+{
+field(CALC, "SSCANF(AA{' ','0'}{' ','0'}{'N\r\n','   '},'%f')")
+}
+
+record(scalcout, "$(P):CLC:TAREWEIGHT") 
+{
+field(CALC, "SSCANF(AA{' ','0'}{' ','0'}{'T\r\n','   '},'%f')")
+}

@@ -1,0 +1,23 @@
+#
+# BL05I_mks937bGauge_pressureOverride.template for BL05I module.
+#
+# Override template for mks937b Gauge
+# Use this template AFTER mks937bGauge.template in spreadsheet or substitution file.
+# This database must be loaded after the IOC database, e.g. BL05I-VA-IOC-03.db
+#
+# There is no analogue input :PLOG record so we get P directly from the appropriate gauge.
+#
+# Substitutions:
+# % macro, GAUGE, The gauge name
+# % macro, IMG, The corresponding Cold Cathode Gauge
+# % macro, PIRG, The corresponding Pirani Gauge
+#
+# ******************************************************************************
+record(calc, "$(GAUGE):P") {
+  field(CALC, "C=1?B:A")
+  field(INPA, "$(PIRG):P PP MS")
+  field(INPB, "$(IMG):P PP MS")
+  field(INPC, "$(IMG):ISENABLED PP")
+}
+# ******************************************************************************
+
