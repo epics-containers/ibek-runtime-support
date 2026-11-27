@@ -1,0 +1,87 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/pvi/releases/latest/download/pvi.device.schema.json
+# Grouped from the DLS EDM screen FluxCalcs.edl (femto 4-10-1).
+# First generated from that screen by builder2ibek tools/pvi-from-edm for
+# ibek-support-dls; maintained by hand here.
+
+label: FluxCalcs
+children:
+- type: Group
+  name: Details
+  layout:
+    type: Grid
+    labelled: true
+  children:
+  - type: SignalR
+    name: Flux
+    label: Photon Flux
+    read_pv: $(P)$(R):FLUX
+    read_widget:
+      type: TextRead
+  - type: SignalR
+    name: Responsivity
+    label: Responsivity
+    read_pv: $(P)$(R):RESPONSIVITY
+    read_widget:
+      type: TextRead
+  - type: SignalR
+    name: Fcurr
+    label: Diode Current
+    read_pv: $(P)$(R):FCURR
+    read_widget:
+      type: TextRead
+  - type: Group
+    name: Coefficients
+    label: Coefficients
+    layout:
+      type: SubScreen
+      labelled: false
+    children:
+    - type: Group
+      name: ResponsivityFittingCoefficients
+      label: Responsivity Fitting Coefficients
+      layout:
+        type: Grid
+        labelled: true
+      children:
+      - type: SignalW
+        name: B0
+        label: B0
+        write_pv: $(P)$(R):B0
+        write_widget:
+          type: TextWrite
+      - type: SignalW
+        name: B1
+        label: B1
+        write_pv: $(P)$(R):B1
+        write_widget:
+          type: TextWrite
+      - type: SignalW
+        name: B2
+        label: B2
+        write_pv: $(P)$(R):B2
+        write_widget:
+          type: TextWrite
+      - type: SignalW
+        name: B3
+        label: B3
+        write_pv: $(P)$(R):B3
+        write_widget:
+          type: TextWrite
+      - type: SignalW
+        name: B4
+        label: B4
+        write_pv: $(P)$(R):B4
+        write_widget:
+          type: TextWrite
+      - type: SignalW
+        name: B5
+        label: B5
+        write_pv: $(P)$(R):B5
+        write_widget:
+          type: TextWrite
+      - type: SignalW
+        name: B6
+        label: B6
+        write_pv: $(P)$(R):B6
+        write_widget:
+          type: TextWrite

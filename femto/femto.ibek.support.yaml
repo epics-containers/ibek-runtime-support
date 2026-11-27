@@ -1,0 +1,693 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/4.10.0/ibek.support.schema.json
+
+# Imported from DLS production support module: femto 4-10-1
+# Source: /dls_sw/prod/R3.14.12.7/support/femto/4-10-1/db
+# (controls/support/femto on DLS GitLab, tag 4-10-1).
+# Pristine copies of ten of the release's compiled templates. They are the
+# VisualDCT output of femtoApp/Db/*.vdb, already expanded, so they are plain
+# msi templates. Releases 4-9 and 4-10 have the same db/ folder.
+#
+# These ten use only these records: ai, ao, bi, bo, mbbo and stringout from
+# EPICS base, and transform from calc. So they run on any generic IOC image
+# that builds calc, such as ioc-generic and ioc-streamdevice-runtime.
+#
+# FluxCalcs.template is NOT pristine: the release's version calls two aSub
+# routines compiled into the femto library (fluxCalculation and
+# bcoeffCompile in femtoApp/src/asubFunctions.c). Here they are replaced by
+# calcout and calc records that compute the same values with the same
+# macros. The comments in FluxCalcs.template trace each record back to the C.
+#
+# The gain, AC/DC and overload bits (bo, and bi in femto_overload) default
+# to DTYP Hy8001, as in the release: the device support of a VME digital I/O
+# card, which no Linux generic IOC builds. A Linux IOC sets DTYP to
+# "Soft Channel" and links the bits to the PVs of its remote I/O.
+#
+# The entity models and their parameters are those of femto in
+# ibek-support-dls, which follow the classes of the release's etc/builder.py,
+# so existing ioc.yaml files validate unchanged.
+#
+# Not in this pattern:
+# - FemtoCurrent: an aSub on the femto library; no IOC uses it.
+# - FemtoFix.template: builder.py has no class for it.
+# - generic_BPM_diag: the generic pattern in this library owns it.
+#
+# To check for updates: diff the templates against the newest
+# /dls_sw/prod/R3.14.12.7/support/femto/ release's db/ folder.
+
+module: femto
+
+entity_models:
+  - name: femto_overload
+    description: |-
+      Add Overload signal to femtoX00 template (not recommended as it may
+          introduce ground loops
+    parameters:
+      P:
+        type: str
+        description: |-
+          PV Prefix
+      Q:
+        type: str
+        description: |-
+          PV Suffix
+        default: ""
+      DTYP:
+        type: str
+        description: |-
+          DTYP of bo records, e.g. Hy8001 or Soft Channel
+        default: Hy8001
+      INPOL:
+        type: str
+        description: |-
+          Input link for Overload bit, e.g. <RIOPV> PP
+        default: "#C$(COL=) S$(SOL=) @"
+      COL:
+        type: int
+        description: |-
+          Card for Overload bit, e.g. 70
+      SOL:
+        type: int
+        description: |-
+          Signal for Overload bit, e.g. 36
+
+    databases:
+      - file: femto_overload.template
+        args:
+          .*:
+
+  - name: femto_scale
+    description: |-
+      Input scaling for remote IO ADCs
+    parameters:
+      P:
+        type: str
+        description: |-
+          PV Prefix
+      Q:
+        type: str
+        description: |-
+          PV Suffix, should probably end in :I
+      DESC:
+        type: str
+        description: |-
+          Description
+      INP:
+        type: str
+        description: |-
+          Input link of record, e.g. @asyn(ADC1 0) GENDATA or "<rio-pv-name> PP"
+      EGU:
+        type: str
+        description: |-
+          Engineering units
+      ESLO:
+        type: str
+        description: |-
+          scaling factor
+      EOFF:
+        type: str
+        description: |-
+          offset
+      PREC:
+        type: str
+        description: |-
+          Precision
+      ADEL:
+        type: float
+        description: |-
+          Alarm deadband
+        default: 0.002
+
+    databases:
+      - file: femto_scale.template
+        args:
+          .*:
+
+  - name: femto_ai
+    description: |-
+      Analogue input with the right gda tags to add it to a femto object
+    parameters:
+      P:
+        type: str
+        description: |-
+          PV Prefix
+      Q:
+        type: str
+        description: |-
+          PV Suffix, should probably end in :I
+      DESC:
+        type: str
+        description: |-
+          Description
+      DTYPE:
+        type: str
+        description: |-
+          DTYP of record, e.g. asynInt32
+      INP:
+        type: str
+        description: |-
+          Input link of record, e.g. @asyn(ADC1 0) GENDATA
+      EGU:
+        type: str
+        description: |-
+          Engineering units
+      EGUF:
+        type: float
+        description: |-
+          EGUs full scale
+      EGUL:
+        type: float
+        description: |-
+          EGUs low scale
+      SCAN:
+        type: str
+        description: |-
+          Scan rate
+      PREC:
+        type: int
+        description: |-
+          Precision
+      HOPR:
+        type: float
+        description: |-
+          Optional.  High operating range.  Defaults to EGUF.
+        default: "{{EGUF}}"
+      LOPR:
+        type: float
+        description: |-
+          Optional.  Low operating range.   Defaults to EGUL.
+        default: "{{EGUL}}"
+      ADEL:
+        type: float
+        description: |-
+          Optional.  Archiver deadband.     Defaults to 0.002.
+        default: 0.002
+    databases:
+      - file: femto_ai.template
+        args:
+          .*:
+
+  - name: femto300
+    description: |-
+      Femto DDPCA-300 support. Optionally use femto_overload
+    parameters:
+      P:
+        type: str
+        description: |-
+          PV Prefix
+      Q:
+        type: str
+        description: |-
+          PV Suffix
+      INITGAIN:
+        type: float
+        description: |-
+          Initial gain value, e.g. 0
+      DTYP:
+        type: str
+        description: |-
+          DTYP of bo records, e.g. Hy8001 or Soft Channel
+        default: Hy8001
+      OUTGB0:
+        type: str
+        description: |-
+          Output link for gain bit 0, e.g. <RIOPV> PP
+        default: "#C$(CGB0=) S$(SGB0=) @"
+      CGB0:
+        type: int
+        description: |-
+          Card for gain bit 0, e.g. 70
+      SGB0:
+        type: int
+        description: |-
+          Signal for gain bit 0, e.g. 32
+      OUTGB1:
+        type: str
+        description: |-
+          Output link for gain bit 1, e.g. <RIOPV> PP
+        default: "#C$(CGB1=) S$(SGB1=) @"
+      CGB1:
+        type: int
+        description: |-
+          Card for gain bit 1, e.g. 70
+      SGB1:
+        type: int
+        description: |-
+          Signal for gain bit 1, e.g. 33
+      OUTGB2:
+        type: str
+        description: |-
+          Output link for gain bit 2, e.g. <RIOPV> PP
+        default: "#C$(CGB2=) S$(SGB2=) @"
+      CGB2:
+        type: int
+        description: |-
+          Card for gain bit 2, e.g. 70
+      SGB2:
+        type: int
+        description: |-
+          Signal for gain bit 2, e.g. 34
+      OUTGB3:
+        type: str
+        description: |-
+          Output link for gain bit 3, e.g. <RIOPV> PP
+        default: "#C$(CGB3=) S$(SGB3=) @"
+      CGB3:
+        type: int
+        description: |-
+          Card for gain bit 3, e.g. 70
+      SGB3:
+        type: int
+        description: |-
+          Signal for gain bit 3, e.g. 35
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+
+    databases:
+      - file: femto300.template
+        args:
+          .*:
+
+    pvi:
+      yaml_path: femto300.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+      pv_prefix: "$(P)$(Q):"
+
+  - name: FluxCalcs
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      P:
+        type: str
+        description: |-
+          prefix
+      R:
+        type: str
+        description: |-
+          suffix
+      GAINSETTING:
+        type: str
+        description: |-
+          PV from femto e.g. BL11I-DI-IONC-05:PHD1:GAIN
+      VOLTAGE:
+        type: str
+        description: |-
+          PV from femto ADC e.g. BL11I-DI-IONC-05:PHD1:I
+      ENERGY:
+        type: str
+        description: |-
+          pv from DCM in keV e.g. BL11I-OP-DCM-01:ENERGY.RBV
+      VAL0:
+        type: str
+        description: |-
+          b0 intercept
+      VAL1:
+        type: str
+        description: |-
+          b1 coefficient
+      VAL2:
+        type: str
+        description: |-
+          b2 coefficient
+      VAL3:
+        type: str
+        description: |-
+          b3 coefficient
+      VAL4:
+        type: str
+        description: |-
+          b4 coefficient
+      VAL5:
+        type: str
+        description: |-
+          b5 coefficient
+      VAL6:
+        type: str
+        description: |-
+          b6 coefficient
+      name:
+        type: id
+        description: |-
+          name for gui element
+      label:
+        type: str
+        description: |-
+          label for gui element
+
+    databases:
+      - file: FluxCalcs.template
+        args:
+          .*:
+
+    pvi:
+      yaml_path: FluxCalcs.pvi.device.yaml
+      ui_macros:
+        P:
+        R:
+      pv_prefix: "$(P)$(R):"
+
+  - name: simulation_femto
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      P:
+        type: str
+        description: |-
+          PV Prefix
+      Q:
+        type: str
+        description: |-
+          PV Suffix
+      INITGAIN:
+        type: float
+        description: |-
+          Initial gain value, e.g. 0
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+
+    databases:
+      - file: simulation_femto.template
+        args:
+          .*:
+
+    pvi:
+      yaml_path: simulation_femto.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+      pv_prefix: "$(P)$(Q):"
+
+  - name: femto_acdc200
+    description: |-
+      Add AC/DC signal to femto200 template
+    parameters:
+      P:
+        type: str
+        description: |-
+          PV Prefix
+      Q:
+        type: str
+        description: |-
+          PV Suffix
+        default: ""
+      DTYP:
+        type: str
+        description: |-
+          DTYP of bo records, e.g. Hy8001 or Soft Channel
+        default: Hy8001
+      OUTAC:
+        type: str
+        description: |-
+          Output link for AC/DC coupling bit, e.g. <RIOPV> PP
+        default: "#C$(CAC=) S$(SAC=) @"
+      CAC:
+        type: int
+        description: |-
+          Card for AC/DC coupling bit, e.g. 70
+      SAC:
+        type: int
+        description: |-
+          Signal for AC/DC coupling bit, e.g. 35
+
+    databases:
+      - file: femto_acdc200.template
+        args:
+          .*:
+
+  - name: simulation_femto_ai
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      P:
+        type: str
+        description: |-
+          PV Prefix
+      Q:
+        type: str
+        description: |-
+          PV Suffix, should probably end in :I
+      DESC:
+        type: str
+        description: |-
+          Description
+      EGU:
+        type: str
+        description: |-
+          Engineering units
+      EGUF:
+        type: float
+        description: |-
+          EGUs full scale
+      EGUL:
+        type: float
+        description: |-
+          EGUs low scale
+      PREC:
+        type: int
+        description: |-
+          Precision
+      HOPR:
+        type: float
+        description: |-
+          Optional.  High operating range.  Defaults to EGUF.
+        default: "{{EGUF}}"
+      LOPR:
+        type: float
+        description: |-
+          Optional.  Low operating range.   Defaults to EGUL.
+        default: "{{EGUL}}"
+
+    databases:
+      - file: simulation_femto_ai.template
+        args:
+          .*:
+
+  - name: femto200
+    description: |-
+      Femto DLPCA-200 support. Optionally use femto_acdc200 and femto_overload
+    parameters:
+      P:
+        type: str
+        description: |-
+          PV Prefix
+      Q:
+        type: str
+        description: |-
+          PV Suffix
+        default: ""
+      INITGAIN:
+        type: float
+        description: |-
+          Initial gain value, e.g. 0
+      DTYP:
+        type: str
+        description: |-
+          DTYP of bo records, e.g. Hy8001 or Soft Channel
+        default: Hy8001
+      OUTGB0:
+        type: str
+        description: |-
+          Output link for gain bit 0, e.g. <RIOPV> PP
+        default: "#C$(CGB0=) S$(SGB0=) @"
+      CGB0:
+        type: int
+        description: |-
+          Card for gain bit 0, e.g. 70
+        default: 0
+      SGB0:
+        type: int
+        description: |-
+          Signal for gain bit 0, e.g. 32
+        default: 0
+      OUTGB1:
+        type: str
+        description: |-
+          Output link for gain bit 1, e.g. <RIOPV> PP
+        default: "#C$(CGB1=) S$(SGB1=) @"
+      CGB1:
+        type: int
+        description: |-
+          Card for gain bit 1, e.g. 70
+        default: 0
+      SGB1:
+        type: int
+        description: |-
+          Signal for gain bit 1, e.g. 33
+        default: 0
+      OUTGB2:
+        type: str
+        description: |-
+          Output link for gain bit 2, e.g. <RIOPV> PP
+        default: "#C$(CGB2=) S$(SGB2=) @"
+      CGB2:
+        type: int
+        description: |-
+          Card for gain bit 2, e.g. 70
+        default: 0
+      SGB2:
+        type: int
+        description: |-
+          Signal for gain bit 2, e.g. 34
+        default: 0
+      OUTHIS:
+        type: str
+        description: |-
+          Output link for High speed/Low noise bit, e.g. <RIOPV> PP
+        default: "#C$(CHIS=) S$(SHIS=) @"
+      CHIS:
+        type: int
+        description: |-
+          Card for High speed/Low noise bit, e.g. 70
+        default: 0
+      SHIS:
+        type: int
+        description: |-
+          Signal for High speed/Low noise bit, e.g. 36
+        default: 0
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+
+    databases:
+      - file: femto200.template
+        args:
+          .*:
+
+    pvi:
+      yaml_path: femto200.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+      pv_prefix: "$(P)$(Q):"
+
+  - name: femto_acdc100
+    description: |-
+      Add AC/DC signal to femto100 template
+    parameters:
+      P:
+        type: str
+        description: |-
+          PV Prefix
+      Q:
+        type: str
+        description: |-
+          PV Suffix
+      DTYP:
+        type: str
+        description: |-
+          DTYP of bo records, e.g. Hy8001 or Soft Channel
+        default: Hy8001
+      OUTAC:
+        type: str
+        description: |-
+          Output link for AC/DC coupling bit, e.g. <RIOPV> PP
+        default: "#C$(CAC=) S$(SAC=) @"
+      CAC:
+        type: int
+        description: |-
+          Card for AC/DC coupling bit, e.g. 70
+      SAC:
+        type: int
+        description: |-
+          Signal for AC/DC coupling bit, e.g. 35
+
+    databases:
+      - file: femto_acdc100.template
+        args:
+          .*:
+
+  - name: femto100
+    description: |-
+      Femto DHPCA-100 support. Optionally use femto_acdc100 and femto_overload
+    parameters:
+      P:
+        type: str
+        description: |-
+          PV Prefix
+      Q:
+        type: str
+        description: |-
+          PV Suffix
+      INITGAIN:
+        type: float
+        description: |-
+          Initial gain value, e.g. 0
+      DTYP:
+        type: str
+        description: |-
+          DTYP of bo records, e.g. Hy8001 or Soft Channel
+        default: Hy8001
+      OUTGB0:
+        type: str
+        description: |-
+          Output link for gain bit 0, e.g. <RIOPV> PP
+        default: "#C$(CGB0=) S$(SGB0=) @"
+      CGB0:
+        type: int
+        description: |-
+          Card for gain bit 0, e.g. 70
+      SGB0:
+        type: int
+        description: |-
+          Signal for gain bit 0, e.g. 32
+      OUTGB1:
+        type: str
+        description: |-
+          Output link for gain bit 1, e.g. <RIOPV> PP
+        default: "#C$(CGB1=) S$(SGB1=) @"
+      CGB1:
+        type: int
+        description: |-
+          Card for gain bit 1, e.g. 70
+      SGB1:
+        type: int
+        description: |-
+          Signal for gain bit 1, e.g. 33
+      OUTGB2:
+        type: str
+        description: |-
+          Output link for gain bit 2, e.g. <RIOPV> PP
+        default: "#C$(CGB2=) S$(SGB2=) @"
+      CGB2:
+        type: int
+        description: |-
+          Card for gain bit 2, e.g. 70
+      SGB2:
+        type: int
+        description: |-
+          Signal for gain bit 2, e.g. 34
+      OUTHIS:
+        type: str
+        description: |-
+          Output link for High speed/Low noise bit, e.g. <RIOPV> PP
+        default: "#C$(CHIS=) S$(SHIS=) @"
+      CHIS:
+        type: int
+        description: |-
+          Card for High speed/Low noise bit, e.g. 70
+      SHIS:
+        type: int
+        description: |-
+          Signal for High speed/Low noise bit, e.g. 36
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+
+    databases:
+      - file: femto100.template
+        args:
+          .*:
+
+    pvi:
+      yaml_path: femto100.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+      pv_prefix: "$(P)$(Q):"

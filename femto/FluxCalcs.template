@@ -1,0 +1,133 @@
+# % macro, P, prefix
+# % macro, R, suffix
+# % macro, GAINSETTING, PV from femto e.g. BL11I-DI-IONC-05:PHD1:GAIN
+# % macro, VOLTAGE, PV from femto ADC e.g. BL11I-DI-IONC-05:PHD1:I
+# % macro, ENERGY, pv from DCM in keV e.g. BL11I-OP-DCM-01:ENERGY.RBV
+# % macro, name, name for gui element
+# % macro, label, label for gui element
+# % macro, VAL0, b0 intercept
+# % macro, VAL1, b1 coefficient
+# % macro, VAL2, b2 coefficient
+# % macro, VAL3, b3 coefficient
+# % macro, VAL4, b4 coefficient
+# % macro, VAL5, b5 coefficient
+# % macro, VAL6, b6 coefficient
+
+# % gui, $(name), edmembed, FluxCalcs.edl, P=$(P),R=$(R),label=$(label)
+
+# Translated from femto 4-10-1 db/FluxCalcs.template, which computes these
+# PVs in the aSub routines fluxCalculation and bcoeffCompile of
+# femtoApp/src/asubFunctions.c, compiled into the femto library. Here plain
+# EPICS base records compute the same values, so the template loads in any
+# IOC. The macros and the PVs that FluxCalcs.edl shows (FLUX, RESPONSIVITY,
+# FCURR and B0..B6) are unchanged. Gone: BCALC (the bcoeffCompile aSub) and
+# BCOEFF (the waveform it filled, read only by FCALC).
+#
+# Processing: a change of VOLTAGE, GAINSETTING or ENERGY processes FCALC,
+# which writes FCURR, which forward-links RESPONSIVITY, which forward-links
+# FLUX. A change of a coefficient B0..B6 processes RESPONSIVITY, then FLUX.
+# RESPONSIVITY and FLUX read the energy from FCALC.C, the value FCALC read,
+# so one pass uses one energy, as the aSub did with its single input C.
+
+# fluxCalculation(), first step: Current = femtoCurrent(gainSetting,
+# adcVoltage), which divides the voltage by femtoGain[gainSetting] and gives
+# 0 for a setting outside the table's 14 entries. femtoGain is
+# {1e3 .. 1e9} for settings 0..6, then {1e5 .. 1e11} for settings 7..13:
+# 10^(B+3) for B<7 and 10^(B-2) above. The aSub was FCALC too (VAL 0, with
+# outputs to FLUX, FCURR and RESPONSIVITY); this calcout's VAL is the
+# current. PINI: the aSub ran at startup, forward-linked from BCALC's PINI.
+record(calcout, "$(P)$(R):FCALC")
+{
+    field(DESC, "Femto current from ADC voltage")
+    field(PINI, "YES")
+    field(INPA, "$(VOLTAGE) CP")
+    field(INPB, "$(GAINSETTING) CP")
+    field(INPC, "$(ENERGY) CP")
+    field(CALC, "B>=0&&B<14?A/10^(B<7?B+3:B-2):0")
+    field(OUT,  "$(P)$(R):FCURR PP")
+    field(PREC, "3")
+    field(EGU, "A")
+}
+
+# fluxCalculation() output B, Current. FLNK added to drive the chain.
+record(ao, "$(P)$(R):FCURR")
+{
+    field(DESC, "Femto Current")
+    field(PREC, "3")
+    field(EGU, "A")
+    field(FLNK, "$(P)$(R):RESPONSIVITY")
+}
+
+# fluxCalculation() output C, Responsivity = responsivity(energy, bcoeff, 7):
+# the sum over i = 0..6 of bcoeff[i] * pow(energy, i), with energy in keV.
+# bcoeffCompile() only copied B0..B6 into bcoeff[0..6], so they are read
+# here directly. The sum runs in the C function's order with the same pow(),
+# so it gives the same double. Was an ao written by the aSub.
+record(calc, "$(P)$(R):RESPONSIVITY")
+{
+    field(DESC, "Diode responsivity")
+    field(INPA, "$(P)$(R):FCALC.C")
+    field(INPB, "$(P)$(R):B0 CP")
+    field(INPC, "$(P)$(R):B1 CP")
+    field(INPD, "$(P)$(R):B2 CP")
+    field(INPE, "$(P)$(R):B3 CP")
+    field(INPF, "$(P)$(R):B4 CP")
+    field(INPG, "$(P)$(R):B5 CP")
+    field(INPH, "$(P)$(R):B6 CP")
+    field(CALC, "B+C*A+D*A^2+E*A^3+F*A^4+G*A^5+H*A^6")
+    field(PREC, 3)
+    field(EGU, "A/W")
+    field(FLNK, "$(P)$(R):FLUX")
+}
+
+# fluxCalculation() output A, Photonrate: with eCharge = 1.60217657e-19 and
+# Denominator = 1000.0 * eCharge * energy * Responsivity, it is 0 when
+# Denominator is 0, else Current / Denominator, and 0 if that is negative.
+# The product is taken in the same order as the C. Was an ao written by the
+# aSub.
+#% archiver 10 Monitor
+record(calc, "$(P)$(R):FLUX")
+{
+    field(DESC, "photon flux")
+    field(INPA, "$(P)$(R):FCURR")
+    field(INPB, "$(P)$(R):FCALC.C")
+    field(INPC, "$(P)$(R):RESPONSIVITY")
+    field(CALC, "D:=1000*1.60217657E-19*B*C;D=0?0:MAX(A/D,0)")
+    field(PREC, "2")
+    field(EGU, "Photons/s")
+}
+
+record(ai, "$(P)$(R):B0") {
+  field(VAL, "$(VAL0)")
+  field(PINI, "YES")
+}
+
+record(ai, "$(P)$(R):B1") {
+  field(VAL, "$(VAL1)")
+  field(PINI, "YES")
+}
+
+record(ai, "$(P)$(R):B2") {
+  field(VAL, "$(VAL2)")
+  field(PINI, "YES")
+}
+
+record(ai, "$(P)$(R):B3") {
+  field(VAL, "$(VAL3)")
+  field(PINI, "YES")
+}
+
+record(ai, "$(P)$(R):B4") {
+  field(VAL, "$(VAL4)")
+  field(PINI, "YES")
+}
+
+record(ai, "$(P)$(R):B5") {
+  field(VAL, "$(VAL5)")
+  field(PINI, "YES")
+}
+
+record(ai, "$(P)$(R):B6") {
+  field(VAL, "$(VAL6)")
+  field(PINI, "YES")
+}
