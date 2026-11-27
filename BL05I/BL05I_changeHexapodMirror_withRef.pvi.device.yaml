@@ -1,0 +1,294 @@
+label: BL05I_changeHexapodMirror_withRef
+children:
+  - type: Group
+    name: Bl05IChangeHexapodMirrorWithRef
+    label: BL05I_changeHexapodMirror_withRef
+    layout:
+      type: Grid
+      labelled: true
+      stacked: false
+    children:
+      - type: SignalX
+        name: SetAbort
+        label: Send abort cmd
+        write_pv: $(P)$(R):SET:ABORT
+        write_widget:
+          type: ButtonPanel
+          actions:
+            Go: '1'
+        value: '1'
+
+      - type: SignalX
+        name: DmdAbort
+        label: Send abort cmd
+        write_pv: $(P)$(R):DMD:ABORT
+        write_widget:
+          type: ButtonPanel
+          actions:
+            Go: '1'
+        value: '1'
+
+      - type: SignalR
+        name: RbvM1Index
+        label: Read $(M1NAME) index from PMAC
+        read_pv: $(P)$(R):RBV:M1INDEX
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: RbvM2Index
+        label: Read $(M2NAME) index from PMAC
+        read_pv: $(P)$(R):RBV:M2INDEX
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: RbvMrefindex
+        label: Read $(MREFNAME) index from PMAC
+        read_pv: $(P)$(R):RBV:MREFINDEX
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: GetMirror
+        label: Index no of mirror demanded by the user.
+        write_pv: $(P)$(R):DMD:MIRROR
+        write_widget:
+          type: ComboBox
+        read_pv: $(P)$(R):GET:MIRROR
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: RbvMirror
+        label: Send cmd to change mirror
+        write_pv: $(P)$(R):SET:MIRROR
+        write_widget:
+          type: TextWrite
+          format: string
+        read_pv: $(P)$(R):RBV:MIRROR
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: GetState
+        label: Read current mirror state.
+        read_pv: $(P)$(R):GET:STATE
+        read_widget:
+          type: TextRead
+
+      - type: SignalX
+        name: SeqChngMirror
+        label: Change mirror.
+        write_pv: $(P)$(R):SEQ:CHNG:MIRROR.PROC
+        write_widget:
+          type: ButtonPanel
+          actions:
+            Go: '1'
+        value: '1'
+
+      - type: SignalR
+        name: RbvState
+        label: Mirror Setup State
+        read_pv: $(P)$(R):RBV:STATE
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: GetStatus
+        label: Read current status.
+        read_pv: $(P)$(R):GET:STATUS
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: RbvStatus
+        label: Mirror control status
+        read_pv: $(P)$(R):RBV:STATUS
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: RbvRunflag
+        label: Mirror PLC running.
+        read_pv: $(P)$(R):RBV:RUNFLAG
+        read_widget:
+          type: LED
+
+      - type: SignalR
+        name: StsInprogress
+        label: Change Mirror Sequences running.
+        read_pv: $(P)$(R):STS:INPROGRESS
+        read_widget:
+          type: LED
+
+      - type: SignalX
+        name: BsySet
+        label: BSY:SET
+        write_pv: $(P)$(R):BSY:SET
+        write_widget:
+          type: ButtonPanel
+          actions:
+            Go: '1'
+        value: '1'
+
+      - type: SignalW
+        name: BsyChanging
+        label: PLC $(PLC) is busy.
+        write_pv: $(P)$(R):BSY:CHANGING
+        write_widget:
+          type: ToggleButton
+
+      - type: SignalX
+        name: BsyUnset
+        label: Frees up busy.
+        write_pv: $(P)$(R):BSY:UNSET
+        write_widget:
+          type: ButtonPanel
+          actions:
+            Go: '1'
+        value: '1'
+
+      - type: SignalRW
+        name: StsReset
+        label: STS:RESET
+        write_pv: $(P)$(R):STS:RESET
+        write_widget:
+          type: TextWrite
+        read_pv: $(P)$(R):STS:RESET
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: PrmM1Hlm
+        label: $(M1NAME) high limit
+        read_pv: $(P)$(R):PRM:M1HLM
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: PrmM2Hlm
+        label: $(M2NAME) high limit
+        read_pv: $(P)$(R):PRM:M2HLM
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: PrmMrefhlm
+        label: $(MREFNAME) high limit
+        read_pv: $(P)$(R):PRM:MREFHLM
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: PrmM1Llm
+        label: $(M1NAME) low limit
+        read_pv: $(P)$(R):PRM:M1LLM
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: PrmM2Llm
+        label: $(M2NAME) low limit
+        read_pv: $(P)$(R):PRM:M2LLM
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: PrmMrefllm
+        label: $(MREFNAME) low limit
+        read_pv: $(P)$(R):PRM:MREFLLM
+        read_widget:
+          type: TextRead
+
+  - type: Group
+    name: Internal
+    label: Internal
+    layout:
+      type: SubScreen
+      labelled: true
+      stacked: false
+    children:
+      - type: SignalR
+        name: DfanM1Index
+        label: Fanout M1 index value.
+        read_pv: $(P)$(R):DFAN:M1INDEX
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: DfanM2Index
+        label: Fanout M2 index value.
+        read_pv: $(P)$(R):DFAN:M2INDEX
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: DfanMrefindex
+        label: Fanout MRef index value.
+        read_pv: $(P)$(R):DFAN:MREFINDEX
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: CmdMirror
+        label: Construct PMAC command
+        read_pv: $(P)$(R):CMD:MIRROR
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: BsyCheck
+        label: BSY:CHECK
+        read_pv: $(P)$(R):BSY:CHECK
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: SeqContinue
+        label: After the PLC has run.
+        read_pv: $(P)$(R):SEQ:CONTINUE
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: StsGood
+        label: Act on good status
+        read_pv: $(P)$(R):STS:GOOD
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: StsBad
+        label: Act on bad status
+        read_pv: $(P)$(R):STS:BAD
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: FanChngLims
+        label: Change motor limits.
+        read_pv: $(P)$(R):FAN:CHNG:LIMS
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: ChngMllm
+        label: Choose low limit
+        read_pv: $(P)$(R):CHNG:MLLM
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: ChngMhlm
+        label: Choose high limit
+        read_pv: $(P)$(R):CHNG:MHLM
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: ChngMdmd
+        label: Copy readback to demand.
+        read_pv: $(P)$(R):CHNG:MDMD
+        read_widget:
+          type: TextRead

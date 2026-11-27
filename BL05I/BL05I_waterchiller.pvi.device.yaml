@@ -1,0 +1,1309 @@
+label: BL05I_waterchiller
+children:
+  - type: Group
+    name: Bl05IWaterchiller
+    label: BL05I_waterchiller
+    layout:
+      type: Grid
+      labelled: true
+      stacked: false
+    children:
+      - type: SignalRW
+        name: Sysplcname
+        label: Name of water chiller PLC
+        write_pv: $(P)$(R):SYSPLCNAME
+        write_widget:
+          type: TextWrite
+          format: string
+        read_pv: $(P)$(R):SYSPLCNAME
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: Sysplcdesc
+        label: Description of water system
+        write_pv: $(P)$(R):SYSPLCDESC
+        write_widget:
+          type: TextWrite
+          format: string
+        read_pv: $(P)$(R):SYSPLCDESC
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: P1PressureRbv
+        label: Pressure 1
+        read_pv: $(P1NAME):PRESSURE:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: P2PressureRbv
+        label: Pressure 2
+        read_pv: $(P2NAME):PRESSURE:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: F1FlowRbv
+        label: Flow 1
+        read_pv: $(F1NAME):FLOW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: F2FlowRbv
+        label: Flow 2
+        read_pv: $(F2NAME):FLOW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: T1TempRbv
+        label: Temperature 1
+        read_pv: $(T1NAME):TEMP:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: T2TempRbv
+        label: Temperature 2
+        read_pv: $(T2NAME):TEMP:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: T3TempRbv
+        label: Temperature 3
+        read_pv: $(T3NAME):TEMP:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: T4TempRbv
+        label: Temperature 4
+        read_pv: $(T4NAME):TEMP:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: T5TempRbv
+        label: Temperature 5
+        read_pv: $(T5NAME):TEMP:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: T6TempRbv
+        label: Temperature 6
+        read_pv: $(T6NAME):TEMP:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: P1PressureHihiRbv
+        label: Pressure 1 HIHI demand.
+        write_pv: $(P1NAME):PRESSURE:HIHI:DMD
+        write_widget:
+          type: TextWrite
+        read_pv: $(P1NAME):PRESSURE:HIHI:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: P2PressureHihiRbv
+        label: Pressure 2 HIHI demand.
+        write_pv: $(P2NAME):PRESSURE:HIHI:DMD
+        write_widget:
+          type: TextWrite
+        read_pv: $(P2NAME):PRESSURE:HIHI:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: F1FlowHihiRbv
+        label: Flow 1 HIHI demand.
+        write_pv: $(F1NAME):FLOW:HIHI:DMD
+        write_widget:
+          type: TextWrite
+        read_pv: $(F1NAME):FLOW:HIHI:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: F2FlowHihiRbv
+        label: Flow 2 HIHI demand.
+        write_pv: $(F2NAME):FLOW:HIHI:DMD
+        write_widget:
+          type: TextWrite
+        read_pv: $(F2NAME):FLOW:HIHI:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: T1TempHihiRbv
+        label: Temp 1 HIHI demand.
+        write_pv: $(T1NAME):TEMP:HIHI:DMD
+        write_widget:
+          type: TextWrite
+        read_pv: $(T1NAME):TEMP:HIHI:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: T2TempHihiRbv
+        label: Temp 2 HIHI demand.
+        write_pv: $(T2NAME):TEMP:HIHI:DMD
+        write_widget:
+          type: TextWrite
+        read_pv: $(T2NAME):TEMP:HIHI:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: T3TempHihiRbv
+        label: Temp 3 HIHI demand.
+        write_pv: $(T3NAME):TEMP:HIHI:DMD
+        write_widget:
+          type: TextWrite
+        read_pv: $(T3NAME):TEMP:HIHI:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: T4TempHihiRbv
+        label: Temp 4 HIHI demand.
+        write_pv: $(T4NAME):TEMP:HIHI:DMD
+        write_widget:
+          type: TextWrite
+        read_pv: $(T4NAME):TEMP:HIHI:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: T5TempHihiRbv
+        label: Temp 5 HIHI demand.
+        write_pv: $(T5NAME):TEMP:HIHI:DMD
+        write_widget:
+          type: TextWrite
+        read_pv: $(T5NAME):TEMP:HIHI:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: T6TempHihiRbv
+        label: Temp 6 HIHI demand.
+        write_pv: $(T6NAME):TEMP:HIHI:DMD
+        write_widget:
+          type: TextWrite
+        read_pv: $(T6NAME):TEMP:HIHI:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: P1PhihirawSet
+        label: Pressure 1 HIHI control.
+        write_pv: $(PLCNAME):P1:PHIHIRAW:SET
+        write_widget:
+          type: TextWrite
+        read_pv: $(PLCNAME):P1:PHIHIRAW:SET
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: P2PhihirawSet
+        label: Pressure 2 HIHI control.
+        write_pv: $(PLCNAME):P2:PHIHIRAW:SET
+        write_widget:
+          type: TextWrite
+        read_pv: $(PLCNAME):P2:PHIHIRAW:SET
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: F1FhihirawSet
+        label: Flow 1 HIHI control.
+        write_pv: $(PLCNAME):F1:FHIHIRAW:SET
+        write_widget:
+          type: TextWrite
+        read_pv: $(PLCNAME):F1:FHIHIRAW:SET
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: F2FhihirawSet
+        label: Flow 2 HIHI control.
+        write_pv: $(PLCNAME):F2:FHIHIRAW:SET
+        write_widget:
+          type: TextWrite
+        read_pv: $(PLCNAME):F2:FHIHIRAW:SET
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: T1ThihirawSet
+        label: Temperature 1 HIHI control.
+        write_pv: $(PLCNAME):T1:THIHIRAW:SET
+        write_widget:
+          type: TextWrite
+        read_pv: $(PLCNAME):T1:THIHIRAW:SET
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: T2ThihirawSet
+        label: Temperature 2 HIHI control.
+        write_pv: $(PLCNAME):T2:THIHIRAW:SET
+        write_widget:
+          type: TextWrite
+        read_pv: $(PLCNAME):T2:THIHIRAW:SET
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: T3ThihirawSet
+        label: Temperature 3 HIHI control.
+        write_pv: $(PLCNAME):T3:THIHIRAW:SET
+        write_widget:
+          type: TextWrite
+        read_pv: $(PLCNAME):T3:THIHIRAW:SET
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: T4ThihirawSet
+        label: Temperature 4 HIHI control.
+        write_pv: $(PLCNAME):T4:THIHIRAW:SET
+        write_widget:
+          type: TextWrite
+        read_pv: $(PLCNAME):T4:THIHIRAW:SET
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: T5ThihirawSet
+        label: Temperature 5 HIHI control.
+        write_pv: $(PLCNAME):T5:THIHIRAW:SET
+        write_widget:
+          type: TextWrite
+        read_pv: $(PLCNAME):T5:THIHIRAW:SET
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: T6ThihirawSet
+        label: Temperature 6 HIHI control.
+        write_pv: $(PLCNAME):T6:THIHIRAW:SET
+        write_widget:
+          type: TextWrite
+        read_pv: $(PLCNAME):T6:THIHIRAW:SET
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: P1Ispresent
+        label: Pressure Sensor 1 present
+        read_pv: $(PLCNAME):P1:ISPRESENT
+        read_widget:
+          type: LED
+
+      - type: SignalR
+        name: P2Ispresent
+        label: Pressure Sensor 2 present
+        read_pv: $(PLCNAME):P2:ISPRESENT
+        read_widget:
+          type: LED
+
+      - type: SignalR
+        name: F1Ispresent
+        label: Flow meter 1 present
+        read_pv: $(PLCNAME):F1:ISPRESENT
+        read_widget:
+          type: LED
+
+      - type: SignalR
+        name: F2Ispresent
+        label: Flow meter 2 present
+        read_pv: $(PLCNAME):F2:ISPRESENT
+        read_widget:
+          type: LED
+
+      - type: SignalR
+        name: T1Ispresent
+        label: Temp Sensor 1 present
+        read_pv: $(PLCNAME):T1:ISPRESENT
+        read_widget:
+          type: LED
+
+      - type: SignalR
+        name: T2Ispresent
+        label: Temp Sensor 2 present
+        read_pv: $(PLCNAME):T2:ISPRESENT
+        read_widget:
+          type: LED
+
+      - type: SignalR
+        name: T3Ispresent
+        label: Temp Sensor 3 present
+        read_pv: $(PLCNAME):T3:ISPRESENT
+        read_widget:
+          type: LED
+
+      - type: SignalR
+        name: T4Ispresent
+        label: Temp Sensor 4 present
+        read_pv: $(PLCNAME):T4:ISPRESENT
+        read_widget:
+          type: LED
+
+      - type: SignalR
+        name: T5Ispresent
+        label: Temp Sensor 5 present
+        read_pv: $(PLCNAME):T5:ISPRESENT
+        read_widget:
+          type: LED
+
+      - type: SignalR
+        name: T6Ispresent
+        label: Temp Sensor 6 present
+        read_pv: $(PLCNAME):T6:ISPRESENT
+        read_widget:
+          type: LED
+
+      - type: SignalR
+        name: PftMaxtemp
+        label: Current high temp reading.
+        read_pv: $(PLCNAME):PFT:MAXTEMP
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: PftTempsevr
+        label: Device temperature severity.
+        write_pv: $(PLCNAME):PFT:TEMPSEVR
+        write_widget:
+          type: ComboBox
+        read_pv: $(PLCNAME):PFT:TEMPSEVR
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: Maxtemp
+        label: Combined temp and severity.
+        read_pv: $(P)$(R):MAXTEMP
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: P1Label
+        label: Label for Press Sensor 1
+        read_pv: $(PLCNAME):P1:LABEL
+        read_widget:
+          type: TextRead
+          format: string
+
+      - type: SignalR
+        name: P2Label
+        label: Label for Press Sensor 2
+        read_pv: $(PLCNAME):P2:LABEL
+        read_widget:
+          type: TextRead
+          format: string
+
+      - type: SignalR
+        name: F1Label
+        label: Label for Flow Sensor 1
+        read_pv: $(PLCNAME):F1:LABEL
+        read_widget:
+          type: TextRead
+          format: string
+
+      - type: SignalR
+        name: F2Label
+        label: Label for Flow Sensor 2
+        read_pv: $(PLCNAME):F2:LABEL
+        read_widget:
+          type: TextRead
+          format: string
+
+      - type: SignalR
+        name: T1Label
+        label: Label/descr for Temp Sensor 1
+        read_pv: $(PLCNAME):T1:LABEL
+        read_widget:
+          type: TextRead
+          format: string
+
+      - type: SignalR
+        name: T2Label
+        label: Label for Temp Sensor 2
+        read_pv: $(PLCNAME):T2:LABEL
+        read_widget:
+          type: TextRead
+          format: string
+
+      - type: SignalR
+        name: T3Label
+        label: Label/descr for Temp Sensor 3
+        read_pv: $(PLCNAME):T3:LABEL
+        read_widget:
+          type: TextRead
+          format: string
+
+      - type: SignalR
+        name: T4Label
+        label: Label for Temp Sensor 4
+        read_pv: $(PLCNAME):T4:LABEL
+        read_widget:
+          type: TextRead
+          format: string
+
+      - type: SignalR
+        name: T5Label
+        label: Label/descr for Temp Sensor 5
+        read_pv: $(PLCNAME):T5:LABEL
+        read_widget:
+          type: TextRead
+          format: string
+
+      - type: SignalR
+        name: T6Label
+        label: Label for Temp Sensor 6
+        read_pv: $(PLCNAME):T6:LABEL
+        read_widget:
+          type: TextRead
+          format: string
+
+      - type: SignalRW
+        name: V1DemandRbv
+        label: Valve 1 demand user demand.
+        write_pv: $(V1NAME):DEMAND:DMD
+        write_widget:
+          type: TextWrite
+        read_pv: $(V1NAME):DEMAND:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: V1PidPRbv
+        label: Valve 1 PID P param control
+        write_pv: $(V1NAME):PID:P:SET
+        write_widget:
+          type: TextWrite
+        read_pv: $(V1NAME):PID:P:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: V1PidIRbv
+        label: Valve 1 PID I param control
+        write_pv: $(V1NAME):PID:I:SET
+        write_widget:
+          type: TextWrite
+        read_pv: $(V1NAME):PID:I:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: V1PidDRbv
+        label: Valve 1 PID D param control
+        write_pv: $(V1NAME):PID:D:SET
+        write_widget:
+          type: TextWrite
+        read_pv: $(V1NAME):PID:D:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: V1PidTcRbv
+        label: Valve 1 PID time cst control
+        write_pv: $(V1NAME):PID:TC:SET
+        write_widget:
+          type: TextWrite
+        read_pv: $(V1NAME):PID:TC:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: V1PidTfRbv
+        label: Valve 1 PID Filter time ctrl
+        write_pv: $(V1NAME):PID:TF:SET
+        write_widget:
+          type: TextWrite
+        read_pv: $(V1NAME):PID:TF:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: V2DemandRbv
+        label: Valve 2 demand user demand.
+        write_pv: $(V2NAME):DEMAND:DMD
+        write_widget:
+          type: TextWrite
+        read_pv: $(V2NAME):DEMAND:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: V2PidPRbv
+        label: Valve 2 PID P param control.
+        write_pv: $(V2NAME):PID:P:SET
+        write_widget:
+          type: TextWrite
+        read_pv: $(V2NAME):PID:P:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: V2PidIRbv
+        label: Valve 2 PID I param control.
+        write_pv: $(V2NAME):PID:I:SET
+        write_widget:
+          type: TextWrite
+        read_pv: $(V2NAME):PID:I:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: V2PidDRbv
+        label: Valve 2 PID D param control.
+        write_pv: $(V2NAME):PID:D:SET
+        write_widget:
+          type: TextWrite
+        read_pv: $(V2NAME):PID:D:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: V2PidTcRbv
+        label: Valve 2 PID time cst control
+        write_pv: $(V2NAME):PID:TC:SET
+        write_widget:
+          type: TextWrite
+        read_pv: $(V2NAME):PID:TC:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: V2PidTfRbv
+        label: Valve 2 PID Filter time ctrl
+        write_pv: $(V2NAME):PID:TF:SET
+        write_widget:
+          type: TextWrite
+        read_pv: $(V2NAME):PID:TF:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: V1DrawSet
+        label: Valve 1 Demand control.
+        write_pv: $(PLCNAME):V1:DRAW:SET
+        write_widget:
+          type: TextWrite
+        read_pv: $(PLCNAME):V1:DRAW:SET
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: V1PidTcDmd
+        label: Valve 1 PID time cst demand
+        write_pv: $(V1NAME):PID:TC:DMD
+        write_widget:
+          type: TextWrite
+        read_pv: $(V1NAME):PID:TC:DMD
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: V1PidTfDmd
+        label: Valve1 PID Filter time demand
+        write_pv: $(V1NAME):PID:TF:DMD
+        write_widget:
+          type: TextWrite
+        read_pv: $(V1NAME):PID:TF:DMD
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: V2DrawSet
+        label: Valve 2 Demand control.
+        write_pv: $(PLCNAME):V2:DRAW:SET
+        write_widget:
+          type: TextWrite
+        read_pv: $(PLCNAME):V2:DRAW:SET
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: V2PidTcDmd
+        label: Valve 2 PID time cst demand
+        write_pv: $(V2NAME):PID:TC:DMD
+        write_widget:
+          type: TextWrite
+        read_pv: $(V2NAME):PID:TC:DMD
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: V2PidTfDmd
+        label: Valve2 PID Filter time demand
+        write_pv: $(V2NAME):PID:TF:DMD
+        write_widget:
+          type: TextWrite
+        read_pv: $(V2NAME):PID:TF:DMD
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: V1Ispresent
+        label: Valve 1 present
+        read_pv: $(PLCNAME):V1:ISPRESENT
+        read_widget:
+          type: LED
+
+      - type: SignalR
+        name: V2Ispresent
+        label: Valve 2 present
+        read_pv: $(PLCNAME):V2:ISPRESENT
+        read_widget:
+          type: LED
+
+      - type: SignalR
+        name: V1Label
+        label: Label/descr for Valve 1
+        read_pv: $(PLCNAME):V1:LABEL
+        read_widget:
+          type: TextRead
+          format: string
+
+      - type: SignalR
+        name: V2Label
+        label: Label/descr for Valve 2
+        read_pv: $(PLCNAME):V2:LABEL
+        read_widget:
+          type: TextRead
+          format: string
+
+      - type: SignalRW
+        name: V1PidStateRbv
+        label: Valve 1 PID Ena/Disa Control
+        write_pv: $(V1NAME):PID:STATE:SET
+        write_widget:
+          type: ComboBox
+        read_pv: $(V1NAME):PID:STATE:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: V2PidStateRbv
+        label: Valve 2 PID Ena/Disa Control
+        write_pv: $(V2NAME):PID:STATE:SET
+        write_widget:
+          type: ComboBox
+        read_pv: $(V2NAME):PID:STATE:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: TrbnpStateRbv
+        label: Water turbine control.
+        write_pv: $(WPNAME):STATE:SET
+        write_widget:
+          type: ComboBox
+        read_pv: $(WPNAME):STATE:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: TrbnpIlkstaRbv
+        label: Water turbine pump ILK status
+        read_pv: $(WPNAME):ILKSTA:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: UvstlStateRbv
+        label: UV Steriliser Control
+        write_pv: $(UVNAME):STATE:SET
+        write_widget:
+          type: ComboBox
+        read_pv: $(UVNAME):STATE:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: UvstlIlkstaRbv
+        label: UV Steriliser interlock status
+        read_pv: $(UVNAME):ILKSTA:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: TrbnpLabel
+        label: Labelfor water pump
+        read_pv: $(PLCNAME):TRBNP:LABEL
+        read_widget:
+          type: TextRead
+          format: string
+
+      - type: SignalR
+        name: UvstlLabel
+        label: Label for UV Steriliser
+        read_pv: $(PLCNAME):UVSTL:LABEL
+        read_widget:
+          type: TextRead
+          format: string
+
+  - type: Group
+    name: Comms
+    label: Comms
+    layout:
+      type: Grid
+      labelled: true
+      stacked: false
+    children:
+      - type: SignalR
+        name: Asyn
+        label: ASYN
+        read_pv: $(PLCNAME):ASYN
+        read_widget:
+          type: TextRead
+
+      - type: SignalRW
+        name: Disable
+        label: Disable comms
+        write_pv: $(P)$(R):DISABLE
+        write_widget:
+          type: ToggleButton
+        read_pv: $(P)$(R):DISABLE
+        read_widget:
+          type: LED
+
+  - type: Group
+    name: Internal
+    label: Internal
+    layout:
+      type: SubScreen
+      labelled: true
+      stacked: false
+    children:
+      - type: SignalR
+        name: FanScan1
+        label: Scan fanout
+        read_pv: $(PLCNAME):FAN:SCAN1
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: FanScan2
+        label: Stats scan fanout
+        read_pv: $(PLCNAME):FAN:SCAN2
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: ReadPft
+        label: Press, flow, temp, 0210-0219
+        read_pv: $(PLCNAME):READ:PFT
+        read_widget:
+          type: ArrayTrace
+          axis: x
+          width: 900
+          height: 500
+
+      - type: SignalR
+        name: ReadPfthihi
+        label: Press, flow, temp, 0110-0119
+        read_pv: $(PLCNAME):READ:PFTHIHI
+        read_widget:
+          type: ArrayTrace
+          axis: x
+          width: 900
+          height: 500
+
+      - type: SignalR
+        name: FanPft
+        label: Propagate press, flow, temp
+        read_pv: $(PLCNAME):FAN:PFT
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: FanTemps
+        label: Propagate temperatures
+        read_pv: $(PLCNAME):FAN:TEMPS
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: FanPfthihi
+        label: Propagate P,f,T setpoints
+        read_pv: $(PLCNAME):FAN:PFTHIHI
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: FanTemphihis
+        label: Propagate temp setpoints
+        read_pv: $(PLCNAME):FAN:TEMPHIHIS
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: P1PrawRbv
+        label: Press Sens 1 Raw value
+        read_pv: $(PLCNAME):P1:PRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: P2PrawRbv
+        label: Press Sens 2 Raw value
+        read_pv: $(PLCNAME):P2:PRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: F1FrawRbv
+        label: Flows Sens 1 Raw value
+        read_pv: $(PLCNAME):F1:FRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: F2FrawRbv
+        label: Flows Sens 2 Raw value
+        read_pv: $(PLCNAME):F2:FRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: T1TrawRbv
+        label: Temp Sens 1 Raw value
+        read_pv: $(PLCNAME):T1:TRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: T2TrawRbv
+        label: Temp Sens 2 Raw value
+        read_pv: $(PLCNAME):T2:TRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: T3TrawRbv
+        label: Temp Sens 3 Raw value
+        read_pv: $(PLCNAME):T3:TRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: T4TrawRbv
+        label: Temp Sens 4 Raw value
+        read_pv: $(PLCNAME):T4:TRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: T5TrawRbv
+        label: Temp Sens 5 Raw value
+        read_pv: $(PLCNAME):T5:TRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: T6TrawRbv
+        label: Temp Sens 6 Raw value
+        read_pv: $(PLCNAME):T6:TRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: P1PhihirawRbv
+        label: Press Sens 1 Raw HIHI value
+        read_pv: $(PLCNAME):P1:PHIHIRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: P2PhihirawRbv
+        label: Press Sens 2 Raw HIHI value
+        read_pv: $(PLCNAME):P2:PHIHIRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: F1FhihirawRbv
+        label: Flowmeter 1 Raw HIHI value
+        read_pv: $(PLCNAME):F1:FHIHIRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: F2FhihirawRbv
+        label: Flowmeter 2 Raw HIHI value
+        read_pv: $(PLCNAME):F2:FHIHIRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: T1ThihirawRbv
+        label: Temp Sens 1 Raw HIHI value
+        read_pv: $(PLCNAME):T1:THIHIRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: T2ThihirawRbv
+        label: Temp Sens 2 Raw HIHI value
+        read_pv: $(PLCNAME):T2:THIHIRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: T3ThihirawRbv
+        label: Temp Sens 3 Raw HIHI value
+        read_pv: $(PLCNAME):T3:THIHIRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: T4ThihirawRbv
+        label: Temp Sens 4 Raw HIHI value
+        read_pv: $(PLCNAME):T4:THIHIRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: T5ThihirawRbv
+        label: Temp Sens 5 Raw HIHI value
+        read_pv: $(PLCNAME):T5:THIHIRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: T6ThihirawRbv
+        label: Temp Sens 6 Raw HIHI value
+        read_pv: $(PLCNAME):T6:THIHIRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: DfanP1HihiRbv
+        label: Press 1 HIHI rbv propagation
+        read_pv: $(PLCNAME):DFAN:P1:HIHI:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: DfanP2HihiRbv
+        label: Press 2 HIHI rbv propagation
+        read_pv: $(PLCNAME):DFAN:P2:HIHI:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: DfanF1HihiRbv
+        label: Flow 1 HIHI rbv propagation
+        read_pv: $(PLCNAME):DFAN:F1:HIHI:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: DfanF2HihiRbv
+        label: Flow 2 HIHI rbv propagation
+        read_pv: $(PLCNAME):DFAN:F2:HIHI:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: DfanT1HihiRbv
+        label: Temp 1 HIHI rbv propagation
+        read_pv: $(PLCNAME):DFAN:T1:HIHI:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: DfanT2HihiRbv
+        label: Temp 2 HIHI rbv propagation
+        read_pv: $(PLCNAME):DFAN:T2:HIHI:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: DfanT3HihiRbv
+        label: Temp 3 HIHI rbv propagation
+        read_pv: $(PLCNAME):DFAN:T3:HIHI:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: DfanT4HihiRbv
+        label: Temp 4 HIHI rbv propagation
+        read_pv: $(PLCNAME):DFAN:T4:HIHI:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: DfanT5HihiRbv
+        label: Temp 5 HIHI rbv propagation
+        read_pv: $(PLCNAME):DFAN:T5:HIHI:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: DfanT6HihiRbv
+        label: Temp 6 HIHI rbv propagation
+        read_pv: $(PLCNAME):DFAN:T6:HIHI:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: TfmMaxtemp
+        label: Select max temp reading.
+        read_pv: $(PLCNAME):TFM:MAXTEMP
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: TfmTempsevr
+        label: Calculate combined temperature severity.
+        read_pv: $(PLCNAME):TFM:TEMPSEVR
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: ClcMaxts
+        label: Calc combined temp and sev
+        read_pv: $(PLCNAME):CLC:MAXTS
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: ReadV1
+        label: Read valve1 demand 0100-0105
+        read_pv: $(PLCNAME):READ:V1
+        read_widget:
+          type: ArrayTrace
+          axis: x
+          width: 900
+          height: 500
+
+      - type: SignalR
+        name: ReadV2
+        label: Read valve2 demand 0120-0125
+        read_pv: $(PLCNAME):READ:V2
+        read_widget:
+          type: ArrayTrace
+          axis: x
+          width: 900
+          height: 500
+
+      - type: SignalR
+        name: FanV1
+        label: Propagate V1 status
+        read_pv: $(PLCNAME):FAN:V1
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: FanV2
+        label: Propagate V2 status
+        read_pv: $(PLCNAME):FAN:V2
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: V1DrawRbv
+        label: Valve 1 Demand Raw value
+        read_pv: $(PLCNAME):V1:DRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: V1PidPrawRbv
+        label: Valve 1 PID P Raw value
+        read_pv: $(PLCNAME):V1:PID:PRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: V1PidIrawRbv
+        label: Valve 1 PID I Raw value
+        read_pv: $(PLCNAME):V1:PID:IRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: V1PidDrawRbv
+        label: Valve 1 PID D Raw value
+        read_pv: $(PLCNAME):V1:PID:DRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: V1PidTcrawRbv
+        label: Valve 1 PID Time Const Rval
+        read_pv: $(PLCNAME):V1:PID:TCRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: V1PidTfrawRbv
+        label: Valve 1 PID Filter Time Rval
+        read_pv: $(PLCNAME):V1:PID:TFRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: V2DrawRbv
+        label: Valve 1 Raw value
+        read_pv: $(PLCNAME):V2:DRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: V2PidPrawRbv
+        label: Valve 2 PID P Raw value
+        read_pv: $(PLCNAME):V2:PID:PRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: V2PidIrawRbv
+        label: Valve 2 PID I Raw value
+        read_pv: $(PLCNAME):V2:PID:IRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: V2PidDrawRbv
+        label: Valve 2 PID D Raw value
+        read_pv: $(PLCNAME):V2:PID:DRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: V2PidTcrawRbv
+        label: Valve 2 PID Time Const Rval
+        read_pv: $(PLCNAME):V2:PID:TCRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: V2PidTfrawRbv
+        label: Valve 2 PID Filter Time Rval
+        read_pv: $(PLCNAME):V2:PID:TFRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: ReadPid
+        label: Valve PID States 0030-0049
+        read_pv: $(PLCNAME):READ:PID
+        read_widget:
+          type: ArrayTrace
+          axis: x
+          width: 900
+          height: 500
+
+      - type: SignalR
+        name: FanPid
+        label: Propagate PID Enable status
+        read_pv: $(PLCNAME):FAN:PID
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: V1PidSrawRbv
+        label: Valve 1 Raw PID State
+        read_pv: $(PLCNAME):V1:PID:SRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: V2PidSrawRbv
+        label: Valve 2 Raw PID State
+        read_pv: $(PLCNAME):V2:PID:SRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: ReadWpuv
+        label: UVSteriliser, pump 0010-0028
+        read_pv: $(PLCNAME):READ:WPUV
+        read_widget:
+          type: ArrayTrace
+          axis: x
+          width: 900
+          height: 500
+
+      - type: SignalR
+        name: FanWpuv
+        label: Propagate pump/Ster. status
+        read_pv: $(PLCNAME):FAN:WPUV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: FanWp
+        label: Propagate water pump status
+        read_pv: $(PLCNAME):FAN:WP
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: FanUv
+        label: Propagate Steriliser status
+        read_pv: $(PLCNAME):FAN:UV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: TrbnpSrawRbv
+        label: Raw Water Turbine Pump State
+        read_pv: $(PLCNAME):TRBNP:SRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: TrbnpIlkstarawRbv
+        label: Raw Pump Interlock Status
+        read_pv: $(PLCNAME):TRBNP:ILKSTARAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: TrbnpIlksRbv
+        label: $(WPDESC) ILKs
+        read_pv: $(WPNAME):ILKS:RBV
+        read_widget:
+          type: ArrayTrace
+          axis: x
+          width: 900
+          height: 500
+
+      - type: SignalR
+        name: UvstlSrawRbv
+        label: Raw UV Steriliser State.
+        read_pv: $(PLCNAME):UVSTL:SRAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: UvstlIlkstarawRbv
+        label: Raw UV Steriliser ILK Status
+        read_pv: $(PLCNAME):UVSTL:ILKSTARAW:RBV
+        read_widget:
+          type: TextRead
+
+      - type: SignalR
+        name: UvstlIlksRbv
+        label: $(UVDESC) ILKs
+        read_pv: $(UVNAME):ILKS:RBV
+        read_widget:
+          type: ArrayTrace
+          axis: x
+          width: 900
+          height: 500
